@@ -1,0 +1,13 @@
+{
+  "name": "Minter Explorer Extender",
+  "debug": true,
+  "baseCoin": "BIP",
+  "database": {
+    "url": "postgres://postgres:postgres@localhost/postgres?sslmode=disable"
+  },
+  "minterApi": {
+    "isSecure": true,
+    "link": "127.0.0.1",
+    "port": "8841"
+  }
+}
