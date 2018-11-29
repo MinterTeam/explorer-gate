@@ -3,6 +3,7 @@ package minter_api
 import (
 	"bytes"
 	"encoding/json"
+	er "errors"
 	"github.com/daniildulin/explorer-gate/env"
 	"github.com/daniildulin/explorer-gate/errors"
 	"github.com/daniildulin/explorer-gate/models"
@@ -52,7 +53,7 @@ func (api *MinterApi) PushTransaction(tx string) (string, error) {
 	data := []byte(`{"transaction":"` + tx + `"}`)
 
 	for _, node := range api.nodes {
-		link := node.GetFullLink() + `/api/sendTransactionSync`
+		link := node.GetFullLink() + `/api/sendTransaction`
 		api.postJson(link, data, &response)
 
 		if response.Log == nil {
@@ -65,12 +66,39 @@ func (api *MinterApi) PushTransaction(tx string) (string, error) {
 	return ``, err
 }
 
+func (api *MinterApi) GetTransaction(hash string) (bool, error) {
+	var err error
+	response := TransactionResponse{}
+	api.checkNodes()
+
+	if api.GetActiveNodesCount() == 0 {
+		return false, errors.NewNodeError(`Nodes unavailable`, 0)
+	}
+
+	for _, node := range api.nodes {
+		link := node.GetFullLink() + `/api/transaction/` + hash
+
+		err := api.getJson(link, &response)
+
+		if err == nil {
+			return true, nil
+		}
+	}
+
+	return false, err
+}
+
 func (api *MinterApi) getJson(url string, target interface{}) error {
 	r, err := api.httpClient.Get(url)
 	if err != nil {
 		return err
 	}
 	defer r.Body.Close()
+
+	if r.StatusCode != http.StatusOK {
+		return er.New("response code is not 200")
+	}
+
 	return json.NewDecoder(r.Body).Decode(target)
 }
 

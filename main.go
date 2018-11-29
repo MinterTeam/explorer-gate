@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"fmt"
 	"github.com/daniildulin/explorer-gate/env"
@@ -11,6 +12,9 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
+	"github.com/tendermint/tendermint/libs/pubsub/query"
+	tmClient "github.com/tendermint/tendermint/rpc/client"
+	"log"
 	"net/http"
 	"os"
 	"time"
@@ -46,14 +50,30 @@ func main() {
 	helpers.CheckErr(err)
 	defer db.Close()
 	db.LogMode(config.GetBool(`debug`))
-	minterApi := minter_api.New(config, db, &http.Client{Timeout: 10 * time.Second})
-	gate := minter_gate.New(config, minterApi)
 
+	nodeRpc := tmClient.NewHTTP(`tcp://`+config.GetString(`minterApi.link`)+`:26657`, `/websocket`)
+	err = nodeRpc.Start()
+	if err != nil {
+		log.Println(err)
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	q := query.MustParse(`tm.event = 'Tx'`)
+	txs := make(chan interface{})
+	err = nodeRpc.Subscribe(ctx, "explorer-gate", q, txs)
+	if err != nil {
+		log.Println(err)
+	}
+
+	minterApi := minter_api.New(config, db, &http.Client{Timeout: 10 * time.Second})
+
+	gate := minter_gate.New(config, minterApi, txs)
+
+	//gin.SetMode(gin.ReleaseMode)
 	router := gin.Default()
 	router.Use(gin.Logger())
-	router.Use(gin.ErrorLogger()) // print all errors
-	router.Use(gin.Recovery())    // returns 500 on any code panics
-
+	router.Use(gin.ErrorLogger())   // print all errors
+	router.Use(gin.Recovery())      // returns 500 on any code panics
 	router.Use(apiMiddleware(gate)) // init global context
 
 	v1 := router.Group("/api/v1")

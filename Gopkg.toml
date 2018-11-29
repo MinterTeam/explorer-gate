@@ -29,6 +29,10 @@
   name = "github.com/spf13/viper"
   version = "1.2.1"
 
+[[constraint]]
+  name = "github.com/tendermint/tendermint"
+  version = "=v0.26.4"
+
 [prune]
   go-tests = true
   unused-packages = true

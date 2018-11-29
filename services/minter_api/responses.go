@@ -13,3 +13,7 @@ type SendTransactionResponse struct {
 type SendTransactionResult struct {
 	Hash string `json:"hash"`
 }
+
+type TransactionResponse struct {
+	Response
+}
