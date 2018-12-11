@@ -12,11 +12,15 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
+	"github.com/olebedev/emitter"
 	"github.com/tendermint/tendermint/libs/pubsub/query"
 	tmClient "github.com/tendermint/tendermint/rpc/client"
+	"github.com/tendermint/tendermint/types"
 	"log"
 	"net/http"
 	"os"
+	"regexp"
+	"strings"
 	"time"
 )
 
@@ -46,6 +50,8 @@ func main() {
 		os.Exit(0)
 	}
 
+	ee := &emitter.Emitter{}
+
 	db, err := gorm.Open("postgres", config.GetString(`database.url`))
 	helpers.CheckErr(err)
 	defer db.Close()
@@ -60,21 +66,22 @@ func main() {
 	defer cancel()
 	q := query.MustParse(`tm.event = 'Tx'`)
 	txs := make(chan interface{})
+
 	err = nodeRpc.Subscribe(ctx, "explorer-gate", q, txs)
 	if err != nil {
 		log.Println(err)
 	}
+	go txsStore(txs, ee)
 
 	minterApi := minter_api.New(config, db, &http.Client{Timeout: 10 * time.Second})
-
-	gate := minter_gate.New(config, minterApi, txs)
+	gate := minter_gate.New(config, minterApi, ee)
 
 	//gin.SetMode(gin.ReleaseMode)
 	router := gin.Default()
 	router.Use(gin.Logger())
-	router.Use(gin.ErrorLogger())   // print all errors
-	router.Use(gin.Recovery())      // returns 500 on any code panics
-	router.Use(apiMiddleware(gate)) // init global context
+	router.Use(gin.ErrorLogger())       // print all errors
+	router.Use(gin.Recovery())          // returns 500 on any code panics
+	router.Use(apiMiddleware(gate, ee)) // init global context
 
 	v1 := router.Group("/api/v1")
 
@@ -88,12 +95,20 @@ func main() {
 	})
 
 	router.Run(config.GetString(`gateApi.link`) + `:` + config.GetString(`gateApi.port`))
-
 }
 
-func apiMiddleware(gate *minter_gate.MinterGate) gin.HandlerFunc {
+func apiMiddleware(gate *minter_gate.MinterGate, ee *emitter.Emitter) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		c.Set("gate", gate)
+		c.Set("emitter", ee)
 		c.Next()
+	}
+}
+
+func txsStore(txs <-chan interface{}, emitter *emitter.Emitter) {
+	var re = regexp.MustCompile(`(?mi)^Tx\{(.*)\}`)
+	for e := range txs {
+		matches := re.FindStringSubmatch(e.(types.EventDataTx).Tx.String())
+		<-emitter.Emit(strings.ToUpper(matches[1]), matches[1])
 	}
 }

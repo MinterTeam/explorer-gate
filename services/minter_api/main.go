@@ -6,6 +6,7 @@ import (
 	er "errors"
 	"github.com/daniildulin/explorer-gate/env"
 	"github.com/daniildulin/explorer-gate/errors"
+	"github.com/daniildulin/explorer-gate/helpers"
 	"github.com/daniildulin/explorer-gate/models"
 	"github.com/jinzhu/gorm"
 	"math/big"
@@ -50,16 +51,15 @@ func (api *MinterApi) PushTransaction(tx string) (string, error) {
 		return ``, errors.NewNodeError(`Nodes unavailable`, 0)
 	}
 
-	data := []byte(`{"transaction":"` + tx + `"}`)
-
 	for _, node := range api.nodes {
-		link := node.GetFullLink() + `/api/sendTransaction`
-		api.postJson(link, data, &response)
+		link := node.GetFullLink() + `/send_transaction?tx=0x` + tx
+		err := api.getJson(link, &response)
+		helpers.CheckErr(err)
 
-		if response.Log == nil {
-			return response.Result.Hash, nil
-		} else {
-			err = getNodeErrorFromResponse(&response)
+		if response.Result != nil && response.Result.Code == 0 {
+			return `Mt` + strings.ToLower(response.Result.Hash), nil
+		} else if response.Error != nil || (response.Result != nil && response.Result.Code != 0) {
+			return ``, getNodeErrorFromResponse(&response)
 		}
 	}
 
@@ -127,17 +127,25 @@ func getNodeErrorFromResponse(r *SendTransactionResponse) error {
 
 	bip := big.NewFloat(0.000000000000000001)
 
-	switch r.Code {
-	case 107:
-		var re = regexp.MustCompile(`(?mi)^.*Wanted *(\d+) (\w+)`)
-		matches := re.FindStringSubmatch(*r.Log)
-		value, _, err := big.ParseFloat(matches[1], 10, 0, big.ToZero)
-		if err != nil {
-			return err
+	if r.Result != nil {
+		switch r.Result.Code {
+		case 107:
+			var re = regexp.MustCompile(`(?mi)^.*Wanted *(\d+) (\w+)`)
+			matches := re.FindStringSubmatch(r.Result.Log)
+			value, _, err := big.ParseFloat(matches[1], 10, 0, big.ToZero)
+			if err != nil {
+				return err
+			}
+			value = value.Mul(value, bip)
+			return errors.NewInsufficientFundsError(strings.Replace(r.Result.Log, matches[1], value.String(), -1), int32(r.Result.Code), value.String(), matches[2])
+		default:
+			return errors.NewNodeError(r.Result.Log, int32(r.Result.Code))
 		}
-		value = value.Mul(value, bip)
-		return errors.NewInsufficientFundsError(strings.Replace(*r.Log, matches[1], value.String(), -1), r.Code, value.String(), matches[2])
-	default:
-		return errors.NewNodeError(*r.Log, r.Code)
 	}
+
+	if r.Error != nil {
+		return errors.NewNodeError(r.Error.Data, r.Error.Code)
+	}
+
+	return errors.NewNodeError(`Unknown error`, -1)
 }

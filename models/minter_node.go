@@ -1,7 +1,7 @@
 package models
 
 import (
-	"strconv"
+	"fmt"
 	"time"
 )
 
@@ -28,6 +28,5 @@ func (node MinterNode) GetFullLink() string {
 	} else {
 		protocol += `://`
 	}
-
-	return protocol + node.Host + `:` + strconv.Itoa(int(node.Port))
+	return protocol + node.Host + `:` + fmt.Sprint(node.Port)
 }

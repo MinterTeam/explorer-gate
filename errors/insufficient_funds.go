@@ -2,12 +2,12 @@ package errors
 
 type InsufficientFundsError struct {
 	log   string
-	code  uint
+	code  int32
 	value string
 	coin  string
 }
 
-func NewInsufficientFundsError(text string, code uint, val string, coin string) error {
+func NewInsufficientFundsError(text string, code int32, val string, coin string) error {
 	return &InsufficientFundsError{text, code, val, coin}
 }
 
@@ -15,7 +15,7 @@ func (e *InsufficientFundsError) Error() string {
 	return e.log
 }
 
-func (e *InsufficientFundsError) Code() uint {
+func (e *InsufficientFundsError) Code() int32 {
 	return e.code
 }
 

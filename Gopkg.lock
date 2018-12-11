@@ -254,6 +254,14 @@
   version = "1.0.1"
 
 [[projects]]
+  branch = "master"
+  digest = "1:6d42480278e7719074c770605d8695d019fb28787242ca939ebee6a40088f075"
+  name = "github.com/olebedev/emitter"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "68bb25b251f61cde3824cc316f238f0da1704331"
+
+[[projects]]
   digest = "1:95741de3af260a92cc5c7f3f3061e85273f5a81b5db20d4bd68da74bd521675e"
   name = "github.com/pelletier/go-toml"
   packages = ["."]
@@ -466,19 +474,6 @@
   version = "v0.26.4"
 
 [[projects]]
-  digest = "1:5208518bcf8b7688259454837b4f94f239406cf703a838bb3bf9bd29c371cfd8"
-  name = "github.com/tendermint/tmlibs"
-  packages = [
-    "common",
-    "log",
-    "pubsub",
-    "pubsub/query",
-  ]
-  pruneopts = "UT"
-  revision = "692f1d86a6e2c0efa698fd1e4541b68c74ffaf38"
-  version = "v0.8.4"
-
-[[projects]]
   digest = "1:03aa6e485e528acb119fb32901cf99582c380225fc7d5a02758e08b180cb56c3"
   name = "github.com/ugorji/go"
   packages = ["codec"]
@@ -623,10 +618,11 @@
     "github.com/gin-gonic/gin",
     "github.com/jinzhu/gorm",
     "github.com/jinzhu/gorm/dialects/postgres",
+    "github.com/olebedev/emitter",
     "github.com/spf13/viper",
+    "github.com/tendermint/tendermint/libs/pubsub/query",
     "github.com/tendermint/tendermint/rpc/client",
     "github.com/tendermint/tendermint/types",
-    "github.com/tendermint/tmlibs/pubsub/query",
   ]
   solver-name = "gps-cdcl"
   solver-version = 1
