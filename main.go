@@ -7,7 +7,6 @@ import (
 	"github.com/daniildulin/explorer-gate/env"
 	"github.com/daniildulin/explorer-gate/handlers"
 	"github.com/daniildulin/explorer-gate/helpers"
-	"github.com/daniildulin/explorer-gate/services/minter_api"
 	"github.com/daniildulin/explorer-gate/services/minter_gate"
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
@@ -73,12 +72,13 @@ func main() {
 	}
 	go txsStore(txs, ee)
 
-	minterApi := minter_api.New(config, db, &http.Client{Timeout: 10 * time.Second})
-	gate := minter_gate.New(config, minterApi, ee)
+	gate := minter_gate.New(config, ee)
 
-	//gin.SetMode(gin.ReleaseMode)
 	router := gin.Default()
-	router.Use(gin.Logger())
+	if !config.GetBool(`debug`) {
+		gin.SetMode(gin.ReleaseMode)
+		router.Use(gin.Logger())
+	}
 	router.Use(gin.ErrorLogger())       // print all errors
 	router.Use(gin.Recovery())          // returns 500 on any code panics
 	router.Use(apiMiddleware(gate, ee)) // init global context
