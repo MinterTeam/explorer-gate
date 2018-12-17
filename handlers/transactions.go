@@ -71,7 +71,7 @@ func PushTransaction(c *gin.Context) {
 			})
 		}
 	} else {
-		for range ee.On(strings.ToUpper(tx.Transaction)) {
+		for range ee.On(strings.ToUpper(tx.Transaction), emitter.Once) {
 			c.JSON(http.StatusOK, gin.H{
 				"data": gin.H{
 					"hash": &hash,
