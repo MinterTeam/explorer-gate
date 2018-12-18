@@ -1,16 +1,16 @@
 package handlers
 
 import (
+	"github.com/daniildulin/explorer-gate/core"
 	"github.com/daniildulin/explorer-gate/errors"
 	"github.com/daniildulin/explorer-gate/helpers"
-	"github.com/daniildulin/explorer-gate/services/minter_gate"
 	"github.com/gin-gonic/gin"
 	"github.com/olebedev/emitter"
 	"net/http"
 	"strings"
 )
 
-func index(c *gin.Context) {
+func Index(c *gin.Context) {
 	c.JSON(200, gin.H{
 		"name":    "Minter Explorer Gate API",
 		"version": "0.1",
@@ -24,7 +24,7 @@ type PushTransactionRequest struct {
 func PushTransaction(c *gin.Context) {
 
 	var err error
-	gate, ok := c.MustGet("gate").(*minter_gate.MinterGate)
+	gate, ok := c.MustGet("gate").(*core.MinterGate)
 	helpers.CheckErrBool(ok)
 	ee, ok := c.MustGet("emitter").(*emitter.Emitter)
 	helpers.CheckErrBool(ok)
@@ -35,7 +35,7 @@ func PushTransaction(c *gin.Context) {
 		return
 	}
 
-	hash, err := gate.PushTransaction(tx.Transaction)
+	hash, err := gate.TxPush(tx.Transaction)
 
 	if err != nil {
 		switch e := err.(type) {

@@ -1,4 +1,4 @@
-package minter_gate
+package core
 
 import (
 	"github.com/daniildulin/explorer-gate/env"
@@ -33,7 +33,7 @@ func New(config env.Config, e *emitter.Emitter) *MinterGate {
 	}
 }
 
-func (mg MinterGate) PushTransaction(transaction string) (*string, error) {
+func (mg MinterGate) TxPush(transaction string) (*string, error) {
 	response, err := mg.api.PushTransaction(transaction)
 	if err != nil {
 		return nil, err

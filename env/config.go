@@ -20,8 +20,8 @@ type viperConfig struct {
 func (v *viperConfig) Init() {
 	viper.AutomaticEnv()
 
-	viper.AddConfigPath("/etc/minter/") // path to look for the config file in
 	viper.AddConfigPath(".")
+	viper.AddConfigPath("/etc/minter/") // path to look for the config file in
 
 	replacer := strings.NewReplacer(`.`, `_`)
 	viper.SetEnvKeyReplacer(replacer)

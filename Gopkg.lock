@@ -2,6 +2,14 @@
 
 
 [[projects]]
+  digest = "1:2e213cde20822574f3526dc3a2763387e8354ae465a520694976b3d262178320"
+  name = "github.com/Depado/ginprom"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "9c4f3ccb237f5caa42e502a3b7540083c5b0167e"
+  version = "v1.0.3"
+
+[[projects]]
   branch = "master"
   digest = "1:d6afaeed1502aa28e80a4ed0981d570ad91b2579193404256ce672ed0a609e0d"
   name = "github.com/beorn7/perks"
@@ -631,11 +639,14 @@
   analyzer-name = "dep"
   analyzer-version = 1
   input-imports = [
+    "github.com/Depado/ginprom",
     "github.com/daniildulin/minter-node-api",
+    "github.com/daniildulin/minter-node-api/responses",
     "github.com/gin-gonic/gin",
     "github.com/jinzhu/gorm",
     "github.com/jinzhu/gorm/dialects/postgres",
     "github.com/olebedev/emitter",
+    "github.com/prometheus/client_golang/prometheus/promhttp",
     "github.com/spf13/viper",
     "github.com/tendermint/tendermint/libs/pubsub/query",
     "github.com/tendermint/tendermint/rpc/client",

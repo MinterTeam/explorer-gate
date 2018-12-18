@@ -11,7 +11,7 @@ TimeoutStartSec=10
 Restart=always
 RestartSec=15s
 WorkingDirectory=/opt/minter
-ExecStart=/opt/minter/explorer_gate
+ExecStart=/opt/minter/gate
 
 User=minter
 Group=minter
