@@ -11,16 +11,14 @@ import (
 func EstimateTxCommission(c *gin.Context) {
 	gate, ok := c.MustGet("gate").(*core.MinterGate)
 	helpers.CheckErrBool(ok)
-
-	tx := c.Query(`transaction`)
-	price, err := gate.EstimateTxCommission(tx)
-
+	tx := `0x` + c.Query(`transaction`)
+	commission, err := gate.EstimateTxCommission(tx)
 	if err != nil {
 		errors.SetErrorResponse(err, c)
 	} else {
 		c.JSON(http.StatusOK, gin.H{
 			"data": gin.H{
-				"commission": &price,
+				"commission": &commission,
 			},
 		})
 	}
