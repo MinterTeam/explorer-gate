@@ -65,7 +65,7 @@ func PushTransaction(c *gin.Context) {
 		default:
 			c.JSON(http.StatusInternalServerError, gin.H{
 				"error": gin.H{
-					"code": 0,
+					"code": 1,
 					"log":  e.Error(),
 				},
 			})
