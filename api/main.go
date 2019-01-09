@@ -71,8 +71,14 @@ func SetupRouter(config env.Config) *gin.Engine {
 	router.Use(gin.Recovery())                 // returns 500 on any code panics
 	router.Use(apiMiddleware(gateService, ee)) // init global context
 
+	router.GET(`/`, handlers.Index)
+
 	v1 := router.Group("/api/v1")
 	{
+		v1.GET(`/estimate/tx-commission`, handlers.EstimateTxCommission)
+		v1.GET(`/estimate/coin-buy`, handlers.EstimateCoinBuy)
+		v1.GET(`/estimate/coin-sell`, handlers.EstimateCoinSell)
+
 		v1.POST("/transaction/push", handlers.PushTransaction)
 	}
 

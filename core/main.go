@@ -17,6 +17,11 @@ type MinterGate struct {
 	emitter *emitter.Emitter
 }
 
+type CoinEstimate struct {
+	Value      string
+	Commission string
+}
+
 func New(config env.Config, e *emitter.Emitter) *MinterGate {
 
 	apiLink := `http`
@@ -45,6 +50,30 @@ func (mg MinterGate) TxPush(transaction string) (*string, error) {
 
 	hash := `Mt` + strings.ToLower(response.Result.Hash)
 	return &hash, nil
+}
+
+func (mg *MinterGate) EstimateTxCommission(transaction string) (*string, error) {
+	response, err := mg.api.GetEstimateTx(transaction)
+	if err != nil {
+		return nil, err
+	}
+	return &response.Result.Commission, nil
+}
+
+func (mg *MinterGate) EstimateCoinBuy(coinToSell string, coinToBuy string, value string) (*CoinEstimate, error) {
+	response, err := mg.api.GetEstimateCoinBuy(coinToSell, coinToBuy, value)
+	if err != nil {
+		return nil, err
+	}
+	return &CoinEstimate{response.Result.WillPay, response.Result.Commission}, nil
+}
+
+func (mg *MinterGate) EstimateCoinSell(coinToSell string, coinToBuy string, value string) (*CoinEstimate, error) {
+	response, err := mg.api.GetEstimateCoinSell(coinToSell, coinToBuy, value)
+	if err != nil {
+		return nil, err
+	}
+	return &CoinEstimate{response.Result.WillGet, response.Result.Commission}, nil
 }
 
 func getNodeErrorFromResponse(r *responses.SendTransactionResponse) error {

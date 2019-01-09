@@ -13,7 +13,7 @@ import (
 func Index(c *gin.Context) {
 	c.JSON(200, gin.H{
 		"name":    "Minter Explorer Gate API",
-		"version": "0.1",
+		"version": "1.0",
 	})
 }
 
@@ -38,38 +38,7 @@ func PushTransaction(c *gin.Context) {
 	hash, err := gate.TxPush(tx.Transaction)
 
 	if err != nil {
-		switch e := err.(type) {
-		case *errors.NodeError:
-			c.JSON(http.StatusBadRequest, gin.H{
-				"error": gin.H{
-					"code": e.Code(),
-					"log":  e.Error(),
-				},
-			})
-		case *errors.NodeTimeOutError:
-			c.JSON(http.StatusRequestTimeout, gin.H{
-				"error": gin.H{
-					"code": e.Code(),
-					"log":  e.Error(),
-				},
-			})
-		case *errors.InsufficientFundsError:
-			c.JSON(http.StatusBadRequest, gin.H{
-				"error": gin.H{
-					"code":  e.Code(),
-					"log":   e.Error(),
-					"coin":  e.Coin(),
-					"value": e.Value(),
-				},
-			})
-		default:
-			c.JSON(http.StatusInternalServerError, gin.H{
-				"error": gin.H{
-					"code": 1,
-					"log":  e.Error(),
-				},
-			})
-		}
+		errors.SetErrorResponse(err, c)
 	} else {
 		for range ee.On(strings.ToUpper(tx.Transaction), emitter.Once) {
 			c.JSON(http.StatusOK, gin.H{
