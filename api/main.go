@@ -78,6 +78,7 @@ func SetupRouter(config env.Config) *gin.Engine {
 		v1.GET(`/estimate/tx-commission`, handlers.EstimateTxCommission)
 		v1.GET(`/estimate/coin-buy`, handlers.EstimateCoinBuy)
 		v1.GET(`/estimate/coin-sell`, handlers.EstimateCoinSell)
+		v1.GET(`/get-nonce/:address`, handlers.GetNonce)
 
 		v1.POST("/transaction/push", handlers.PushTransaction)
 	}

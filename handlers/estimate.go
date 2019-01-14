@@ -6,6 +6,7 @@ import (
 	"github.com/daniildulin/explorer-gate/helpers"
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"strings"
 )
 
 func EstimateTxCommission(c *gin.Context) {
@@ -57,6 +58,22 @@ func EstimateCoinSell(c *gin.Context) {
 			"data": gin.H{
 				"commission": estimate.Commission,
 				"will_get":   estimate.Value,
+			},
+		})
+	}
+}
+
+func GetNonce(c *gin.Context) {
+	gate, ok := c.MustGet("gate").(*core.MinterGate)
+	helpers.CheckErrBool(ok)
+	address := strings.Title(c.Param(`address`))
+	nonce, err := gate.GetNonce(address)
+	if err != nil {
+		errors.SetErrorResponse(err, c)
+	} else {
+		c.JSON(http.StatusOK, gin.H{
+			"data": gin.H{
+				"nonce": nonce,
 			},
 		})
 	}

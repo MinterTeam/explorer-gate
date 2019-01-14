@@ -22,6 +22,7 @@ type CoinEstimate struct {
 	Commission string
 }
 
+//New instance of Minter Gate
 func New(config env.Config, e *emitter.Emitter) *MinterGate {
 	proto := `http`
 	if config.GetBool(`minterApi.isSecure`) {
@@ -35,6 +36,8 @@ func New(config env.Config, e *emitter.Emitter) *MinterGate {
 	}
 }
 
+//Send transaction to blockchain
+//Return transaction hash
 func (mg MinterGate) TxPush(transaction string) (*string, error) {
 	response, err := mg.api.PushTransaction(transaction)
 	if err != nil {
@@ -49,6 +52,7 @@ func (mg MinterGate) TxPush(transaction string) (*string, error) {
 	return &hash, nil
 }
 
+//Return estimate of transaction
 func (mg *MinterGate) EstimateTxCommission(transaction string) (*string, error) {
 	response, err := mg.api.GetEstimateTx(transaction)
 	if err != nil {
@@ -57,6 +61,7 @@ func (mg *MinterGate) EstimateTxCommission(transaction string) (*string, error) 
 	return &response.Result.Commission, nil
 }
 
+//Return estimate of buy coin
 func (mg *MinterGate) EstimateCoinBuy(coinToSell string, coinToBuy string, value string) (*CoinEstimate, error) {
 	response, err := mg.api.GetEstimateCoinBuy(coinToSell, coinToBuy, value)
 	if err != nil {
@@ -65,12 +70,22 @@ func (mg *MinterGate) EstimateCoinBuy(coinToSell string, coinToBuy string, value
 	return &CoinEstimate{response.Result.WillPay, response.Result.Commission}, nil
 }
 
+//Return estimate of sell coin
 func (mg *MinterGate) EstimateCoinSell(coinToSell string, coinToBuy string, value string) (*CoinEstimate, error) {
 	response, err := mg.api.GetEstimateCoinSell(coinToSell, coinToBuy, value)
 	if err != nil {
 		return nil, err
 	}
 	return &CoinEstimate{response.Result.WillGet, response.Result.Commission}, nil
+}
+
+//Return nonce for address
+func (mg *MinterGate) GetNonce(address string) (*string, error) {
+	response, err := mg.api.GetAddress(address)
+	if err != nil {
+		return nil, err
+	}
+	return &response.Result.TransactionCount, nil
 }
 
 func getNodeErrorFromResponse(r *responses.SendTransactionResponse) error {
