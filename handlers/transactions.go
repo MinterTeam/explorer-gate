@@ -8,6 +8,7 @@ import (
 	"github.com/olebedev/emitter"
 	"net/http"
 	"strings"
+	"time"
 )
 
 func Index(c *gin.Context) {
@@ -40,13 +41,20 @@ func PushTransaction(c *gin.Context) {
 	if err != nil {
 		errors.SetErrorResponse(err, c)
 	} else {
-		for range ee.On(strings.ToUpper(tx.Transaction), emitter.Once) {
+		select {
+		case <-ee.On(strings.ToUpper(tx.Transaction), emitter.Once):
 			c.JSON(http.StatusOK, gin.H{
 				"data": gin.H{
 					"hash": &hash,
 				},
 			})
-			break
+		case <-time.After(30 * time.Second):
+			c.JSON(http.StatusBadRequest, gin.H{
+				"error": gin.H{
+					"code": 1,
+					"log":  `Time out for transaction`,
+				},
+			})
 		}
 	}
 }

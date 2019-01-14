@@ -23,14 +23,11 @@ type CoinEstimate struct {
 }
 
 func New(config env.Config, e *emitter.Emitter) *MinterGate {
-
-	apiLink := `http`
+	proto := `http`
 	if config.GetBool(`minterApi.isSecure`) {
-		apiLink += `s://` + config.GetString(`minterApi.link`) + `:` + config.GetString(`minterApi.port`)
-	} else {
-		apiLink += `://` + config.GetString(`minterApi.link`) + `:` + config.GetString(`minterApi.port`)
+		proto = `https`
 	}
-
+	apiLink := proto + `://` + config.GetString(`minterApi.link`) + `:` + config.GetString(`minterApi.port`)
 	return &MinterGate{
 		emitter: e,
 		api:     minter_node_api.New(apiLink),

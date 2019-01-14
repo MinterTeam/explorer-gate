@@ -51,7 +51,7 @@ func SetupRouter(config env.Config) *gin.Engine {
 	if err != nil {
 		log.Println(err)
 	}
-	go txsStore(txs, ee)
+	go handleTxs(txs, ee)
 
 	gateService := core.New(config, ee)
 
@@ -98,7 +98,7 @@ func apiMiddleware(gate *core.MinterGate, ee *emitter.Emitter) gin.HandlerFunc {
 	}
 }
 
-func txsStore(txs <-chan interface{}, emitter *emitter.Emitter) {
+func handleTxs(txs <-chan interface{}, emitter *emitter.Emitter) {
 	var re = regexp.MustCompile(`(?mi)^Tx\{(.*)\}`)
 	for e := range txs {
 		matches := re.FindStringSubmatch(e.(types.EventDataTx).Tx.String())
