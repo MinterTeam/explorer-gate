@@ -9,7 +9,7 @@
 # Minter Gate
 
 
-The official repository of web part of Minter Gate API.
+The official repository of Minter Gate service.
 Minter Gate is a service which provides to clients publish prepared transactions to Minter Network
 
 _NOTE: This project in active development stage so feel free to send us questions, issues, and wishes_
