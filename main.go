@@ -1,12 +1,24 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"fmt"
 	"github.com/daniildulin/explorer-gate/api"
+	"github.com/daniildulin/explorer-gate/core"
 	"github.com/daniildulin/explorer-gate/env"
+	"github.com/daniildulin/explorer-gate/helpers"
+	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
+	"github.com/olebedev/emitter"
+	"github.com/tendermint/tendermint/libs/pubsub/query"
+	tmClient "github.com/tendermint/tendermint/rpc/client"
+	"github.com/tendermint/tendermint/types"
+	"log"
 	"os"
+	"regexp"
+	"strings"
+	"time"
 )
 
 var Version string   // Version
@@ -34,6 +46,39 @@ func main() {
 		fmt.Printf(`%s v%s Commit %s builded %s\n`, AppName, Version, GitCommit, BuildDate)
 		os.Exit(0)
 	}
+	ee := &emitter.Emitter{}
+	gateService := core.New(config, ee)
 
-	api.Run(config)
+	//Init DB
+	db, err := gorm.Open("postgres", config.GetString(`database.url`))
+	helpers.CheckErr(err)
+	defer db.Close()
+	db.LogMode(config.GetBool(`debug`))
+
+	//Init RPC
+	nodeRpc := tmClient.NewHTTP(`tcp://`+config.GetString(`minterApi.link`)+`:26657`, `/websocket`)
+	err = nodeRpc.Start()
+	if err != nil {
+		log.Println(err)
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	q := query.MustParse(`tm.event = 'Tx'`)
+	txs := make(chan interface{})
+	err = nodeRpc.Subscribe(ctx, "explorer-gate", q, txs)
+	if err != nil {
+		log.Println(err)
+	}
+
+	go handleTxs(txs, ee)
+
+	api.Run(config, gateService, ee)
+}
+
+func handleTxs(txs <-chan interface{}, emitter *emitter.Emitter) {
+	var re = regexp.MustCompile(`(?mi)^Tx\{(.*)\}`)
+	for e := range txs {
+		matches := re.FindStringSubmatch(e.(types.EventDataTx).Tx.String())
+		<-emitter.Emit(strings.ToUpper(matches[1]), matches[1])
+	}
 }

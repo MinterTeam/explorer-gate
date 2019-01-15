@@ -1,60 +1,24 @@
 package api
 
 import (
-	"context"
-	"fmt"
 	"github.com/Depado/ginprom"
 	"github.com/daniildulin/explorer-gate/core"
 	"github.com/daniildulin/explorer-gate/env"
 	"github.com/daniildulin/explorer-gate/handlers"
-	"github.com/daniildulin/explorer-gate/helpers"
 	"github.com/gin-gonic/gin"
-	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
 	"github.com/olebedev/emitter"
-	"github.com/tendermint/tendermint/libs/pubsub/query"
-	tmClient "github.com/tendermint/tendermint/rpc/client"
-	"github.com/tendermint/tendermint/types"
-	"log"
 	"net/http"
-	"regexp"
-	"strings"
-	"time"
 )
 
-func Run(config env.Config) {
-	router := SetupRouter(config)
+// Run API
+func Run(config env.Config, gateService *core.MinterGate, ee *emitter.Emitter) {
+	router := SetupRouter(config, gateService, ee)
 	router.Run(config.GetString(`gateApi.link`) + `:` + config.GetString(`gateApi.port`))
 }
 
-func SetupRouter(config env.Config) *gin.Engine {
-	ee := &emitter.Emitter{}
-
-	fmt.Println(config.GetString(`database.url`))
-
-	db, err := gorm.Open("postgres", config.GetString(`database.url`))
-	helpers.CheckErr(err)
-	defer db.Close()
-	db.LogMode(config.GetBool(`debug`))
-
-	nodeRpc := tmClient.NewHTTP(`tcp://`+config.GetString(`minterApi.link`)+`:26657`, `/websocket`)
-	err = nodeRpc.Start()
-	if err != nil {
-		log.Println(err)
-	}
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
-	q := query.MustParse(`tm.event = 'Tx'`)
-	txs := make(chan interface{})
-
-	err = nodeRpc.Subscribe(ctx, "explorer-gate", q, txs)
-	if err != nil {
-		log.Println(err)
-	}
-	go handleTxs(txs, ee)
-
-	gateService := core.New(config, ee)
-
+//Setup router
+func SetupRouter(config env.Config, gateService *core.MinterGate, ee *emitter.Emitter) *gin.Engine {
 	router := gin.Default()
 	if !config.GetBool(`debug`) {
 		gin.SetMode(gin.ReleaseMode)
@@ -79,30 +43,20 @@ func SetupRouter(config env.Config) *gin.Engine {
 		v1.GET(`/estimate/coin-buy`, handlers.EstimateCoinBuy)
 		v1.GET(`/estimate/coin-sell`, handlers.EstimateCoinSell)
 		v1.GET(`/get-nonce/:address`, handlers.GetNonce)
-
-		v1.POST("/transaction/push", handlers.PushTransaction)
+		v1.POST(`/transaction/push`, handlers.PushTransaction)
 	}
-
 	// Default handler 404
 	router.NoRoute(func(c *gin.Context) {
-		c.JSON(http.StatusNotFound, gin.H{"error": "Resource not found."})
+		c.JSON(http.StatusNotFound, gin.H{"error": gin.H{"code": 404, "log": "Resource not found."}})
 	})
-
 	return router
 }
 
+//Add necessary services to global context
 func apiMiddleware(gate *core.MinterGate, ee *emitter.Emitter) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		c.Set("gate", gate)
 		c.Set("emitter", ee)
 		c.Next()
-	}
-}
-
-func handleTxs(txs <-chan interface{}, emitter *emitter.Emitter) {
-	var re = regexp.MustCompile(`(?mi)^Tx\{(.*)\}`)
-	for e := range txs {
-		matches := re.FindStringSubmatch(e.(types.EventDataTx).Tx.String())
-		<-emitter.Emit(strings.ToUpper(matches[1]), matches[1])
 	}
 }

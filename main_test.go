@@ -3,9 +3,11 @@ package main
 import (
 	"bytes"
 	"github.com/daniildulin/explorer-gate/api"
+	"github.com/daniildulin/explorer-gate/core"
 	"github.com/daniildulin/explorer-gate/env"
 	"github.com/gin-gonic/gin"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
+	"github.com/olebedev/emitter"
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
@@ -16,14 +18,16 @@ var testTx = `0xf8820d018a4d4e540000000000000001a9e88a4d4e5400000000000000941b68
 
 func Test_main(t *testing.T) {
 	config = env.NewViperConfig()
-	router := api.SetupRouter(config)
+	ee := &emitter.Emitter{}
+	gateService := core.New(config, ee)
+	router := api.SetupRouter(config, gateService, ee)
 	testPushTransaction(router, t)
 	testEstimateTx(router, t)
 }
 
 func testPushTransaction(router *gin.Engine, t *testing.T) {
 	w := httptest.NewRecorder()
-	payload := []byte(`{"transaction":"test"}`)
+	payload := []byte(`{"transaction":"` + testTx + `"}`)
 	req, _ := http.NewRequest("POST", "/api/v1/transaction/push", bytes.NewBuffer(payload))
 	router.ServeHTTP(w, req)
 	assert.NotEqual(t, 500, w.Code)
