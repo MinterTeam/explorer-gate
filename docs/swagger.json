@@ -88,7 +88,7 @@
             "name": "valueToSell",
             "in": "query",
             "required": true,
-            "description": "Number of coins you sell (in PIP) ",
+            "description": "Number of coins you sell (in PIP)",
             "schema": {
               "type": "integer",
               "format": "uint64",
@@ -154,7 +154,7 @@
             "name": "valueToSell",
             "in": "query",
             "required": true,
-            "description": "Number of coins you have to pay (in PIP) ",
+            "description": "Number of coins you have to pay (in PIP)",
             "schema": {
               "type": "integer",
               "format": "uint64",
@@ -239,7 +239,7 @@
         "tags": [
           "Transaction"
         ],
-        "summary": "Send transaction to the network and retern hash of transactions.",
+        "summary": "Send transaction to the network and return hash of transactions.",
         "requestBody": {
           "required": true,
           "content": {
@@ -262,7 +262,7 @@
             }
           },
           "400": {
-            "description": "Bad request.",
+            "description": "Bad request",
             "content": {
               "application/json": {
                 "schema": {
@@ -306,13 +306,13 @@
       },
       "EstimateTransaction": {
         "properties": {
-          "commision": {
+          "commission": {
             "type": "string",
             "example": "1000000000"
           }
         },
         "required": [
-          "commision"
+          "commission"
         ]
       },
       "EstimateCoinSell": {
@@ -321,14 +321,14 @@
             "type": "string",
             "example": "100000"
           },
-          "commision": {
+          "commission": {
             "type": "string",
             "example": "1000000000"
           }
         },
         "required": [
           "will_get",
-          "commision"
+          "commission"
         ]
       },
       "EstimateCoinBuy": {
@@ -337,14 +337,14 @@
             "type": "string",
             "example": "100000"
           },
-          "commision": {
+          "commission": {
             "type": "string",
             "example": "1000000000"
           }
         },
         "required": [
           "will_pay",
-          "commision"
+          "commission"
         ]
       },
       "Nonce": {
