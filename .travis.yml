@@ -2,12 +2,9 @@ language: go
 
 go:
   - 1.11.x
-  - tip
 
 install:
-  - make prepare_metalinter
+  - go get -t -v ./
 
 script:
-  - make vendor
-  - make check
-  - make build
+  - go test -v ./
