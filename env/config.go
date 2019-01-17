@@ -1,7 +1,7 @@
 package env
 
 import (
-	"github.com/daniildulin/explorer-gate/helpers"
+	"github.com/MinterTeam/explorer-gate/helpers"
 	"strings"
 
 	"github.com/spf13/viper"

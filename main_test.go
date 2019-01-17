@@ -2,9 +2,9 @@ package main
 
 import (
 	"bytes"
-	"github.com/daniildulin/explorer-gate/api"
-	"github.com/daniildulin/explorer-gate/core"
-	"github.com/daniildulin/explorer-gate/env"
+	"github.com/MinterTeam/explorer-gate/api"
+	"github.com/MinterTeam/explorer-gate/core"
+	"github.com/MinterTeam/explorer-gate/env"
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres"

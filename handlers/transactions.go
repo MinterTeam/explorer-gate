@@ -1,9 +1,9 @@
 package handlers
 
 import (
-	"github.com/daniildulin/explorer-gate/core"
-	"github.com/daniildulin/explorer-gate/errors"
-	"github.com/daniildulin/explorer-gate/helpers"
+	"github.com/MinterTeam/explorer-gate/core"
+	"github.com/MinterTeam/explorer-gate/errors"
+	"github.com/MinterTeam/explorer-gate/helpers"
 	"github.com/gin-gonic/gin"
 	"github.com/olebedev/emitter"
 	"net/http"

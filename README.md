@@ -1,10 +1,9 @@
 <p align="center" background="black"><img src="minter-logo.svg" width="400"></p>
 
 <p align="center" style="text-align: center;">
-    <a href="https://github.com/daniildulin/minter-explorer-gate/blob/master/LICENSE">
+    <a href="https://github.com/daniildulin/explorer-gate/blob/master/LICENSE">
         <img src="https://img.shields.io/packagist/l/doctrine/orm.svg" alt="License">
     </a>
-    <img src="https://travis-ci.org/daniildulin/minter-explorer-gate.svg?branch=master" alt="Build">
 </p>
 
 # Minter Gate

@@ -1,9 +1,9 @@
 package core
 
 import (
-	"github.com/daniildulin/explorer-gate/env"
-	"github.com/daniildulin/explorer-gate/errors"
-	"github.com/daniildulin/explorer-gate/models"
+	"github.com/MinterTeam/explorer-gate/env"
+	"github.com/MinterTeam/explorer-gate/errors"
+	"github.com/MinterTeam/explorer-gate/models"
 	"github.com/daniildulin/minter-node-api"
 	"github.com/daniildulin/minter-node-api/responses"
 	"github.com/jinzhu/gorm"

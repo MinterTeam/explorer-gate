@@ -2,9 +2,9 @@ package api
 
 import (
 	"github.com/Depado/ginprom"
-	"github.com/daniildulin/explorer-gate/core"
-	"github.com/daniildulin/explorer-gate/env"
-	"github.com/daniildulin/explorer-gate/handlers"
+	"github.com/MinterTeam/explorer-gate/core"
+	"github.com/MinterTeam/explorer-gate/env"
+	"github.com/MinterTeam/explorer-gate/handlers"
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
