@@ -7,7 +7,6 @@ import (
 	"github.com/daniildulin/explorer-gate/api"
 	"github.com/daniildulin/explorer-gate/core"
 	"github.com/daniildulin/explorer-gate/env"
-	"github.com/daniildulin/explorer-gate/helpers"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
 	"github.com/olebedev/emitter"
@@ -46,14 +45,20 @@ func main() {
 		fmt.Printf(`%s v%s Commit %s builded %s\n`, AppName, Version, GitCommit, BuildDate)
 		os.Exit(0)
 	}
-	ee := &emitter.Emitter{}
-	gateService := core.New(config, ee)
 
 	//Init DB
-	db, err := gorm.Open("postgres", config.GetString(`database.url`))
-	helpers.CheckErr(err)
-	defer db.Close()
-	db.LogMode(config.GetBool(`debug`))
+	var db *gorm.DB
+	var err error
+
+	if !config.GetBool(`singleNode`) {
+		db, err = gorm.Open("postgres", config.GetString(`database.url`))
+		log.Println(err)
+		defer db.Close()
+		db.LogMode(config.GetBool(`debug`))
+	}
+
+	ee := &emitter.Emitter{}
+	gateService := core.New(config, ee, db)
 
 	//Init RPC
 	nodeRpc := tmClient.NewHTTP(`tcp://`+config.GetString(`minterApi.link`)+`:26657`, `/websocket`)
@@ -72,7 +77,7 @@ func main() {
 
 	go handleTxs(txs, ee)
 
-	api.Run(config, gateService, ee)
+	api.Run(config, gateService, ee, db)
 }
 
 func handleTxs(txs <-chan interface{}, emitter *emitter.Emitter) {

@@ -2,6 +2,7 @@
   "name": "Minter Gate",
   "debug": true,
   "baseCoin": "BIP",
+  "singleNode": true,
   "database": {
     "url": "postgres://postgres:postgres@localhost/postgres?sslmode=disable"
   },

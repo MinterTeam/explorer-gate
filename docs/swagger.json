@@ -189,7 +189,7 @@
         }
       }
     },
-    "/v1/get-nonce/{address}": {
+    "/v1/nonce/{address}": {
       "get": {
         "tags": [
           "Nonce"
