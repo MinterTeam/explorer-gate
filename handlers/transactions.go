@@ -48,11 +48,11 @@ func PushTransaction(c *gin.Context) {
 					"hash": &hash,
 				},
 			})
-		case <-time.After(30 * time.Second):
+		case <-time.After(60 * time.Second):
 			c.JSON(http.StatusBadRequest, gin.H{
 				"error": gin.H{
 					"code": 1,
-					"log":  `Time out for transaction`,
+					"log":  `Time out waiting for transaction to be included in block`,
 				},
 			})
 		}
