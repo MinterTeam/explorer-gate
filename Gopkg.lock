@@ -23,18 +23,19 @@
   name = "github.com/btcsuite/btcd"
   packages = ["btcec"]
   pruneopts = "UT"
-  revision = "5bda5314ca9549a589e63d7b2e6104492a0d5328"
+  revision = "ed77733ec07dfc8a513741138419b8d9d3de9d2d"
 
 [[projects]]
   branch = "master"
-  digest = "1:ed16347dee1c8a77505275f739c64788146230f766e2a3356eb423e01315832c"
+  digest = "1:89b0b906b41cb28447762bcc191a753116afb5efd4a62b7595a6892abdb4cb75"
   name = "github.com/daniildulin/minter-node-api"
   packages = [
     ".",
+    "errors",
     "responses",
   ]
   pruneopts = "UT"
-  revision = "93caff81d5681c4d16b9f14b5e468af0f987c4d5"
+  revision = "1e0bb6933ce4fa8b66380f6fab889ba5904307cc"
 
 [[projects]]
   digest = "1:ffe9824d294da03b391f44e1ae8281281b4afc1bdaa9588c9097785e3af10cec"
@@ -274,11 +275,11 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:6d42480278e7719074c770605d8695d019fb28787242ca939ebee6a40088f075"
+  digest = "1:06dbb3dd9104b854479546944f509a15abbfa0664bd4acbb428a10f53f3acb9b"
   name = "github.com/olebedev/emitter"
   packages = ["."]
   pruneopts = "UT"
-  revision = "68bb25b251f61cde3824cc316f238f0da1704331"
+  revision = "e8d1457e6aee6368f6abda5ad334fde63e9cc3fa"
 
 [[projects]]
   digest = "1:95741de3af260a92cc5c7f3f3061e85273f5a81b5db20d4bd68da74bd521675e"
@@ -322,7 +323,7 @@
   name = "github.com/prometheus/client_model"
   packages = ["go"]
   pruneopts = "UT"
-  revision = "5c3871d89910bfb32f5fcab2aa4b9ec68e65a99f"
+  revision = "56726106282f1985ea77d5305743db7231b0c0a8"
 
 [[projects]]
   branch = "master"
@@ -338,7 +339,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:08eb8b60450efe841e37512d66ce366a87d187505d7c67b99307a6c1803483a2"
+  digest = "1:f532f2cdb9e9e4a8fad5a7e944482f4dd12650228e4a7a6c8492a0d069ce0690"
   name = "github.com/prometheus/procfs"
   packages = [
     ".",
@@ -347,7 +348,7 @@
     "xfs",
   ]
   pruneopts = "UT"
-  revision = "b1a0a9a36d7453ba0f62578b99712f3a6c5f82d1"
+  revision = "bf6a532e95b1f7a62adf0ab5050a5bb2237ad2f4"
 
 [[projects]]
   digest = "1:c4556a44e350b50a490544d9b06e9fba9c286c21d6c0e47f54f3a9214597298c"
@@ -555,14 +556,14 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:4ff5231c36a2154d059285c0aa91b785a94ed78194fbc762b225573d34c53723"
+  digest = "1:07454820bf257abc4d2761a908a70f99dc563790f2412b12383a0f95a16fe64f"
   name = "golang.org/x/sys"
   packages = [
     "cpu",
     "unix",
   ]
   pruneopts = "UT"
-  revision = "7fbe1cd0fcc20051e1fcb87fbabec4a1bacaaeba"
+  revision = "770c60269bf0ef965e9e7ac8bedcb6bca2a1cefd"
 
 [[projects]]
   digest = "1:a2ab62866c75542dd18d2b069fec854577a20211d7c0ea6ae746072a1dccdd18"
@@ -593,10 +594,10 @@
   name = "google.golang.org/genproto"
   packages = ["googleapis/rpc/status"]
   pruneopts = "UT"
-  revision = "ae2f86662275e140f395167f1dab7081a5bd5fa8"
+  revision = "db91494dd46c1fdcbbde05e5ff5eb56df8f7d79a"
 
 [[projects]]
-  digest = "1:9edd250a3c46675d0679d87540b30c9ed253b19bd1fd1af08f4f5fb3c79fc487"
+  digest = "1:9ab5a33d8cb5c120602a34d2e985ce17956a4e8c2edce7e6961568f95e40c09a"
   name = "google.golang.org/grpc"
   packages = [
     ".",
@@ -632,8 +633,8 @@
     "tap",
   ]
   pruneopts = "UT"
-  revision = "df014850f6dee74ba2fc94874043a9f3f75fbfd8"
-  version = "v1.17.0"
+  revision = "a02b0774206b209466313a0b525d2c738fe407eb"
+  version = "v1.18.0"
 
 [[projects]]
   digest = "1:cbc72c4c4886a918d6ab4b95e347ffe259846260f99ebdd8a198c2331cf2b2e9"

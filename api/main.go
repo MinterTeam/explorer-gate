@@ -44,6 +44,7 @@ func SetupRouter(config env.Config, gateService *core.MinterGate, ee *emitter.Em
 		v1.GET(`/estimate/coin-buy`, handlers.EstimateCoinBuy)
 		v1.GET(`/estimate/coin-sell`, handlers.EstimateCoinSell)
 		v1.GET(`/nonce/:address`, handlers.GetNonce)
+		v1.GET(`/max-gas`, handlers.GetMaxGas)
 		v1.POST(`/transaction/push`, handlers.PushTransaction)
 	}
 	// Default handler 404

@@ -78,3 +78,18 @@ func GetNonce(c *gin.Context) {
 		})
 	}
 }
+
+func GetMaxGas(c *gin.Context) {
+	gate, ok := c.MustGet("gate").(*core.MinterGate)
+	helpers.CheckErrBool(ok)
+	gas, err := gate.GetGas()
+	if err != nil {
+		errors.SetErrorResponse(err, c)
+	} else {
+		c.JSON(http.StatusOK, gin.H{
+			"data": gin.H{
+				"gas": gas,
+			},
+		})
+	}
+}
