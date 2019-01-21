@@ -217,12 +217,15 @@ func getNodeErrorFromResponse(r *responses.SendTransactionResponse) error {
 			}
 			value = value.Mul(value, bip)
 			return errors.NewInsufficientFundsError(strings.Replace(r.Result.Log, matches[1], value.String(), -1), int32(r.Result.Code), value.String(), matches[2])
+		case 412:
+			msg := r.Error.Message + `: ` + r.Error.TxResult.Log
+			return errors.NewNodeError(msg, r.Error.TxResult.Code)
 		default:
 			return errors.NewNodeError(r.Result.Log, int32(r.Result.Code))
 		}
 	}
-	if r.Error != nil {
-		return errors.NewNodeError(r.Error.Data, r.Error.Code)
+	if r.Error != nil && r.Error.Data != nil {
+		return errors.NewNodeError(*r.Error.Data, r.Error.Code)
 	}
 	return errors.NewNodeError(`Unknown error`, -1)
 }

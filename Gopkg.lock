@@ -27,7 +27,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:89b0b906b41cb28447762bcc191a753116afb5efd4a62b7595a6892abdb4cb75"
+  digest = "1:fa4ad70396d64453f8a953d181b4a568b19f60a87bab7aec16340485099e0b96"
   name = "github.com/daniildulin/minter-node-api"
   packages = [
     ".",
@@ -35,7 +35,7 @@
     "responses",
   ]
   pruneopts = "UT"
-  revision = "1e0bb6933ce4fa8b66380f6fab889ba5904307cc"
+  revision = "970fcc92df73a8396bdd6d6f1b8e18b1e647ba87"
 
 [[projects]]
   digest = "1:ffe9824d294da03b391f44e1ae8281281b4afc1bdaa9588c9097785e3af10cec"
