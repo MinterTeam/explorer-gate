@@ -79,10 +79,10 @@ func GetNonce(c *gin.Context) {
 	}
 }
 
-func GetMaxGas(c *gin.Context) {
+func GetMinGas(c *gin.Context) {
 	gate, ok := c.MustGet("gate").(*core.MinterGate)
 	helpers.CheckErrBool(ok)
-	gas, err := gate.GetGas()
+	gas, err := gate.GetMinGas()
 	if err != nil {
 		errors.SetErrorResponse(err, c)
 	} else {

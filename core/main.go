@@ -174,14 +174,14 @@ func (mg *MinterGate) GetNonce(address string) (*string, error) {
 }
 
 //Return nonce for address
-func (mg *MinterGate) GetGas() (*string, error) {
+func (mg *MinterGate) GetMinGas() (*string, error) {
 	if !mg.config.GetBool(`singleNode`) && mg.db != nil {
 		var err error
-		var response *responses.MaxGasResponse
+		var response *responses.GasResponse
 		nodes := mg.GetActiveNodes()
 		for _, node := range nodes {
 			mg.api.SetLink(node.GetFullLink())
-			response, err = mg.api.GetMaxGasPrice()
+			response, err = mg.api.GetMinGasPrice()
 			if err != nil {
 				continue
 			} else {
@@ -190,7 +190,7 @@ func (mg *MinterGate) GetGas() (*string, error) {
 		}
 		return nil, err
 	} else {
-		response, err := mg.api.GetMaxGasPrice()
+		response, err := mg.api.GetMinGasPrice()
 		if err != nil {
 			return nil, err
 		}

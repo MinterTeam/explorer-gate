@@ -27,7 +27,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:fa4ad70396d64453f8a953d181b4a568b19f60a87bab7aec16340485099e0b96"
+  digest = "1:86f336139a2e75af91ad0a26d696448d20168491800e723ad973418a498f2c85"
   name = "github.com/daniildulin/minter-node-api"
   packages = [
     ".",
@@ -35,7 +35,7 @@
     "responses",
   ]
   pruneopts = "UT"
-  revision = "970fcc92df73a8396bdd6d6f1b8e18b1e647ba87"
+  revision = "2a7a89d0d4d0962f045607020140914586e07274"
 
 [[projects]]
   digest = "1:ffe9824d294da03b391f44e1ae8281281b4afc1bdaa9588c9097785e3af10cec"
@@ -556,14 +556,14 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:07454820bf257abc4d2761a908a70f99dc563790f2412b12383a0f95a16fe64f"
+  digest = "1:f57463f4558fe0125807362c3087faab4b6cc76d1525ac8bb32cee0d205c745c"
   name = "golang.org/x/sys"
   packages = [
     "cpu",
     "unix",
   ]
   pruneopts = "UT"
-  revision = "770c60269bf0ef965e9e7ac8bedcb6bca2a1cefd"
+  revision = "054c452bb702e465e95ce8e7a3d9a6cf0cd1188d"
 
 [[projects]]
   digest = "1:a2ab62866c75542dd18d2b069fec854577a20211d7c0ea6ae746072a1dccdd18"
