@@ -27,15 +27,14 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:86f336139a2e75af91ad0a26d696448d20168491800e723ad973418a498f2c85"
+  digest = "1:98066b1b9a52fc8b241f4cbceb538fb631467f13590fa35ac1376487c445a69d"
   name = "github.com/daniildulin/minter-node-api"
   packages = [
     ".",
-    "errors",
     "responses",
   ]
   pruneopts = "UT"
-  revision = "2a7a89d0d4d0962f045607020140914586e07274"
+  revision = "31168c745336236290396072cb389bad08ce2aa0"
 
 [[projects]]
   digest = "1:ffe9824d294da03b391f44e1ae8281281b4afc1bdaa9588c9097785e3af10cec"

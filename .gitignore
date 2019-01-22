@@ -21,3 +21,5 @@ media/
 db_data/
 
 config.json
+
+.idea/httpRequests

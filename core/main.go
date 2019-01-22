@@ -206,22 +206,19 @@ func (mg *MinterGate) GetActiveNodes() []models.MinterNode {
 
 func getNodeErrorFromResponse(r *responses.SendTransactionResponse) error {
 	bip := big.NewFloat(0.000000000000000001)
-	if r.Result != nil {
-		switch r.Result.Code {
+	if r.Error != nil && r.Error.TxResult != nil {
+		switch r.Error.TxResult.Code {
 		case 107:
 			var re = regexp.MustCompile(`(?mi)^.*Wanted *(\d+) (\w+)`)
-			matches := re.FindStringSubmatch(r.Result.Log)
+			matches := re.FindStringSubmatch(r.Error.TxResult.Log)
 			value, _, err := big.ParseFloat(matches[1], 10, 0, big.ToZero)
 			if err != nil {
 				return err
 			}
 			value = value.Mul(value, bip)
-			return errors.NewInsufficientFundsError(strings.Replace(r.Result.Log, matches[1], value.String(), -1), int32(r.Result.Code), value.String(), matches[2])
-		case 412:
-			msg := r.Error.Message + `: ` + r.Error.TxResult.Log
-			return errors.NewNodeError(msg, r.Error.TxResult.Code)
+			return errors.NewInsufficientFundsError(strings.Replace(r.Error.TxResult.Log, matches[1], value.String(), -1), int32(r.Error.TxResult.Code), value.String(), matches[2])
 		default:
-			return errors.NewNodeError(r.Result.Log, int32(r.Result.Code))
+			return errors.NewNodeError(r.Error.TxResult.Log, int32(r.Error.TxResult.Code))
 		}
 	}
 	if r.Error != nil && r.Error.Data != nil {
