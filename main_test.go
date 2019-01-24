@@ -2,6 +2,8 @@ package main
 
 import (
 	"bytes"
+	"encoding/json"
+	"errors"
 	"github.com/MinterTeam/explorer-gate/api"
 	"github.com/MinterTeam/explorer-gate/core"
 	"github.com/MinterTeam/explorer-gate/env"
@@ -15,29 +17,63 @@ import (
 	"testing"
 )
 
-var testTx = `0xf8820d018a4d4e540000000000000001a9e88a4d4e5400000000000000941b685a7c1e78726c48f619c497a07ed75fe00483872386f26fc10000808001b845f8431ca05ddcd3ffd2d5b21ffe4686cadbb462bad9facdd7ee0c2db31a7b6da6f06468b3a044df8fc8b4c4190ef352e0f70112527b6b25c4a22a67c9e9365ac7e511ac12f3`
+var (
+	db          *gorm.DB
+	ee          *emitter.Emitter
+	cfg         env.Config
+	router      *gin.Engine
+	gateService *core.MinterGate
+	testTx      = `f8820d018a4d4e540000000000000001a9e88a4d4e5400000000000000941b685a7c1e78726c48f619c497a07ed75fe00483872386f26fc10000808001b845f8431ca05ddcd3ffd2d5b21ffe4686cadbb462bad9facdd7ee0c2db31a7b6da6f06468b3a044df8fc8b4c4190ef352e0f70112527b6b25c4a22a67c9e9365ac7e511ac12f3`
+)
 
-func Test_main(t *testing.T) {
-	var db *gorm.DB
-	config = env.NewViperConfig()
-	ee := &emitter.Emitter{}
-	gateService := core.New(config, ee, db)
-	router := api.SetupRouter(config, gateService, ee, db)
-	testPushTransaction(router, t)
-	testEstimateTx(router, t)
+type RespData struct {
+	Commission *string `json:"commission"`
 }
 
-func testPushTransaction(router *gin.Engine, t *testing.T) {
+type RespError struct {
+	Code  int     `json:"code"`
+	Log   string  `json:"log"`
+	Value *int    `json:"value"`
+	Coin  *string `json:"coin"`
+}
+
+type Resp struct {
+	Data  *RespData  `json:"data"`
+	Error *RespError `json:"error"`
+}
+
+func init() {
+	cfg = env.NewViperConfig()
+	gateService = core.New(cfg, ee, db)
+	router = api.SetupRouter(cfg, gateService, ee, db)
+}
+
+func TestPushWrongTransaction(t *testing.T) {
+	var target Resp
 	w := httptest.NewRecorder()
 	payload := []byte(`{"transaction":"` + testTx + `"}`)
-	req, _ := http.NewRequest("POST", "/api/v1/transaction/push", bytes.NewBuffer(payload))
+	req, err := http.NewRequest("POST", "/api/v1/transaction/push", bytes.NewBuffer(payload))
+	assert.NoError(t, err)
 	router.ServeHTTP(w, req)
-	assert.NotEqual(t, 500, w.Code)
+	err = json.NewDecoder(w.Body).Decode(&target)
+	assert.NoError(t, err)
+	assert.Equal(t, http.StatusBadRequest, w.Code)
+	assert.IsType(t, target.Error.Code, int(1))
+	assert.IsType(t, target.Error.Log, "")
 }
 
-func testEstimateTx(router *gin.Engine, t *testing.T) {
+func TestEstimateTx(t *testing.T) {
+	var target Resp
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest("GET", "/api/v1/estimate/tx-commission?transaction="+testTx, nil)
 	router.ServeHTTP(w, req)
-	assert.Equal(t, 200, w.Code)
+
+	err := json.NewDecoder(w.Body).Decode(&target)
+	assert.Equal(t, http.StatusOK, w.Code)
+	assert.NoError(t, err)
+	assert.NotNil(t, target.Data)
+	assert.NotNil(t, target.Data.Commission)
+	if target.Data.Commission != nil && *target.Data.Commission == "" {
+		assert.NoError(t, errors.New("Empty commission value"))
+	}
 }

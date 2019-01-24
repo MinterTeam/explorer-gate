@@ -7,5 +7,5 @@ install:
   - go get -t -v ./
 
 script:
-  - cp config.json.example config.json
+  - sh pre_test.sh
   - go test -v ./

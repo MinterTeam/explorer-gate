@@ -8,8 +8,6 @@ import (
 	"github.com/daniildulin/minter-node-api/responses"
 	"github.com/jinzhu/gorm"
 	"github.com/olebedev/emitter"
-	"math/big"
-	"regexp"
 	"strings"
 )
 
@@ -54,7 +52,7 @@ func (mg MinterGate) TxPush(transaction string) (*string, error) {
 				continue
 			}
 			if response.Error != nil || response.Result.Code != 0 {
-				return nil, getNodeErrorFromResponse(response)
+				return nil, errors.GetNodeErrorFromResponse(response)
 			}
 			hash := `Mt` + strings.ToLower(response.Result.Hash)
 			return &hash, nil
@@ -66,7 +64,7 @@ func (mg MinterGate) TxPush(transaction string) (*string, error) {
 			return nil, err
 		}
 		if response.Error != nil || response.Result.Code != 0 {
-			return nil, getNodeErrorFromResponse(response)
+			return nil, errors.GetNodeErrorFromResponse(response)
 		}
 		hash := `Mt` + strings.ToLower(response.Result.Hash)
 		return &hash, nil
@@ -202,27 +200,4 @@ func (mg *MinterGate) GetActiveNodes() []models.MinterNode {
 	var nodes []models.MinterNode
 	mg.db.Where(`is_active = ?`, true).Find(&nodes)
 	return nodes
-}
-
-func getNodeErrorFromResponse(r *responses.SendTransactionResponse) error {
-	bip := big.NewFloat(0.000000000000000001)
-	if r.Error != nil && r.Error.TxResult != nil {
-		switch r.Error.TxResult.Code {
-		case 107:
-			var re = regexp.MustCompile(`(?mi)^.*Wanted *(\d+) (\w+)`)
-			matches := re.FindStringSubmatch(r.Error.TxResult.Log)
-			value, _, err := big.ParseFloat(matches[1], 10, 0, big.ToZero)
-			if err != nil {
-				return err
-			}
-			value = value.Mul(value, bip)
-			return errors.NewInsufficientFundsError(strings.Replace(r.Error.TxResult.Log, matches[1], value.String(), -1), int32(r.Error.TxResult.Code), value.String(), matches[2])
-		default:
-			return errors.NewNodeError(r.Error.TxResult.Log, int32(r.Error.TxResult.Code))
-		}
-	}
-	if r.Error != nil && r.Error.Data != nil {
-		return errors.NewNodeError(*r.Error.Data, r.Error.Code)
-	}
-	return errors.NewNodeError(`Unknown error`, -1)
 }
