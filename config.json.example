@@ -1,7 +1,7 @@
 {
   "name": "Minter Gate",
   "debug": MG_DEBUG,
-  "baseCoin": "MG_BASE_COIN"
+  "baseCoin": "MG_BASE_COIN",
   "minterApi": {
     "isSecure": false,
     "link": "MG_NODE_HOST",
