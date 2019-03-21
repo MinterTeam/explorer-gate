@@ -10,8 +10,8 @@ KillMode=process
 TimeoutStartSec=10
 Restart=always
 RestartSec=15s
-WorkingDirectory=/opt/minter
-ExecStart=/opt/minter/gate
+WorkingDirectory=/opt/minter/gate/current
+ExecStart=/opt/minter/gate/current/gate
 
 User=minter
 Group=minter

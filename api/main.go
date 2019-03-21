@@ -6,20 +6,19 @@ import (
 	"github.com/MinterTeam/explorer-gate/env"
 	"github.com/MinterTeam/explorer-gate/handlers"
 	"github.com/gin-gonic/gin"
-	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
 	"github.com/olebedev/emitter"
 	"net/http"
 )
 
 // Run API
-func Run(config env.Config, gateService *core.MinterGate, ee *emitter.Emitter, db *gorm.DB) {
-	router := SetupRouter(config, gateService, ee, db)
+func Run(config env.Config, gateService *core.MinterGate, ee *emitter.Emitter) {
+	router := SetupRouter(config, gateService, ee)
 	router.Run(config.GetString(`gateApi.link`) + `:` + config.GetString(`gateApi.port`))
 }
 
 //Setup router
-func SetupRouter(config env.Config, gateService *core.MinterGate, ee *emitter.Emitter, db *gorm.DB) *gin.Engine {
+func SetupRouter(config env.Config, gateService *core.MinterGate, ee *emitter.Emitter) *gin.Engine {
 	router := gin.Default()
 	if !config.GetBool(`debug`) {
 		gin.SetMode(gin.ReleaseMode)
@@ -32,9 +31,9 @@ func SetupRouter(config env.Config, gateService *core.MinterGate, ee *emitter.Em
 		ginprom.Path("/metrics"),
 	)
 	router.Use(p.Instrument())
-	router.Use(gin.ErrorLogger())                  // print all errors
-	router.Use(gin.Recovery())                     // returns 500 on any code panics
-	router.Use(apiMiddleware(gateService, ee, db)) // init global context
+	router.Use(gin.ErrorLogger())              // print all errors
+	router.Use(gin.Recovery())                 // returns 500 on any code panics
+	router.Use(apiMiddleware(gateService, ee)) // init global context
 
 	router.GET(`/`, handlers.Index)
 
@@ -55,11 +54,10 @@ func SetupRouter(config env.Config, gateService *core.MinterGate, ee *emitter.Em
 }
 
 //Add necessary services to global context
-func apiMiddleware(gate *core.MinterGate, ee *emitter.Emitter, db *gorm.DB) gin.HandlerFunc {
+func apiMiddleware(gate *core.MinterGate, ee *emitter.Emitter) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		c.Set("gate", gate)
 		c.Set("emitter", ee)
-		c.Set("db", db)
 		c.Next()
 	}
 }

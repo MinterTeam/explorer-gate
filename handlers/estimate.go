@@ -3,7 +3,6 @@ package handlers
 import (
 	"github.com/MinterTeam/explorer-gate/core"
 	"github.com/MinterTeam/explorer-gate/errors"
-	"github.com/MinterTeam/explorer-gate/helpers"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strings"
@@ -11,7 +10,15 @@ import (
 
 func EstimateTxCommission(c *gin.Context) {
 	gate, ok := c.MustGet("gate").(*core.MinterGate)
-	helpers.CheckErrBool(ok)
+	if !ok {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": gin.H{
+				"code": 1,
+				"log":  "Type cast error",
+			},
+		})
+		return
+	}
 	tx := `0x` + c.Query(`transaction`)
 	commission, err := gate.EstimateTxCommission(tx)
 	if err != nil {
@@ -27,7 +34,15 @@ func EstimateTxCommission(c *gin.Context) {
 
 func EstimateCoinBuy(c *gin.Context) {
 	gate, ok := c.MustGet("gate").(*core.MinterGate)
-	helpers.CheckErrBool(ok)
+	if !ok {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": gin.H{
+				"code": 1,
+				"log":  "Type cast error",
+			},
+		})
+		return
+	}
 	coinToSell := c.Query(`coinToSell`)
 	coinToBuy := c.Query(`coinToBuy`)
 	value := c.Query(`valueToBuy`)
@@ -46,7 +61,15 @@ func EstimateCoinBuy(c *gin.Context) {
 
 func EstimateCoinSell(c *gin.Context) {
 	gate, ok := c.MustGet("gate").(*core.MinterGate)
-	helpers.CheckErrBool(ok)
+	if !ok {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": gin.H{
+				"code": 1,
+				"log":  "Type cast error",
+			},
+		})
+		return
+	}
 	coinToSell := c.Query(`coinToSell`)
 	coinToBuy := c.Query(`coinToBuy`)
 	value := c.Query(`valueToSell`)
@@ -65,7 +88,15 @@ func EstimateCoinSell(c *gin.Context) {
 
 func GetNonce(c *gin.Context) {
 	gate, ok := c.MustGet("gate").(*core.MinterGate)
-	helpers.CheckErrBool(ok)
+	if !ok {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": gin.H{
+				"code": 1,
+				"log":  "Type cast error",
+			},
+		})
+		return
+	}
 	address := strings.Title(c.Param(`address`))
 	nonce, err := gate.GetNonce(address)
 	if err != nil {
@@ -81,7 +112,15 @@ func GetNonce(c *gin.Context) {
 
 func GetMinGas(c *gin.Context) {
 	gate, ok := c.MustGet("gate").(*core.MinterGate)
-	helpers.CheckErrBool(ok)
+	if !ok {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": gin.H{
+				"code": 1,
+				"log":  "Type cast error",
+			},
+		})
+		return
+	}
 	gas, err := gate.GetMinGas()
 	if err != nil {
 		errors.SetErrorResponse(err, c)

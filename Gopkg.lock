@@ -10,6 +10,14 @@
   version = "v1.1.0"
 
 [[projects]]
+  digest = "1:653dbb777389604ea28b558b28dbe2a15b24301d51998006859284d6b8adc0e4"
+  name = "github.com/MinterTeam/minter-explorer-tools"
+  packages = ["helpers"]
+  pruneopts = "UT"
+  revision = "5f5ed16bdb83093a7632479b6167f06ffdb2fe3e"
+  version = "v1.3.0"
+
+[[projects]]
   branch = "master"
   digest = "1:d6afaeed1502aa28e80a4ed0981d570ad91b2579193404256ce672ed0a609e0d"
   name = "github.com/beorn7/perks"
@@ -656,6 +664,7 @@
   analyzer-version = 1
   input-imports = [
     "github.com/Depado/ginprom",
+    "github.com/MinterTeam/minter-explorer-tools/helpers",
     "github.com/daniildulin/minter-node-api",
     "github.com/daniildulin/minter-node-api/responses",
     "github.com/gin-gonic/gin",

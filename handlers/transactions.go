@@ -3,7 +3,6 @@ package handlers
 import (
 	"github.com/MinterTeam/explorer-gate/core"
 	"github.com/MinterTeam/explorer-gate/errors"
-	"github.com/MinterTeam/explorer-gate/helpers"
 	"github.com/gin-gonic/gin"
 	"github.com/olebedev/emitter"
 	"net/http"
@@ -26,9 +25,25 @@ func PushTransaction(c *gin.Context) {
 
 	var err error
 	gate, ok := c.MustGet("gate").(*core.MinterGate)
-	helpers.CheckErrBool(ok)
+	if !ok {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": gin.H{
+				"code": 1,
+				"log":  "Type cast error",
+			},
+		})
+		return
+	}
 	ee, ok := c.MustGet("emitter").(*emitter.Emitter)
-	helpers.CheckErrBool(ok)
+	if !ok {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": gin.H{
+				"code": 1,
+				"log":  "Type cast error",
+			},
+		})
+		return
+	}
 
 	var tx PushTransactionRequest
 	if err = c.ShouldBindJSON(&tx); err != nil {

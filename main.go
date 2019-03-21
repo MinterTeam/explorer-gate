@@ -58,7 +58,7 @@ func main() {
 	}
 
 	ee := &emitter.Emitter{}
-	gateService := core.New(config, ee, db)
+	gateService := core.New(config, ee)
 
 	//Init RPC
 	nodeRpc := tmClient.NewHTTP(`tcp://`+config.GetString(`minterApi.link`)+`:26657`, `/websocket`)
@@ -77,7 +77,7 @@ func main() {
 
 	go handleTxs(txs, ee)
 
-	api.Run(config, gateService, ee, db)
+	api.Run(config, gateService, ee)
 }
 
 func handleTxs(txs <-chan interface{}, emitter *emitter.Emitter) {
