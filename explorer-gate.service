@@ -1,7 +1,6 @@
 [Unit]
-Description=Minter Explorer Gete Service
+Description=Minter Gete Service
 Wants=network-online.target
-Requires=postgreql.service
 After=network.target network-online.target
 
 [Service]
