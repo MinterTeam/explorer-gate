@@ -7,7 +7,6 @@ import (
 	"github.com/MinterTeam/explorer-gate/api"
 	"github.com/MinterTeam/explorer-gate/core"
 	"github.com/MinterTeam/explorer-gate/env"
-	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
 	"github.com/olebedev/emitter"
 	"github.com/tendermint/tendermint/libs/pubsub/query"
@@ -32,7 +31,7 @@ var version = flag.Bool(`v`, false, `Prints current version`)
 func init() {
 	config = env.NewViperConfig()
 	AppName = config.GetString(`name`)
-	Version = `0.1`
+	Version = `1.3.0`
 
 	if config.GetBool(`debug`) {
 		fmt.Println(`Service RUN on DEBUG mode`)
@@ -42,20 +41,12 @@ func init() {
 func main() {
 	flag.Parse()
 	if *version {
-		fmt.Printf(`%s v%s Commit %s builded %s\n`, AppName, Version, GitCommit, BuildDate)
+		fmt.Printf(`%s v%s Commit %s builded %s`, AppName, Version, GitCommit, BuildDate)
 		os.Exit(0)
 	}
 
 	//Init DB
-	var db *gorm.DB
 	var err error
-
-	if !config.GetBool(`singleNode`) {
-		db, err = gorm.Open("postgres", config.GetString(`database.url`))
-		log.Println(err)
-		defer db.Close()
-		db.LogMode(config.GetBool(`debug`))
-	}
 
 	ee := &emitter.Emitter{}
 	gateService := core.New(config, ee)
