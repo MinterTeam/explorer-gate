@@ -53,6 +53,9 @@ func (mg *MinterGate) EstimateTxCommission(transaction string) (*string, error) 
 	if err != nil {
 		return nil, err
 	}
+	if response.Error != nil {
+		return nil, errors.NewNodeError(response.Error.Message, response.Error.Code)
+	}
 	return &response.Result.Commission, nil
 }
 
@@ -62,6 +65,11 @@ func (mg *MinterGate) EstimateCoinBuy(coinToSell string, coinToBuy string, value
 	if err != nil {
 		return nil, err
 	}
+
+	if response.Error != nil {
+		return nil, errors.NewNodeError(response.Error.Message, response.Error.Code)
+	}
+
 	return &CoinEstimate{response.Result.WillPay, response.Result.Commission}, nil
 }
 
@@ -70,6 +78,9 @@ func (mg *MinterGate) EstimateCoinSell(coinToSell string, coinToBuy string, valu
 	response, err := mg.api.GetEstimateCoinSell(coinToSell, coinToBuy, value)
 	if err != nil {
 		return nil, err
+	}
+	if response.Error != nil {
+		return nil, errors.NewNodeError(response.Error.Message, response.Error.Code)
 	}
 	return &CoinEstimate{response.Result.WillGet, response.Result.Commission}, nil
 }
@@ -80,6 +91,9 @@ func (mg *MinterGate) GetNonce(address string) (*string, error) {
 	if err != nil {
 		return nil, err
 	}
+	if response.Error != nil {
+		return nil, errors.NewNodeError(response.Error.Message, response.Error.Code)
+	}
 	return &response.Result.TransactionCount, nil
 }
 
@@ -88,6 +102,9 @@ func (mg *MinterGate) GetMinGas() (*string, error) {
 	response, err := mg.api.GetMinGasPrice()
 	if err != nil {
 		return nil, err
+	}
+	if response.Error != nil {
+		return nil, errors.NewNodeError(response.Error.Message, response.Error.Code)
 	}
 	return &response.Result, nil
 }
