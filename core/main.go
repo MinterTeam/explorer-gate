@@ -10,7 +10,7 @@ import (
 
 type MinterGate struct {
 	api     *minter_node_api.MinterNodeApi
-	config  env.Config
+	Config  env.Config
 	emitter *emitter.Emitter
 }
 
@@ -29,7 +29,7 @@ func New(config env.Config, e *emitter.Emitter) *MinterGate {
 	return &MinterGate{
 		emitter: e,
 		api:     minter_node_api.New(apiLink),
-		config:  config,
+		Config:  config,
 	}
 }
 

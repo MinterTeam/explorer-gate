@@ -63,8 +63,8 @@ func PushTransaction(c *gin.Context) {
 					"hash": &hash,
 				},
 			})
-		case <-time.After(60 * time.Second):
-			c.JSON(http.StatusBadRequest, gin.H{
+		case <-time.After(time.Duration(gate.Config.GetInt("minterApi.timeOut")) * time.Second):
+			c.JSON(http.StatusRequestTimeout, gin.H{
 				"error": gin.H{
 					"code": 1,
 					"log":  `Time out waiting for transaction to be included in block`,

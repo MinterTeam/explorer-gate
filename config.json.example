@@ -5,7 +5,8 @@
   "minterApi": {
     "isSecure": false,
     "link": "MG_NODE_HOST",
-    "port": "MG_NODE_PORT"
+    "port": "MG_NODE_PORT",
+    "timeOut": MG_NODE_TIMEOUT
   },
   "gateApi": {
     "isSecure" : false,
