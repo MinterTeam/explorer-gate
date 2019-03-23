@@ -32,7 +32,7 @@ func GetNodeErrorFromResponse(r *responses.SendTransactionResponse) error {
 	if r.Error != nil && r.Error.Data != nil {
 		return NewNodeError(*r.Error.Data, r.Error.Code)
 	}
-	return NewNodeError(`Unknown error`, -1)
+	return NewNodeError(`Unhandled transaction error`, -1)
 }
 
 func SetErrorResponse(err error, c *gin.Context) {
