@@ -50,7 +50,6 @@ func PushTransaction(c *gin.Context) {
 	if err = c.ShouldBindJSON(&tx); err != nil {
 		log.Println(gin.H{
 			"error": gin.H{
-				"code":        1,
 				"log":         err.Error(),
 				"transaction": tx,
 			},
@@ -62,6 +61,12 @@ func PushTransaction(c *gin.Context) {
 	hash, err := gate.TxPush(tx.Transaction)
 
 	if err != nil {
+		log.Println(gin.H{
+			"error": gin.H{
+				"log":         err,
+				"transaction": tx,
+			},
+		})
 		errors.SetErrorResponse(err, c)
 	} else {
 		select {
@@ -74,7 +79,6 @@ func PushTransaction(c *gin.Context) {
 		case <-time.After(time.Duration(gate.Config.GetInt("minterApi.timeOut")) * time.Second):
 			log.Println(gin.H{
 				"error": gin.H{
-					"code":        1,
 					"log":         `Time out waiting for transaction to be included in block`,
 					"transaction": tx,
 				},
