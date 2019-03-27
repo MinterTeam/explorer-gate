@@ -9,10 +9,10 @@ import (
 	"github.com/MinterTeam/explorer-gate/env"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
 	"github.com/olebedev/emitter"
+	"github.com/sirupsen/logrus"
 	"github.com/tendermint/tendermint/libs/pubsub/query"
 	tmClient "github.com/tendermint/tendermint/rpc/client"
 	"github.com/tendermint/tendermint/types"
-	"log"
 	"os"
 	"regexp"
 	"strings"
@@ -45,17 +45,35 @@ func main() {
 		os.Exit(0)
 	}
 
-	//Init DB
-	var err error
+	//Init Logger
+	logger := logrus.New()
+	logger.SetFormatter(&logrus.JSONFormatter{})
+	logger.SetOutput(os.Stdout)
+	logger.SetReportCaller(true)
+	if config.GetBool(`debug`) {
+		logger.SetFormatter(&logrus.TextFormatter{
+			DisableColors: false,
+			FullTimestamp: true,
+		})
+	} else {
+		logger.SetFormatter(&logrus.JSONFormatter{})
+		logger.SetLevel(logrus.WarnLevel)
+	}
 
+	contextLogger := logger.WithFields(logrus.Fields{
+		"version": "1.3.0",
+		"app":     "Minter Gate",
+	})
+
+	var err error
 	ee := &emitter.Emitter{}
-	gateService := core.New(config, ee)
+	gateService := core.New(config, ee, contextLogger)
 
 	//Init RPC
 	nodeRpc := tmClient.NewHTTP(`tcp://`+config.GetString(`minterApi.link`)+`:26657`, `/websocket`)
 	err = nodeRpc.Start()
 	if err != nil {
-		log.Println(err)
+		contextLogger.Error(err)
 	}
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
@@ -63,7 +81,7 @@ func main() {
 	txs := make(chan interface{})
 	err = nodeRpc.Subscribe(ctx, "explorer-gate", q, txs)
 	if err != nil {
-		log.Println(err)
+		contextLogger.Error(err)
 	}
 
 	go handleTxs(txs, ee)

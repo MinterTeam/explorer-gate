@@ -22,7 +22,6 @@ func SetupRouter(config env.Config, gateService *core.MinterGate, ee *emitter.Em
 	router := gin.Default()
 	if !config.GetBool(`debug`) {
 		gin.SetMode(gin.ReleaseMode)
-		router.Use(gin.Logger())
 	}
 
 	p := ginprom.New(

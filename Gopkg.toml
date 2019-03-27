@@ -61,6 +61,11 @@
   name = "github.com/tendermint/tendermint"
   version = "0.26.4"
 
+[[constraint]]
+  name = "github.com/sirupsen/logrus"
+  branch = "master"
+  source = "github.com/sirupsen/logrus"
+
 [prune]
   go-tests = true
   unused-packages = true

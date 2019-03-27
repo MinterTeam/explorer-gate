@@ -233,6 +233,14 @@
   version = "v1.2.0"
 
 [[projects]]
+  digest = "1:31e761d97c76151dde79e9d28964a812c46efc5baee4085b86f68f0c654450de"
+  name = "github.com/konsorten/go-windows-terminal-sequences"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "f55edac94c9bbba5d6182a4be46d86a2c9b5b50e"
+  version = "v1.0.2"
+
+[[projects]]
   branch = "master"
   digest = "1:a64e323dc06b73892e5bb5d040ced475c4645d456038333883f58934abbf6f72"
   name = "github.com/kr/logfmt"
@@ -392,6 +400,15 @@
   pruneopts = "UT"
   revision = "9a47f48565a795472d43519dd49aac781f3034fb"
   version = "v1.6.0"
+
+[[projects]]
+  branch = "master"
+  digest = "1:e4c72127d910a96daf869a44f3dd563b86dbe6931a172863a0e99c5ff04b59e4"
+  name = "github.com/sirupsen/logrus"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "dae0fa8d5b0c810a8ab733fbd5510c7cae84eca4"
+  source = "github.com/sirupsen/logrus"
 
 [[projects]]
   digest = "1:3e39bafd6c2f4bf3c76c3bfd16a2e09e016510ad5db90dc02b88e2f565d6d595"
@@ -566,7 +583,7 @@
   version = "v20180529"
 
 [[projects]]
-  digest = "1:1fdfa9436cc1c11afbdbfb56549e9201a92db0b0a0b7bef0797e7b68c9e8791f"
+  digest = "1:302fb8e685360ad2c439426681439b45efa8083d06f0e886c9cad3deb610927d"
   name = "golang.org/x/crypto"
   packages = [
     "chacha20poly1305",
@@ -581,6 +598,7 @@
     "poly1305",
     "ripemd160",
     "salsa20/salsa",
+    "ssh/terminal",
   ]
   pruneopts = "UT"
   revision = "3764759f34a542a3aef74d6b02e35be7ab893bba"
@@ -604,11 +622,12 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:d3229d0c4f5a29399fe3d39cd64de216af15f8bce9a00932c0a7a5ddaa6418f7"
+  digest = "1:51e9c8a64ecddbba456f24b2119aade9dc8e062fc6d10b30548f75f483e08b76"
   name = "golang.org/x/sys"
   packages = [
     "cpu",
     "unix",
+    "windows",
   ]
   pruneopts = "UT"
   revision = "f7bb7a8bee54210937e93ec56d007d892c1f0580"
@@ -712,6 +731,7 @@
     "github.com/jinzhu/gorm",
     "github.com/jinzhu/gorm/dialects/postgres",
     "github.com/olebedev/emitter",
+    "github.com/sirupsen/logrus",
     "github.com/spf13/viper",
     "github.com/stretchr/testify/assert",
     "github.com/tendermint/tendermint/libs/pubsub/query",

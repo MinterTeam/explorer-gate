@@ -5,7 +5,7 @@ import (
 	"github.com/MinterTeam/explorer-gate/errors"
 	"github.com/gin-gonic/gin"
 	"github.com/olebedev/emitter"
-	"log"
+	"github.com/sirupsen/logrus"
 	"net/http"
 	"strings"
 	"time"
@@ -48,25 +48,16 @@ func PushTransaction(c *gin.Context) {
 
 	var tx PushTransactionRequest
 	if err = c.ShouldBindJSON(&tx); err != nil {
-		log.Println(gin.H{
-			"error": gin.H{
-				"log":         err.Error(),
-				"transaction": tx,
-			},
-		})
+		gate.Logger.Error(err)
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-
 	hash, err := gate.TxPush(tx.Transaction)
 
 	if err != nil {
-		log.Println(gin.H{
-			"error": gin.H{
-				"log":         err,
-				"transaction": tx,
-			},
-		})
+		gate.Logger.WithFields(logrus.Fields{
+			"transaction": tx,
+		}).Error(err)
 		errors.SetErrorResponse(err, c)
 	} else {
 		select {
@@ -77,12 +68,10 @@ func PushTransaction(c *gin.Context) {
 				},
 			})
 		case <-time.After(time.Duration(gate.Config.GetInt("minterApi.timeOut")) * time.Second):
-			log.Println(gin.H{
-				"error": gin.H{
-					"log":         `Time out waiting for transaction to be included in block`,
-					"transaction": tx,
-				},
-			})
+			gate.Logger.WithFields(logrus.Fields{
+				"transaction": tx,
+				"code":        504,
+			}).Error(`Time out waiting for transaction to be included in block`)
 			c.JSON(http.StatusRequestTimeout, gin.H{
 				"error": gin.H{
 					"code": 1,
