@@ -10,13 +10,10 @@ import (
 	_ "github.com/jinzhu/gorm/dialects/postgres"
 	"github.com/olebedev/emitter"
 	"github.com/sirupsen/logrus"
-	"github.com/tendermint/tendermint/libs/pubsub/query"
 	tmClient "github.com/tendermint/tendermint/rpc/client"
+	"github.com/tendermint/tendermint/rpc/core/types"
 	"github.com/tendermint/tendermint/types"
 	"os"
-	"regexp"
-	"strings"
-	"time"
 )
 
 var Version string   // Version
@@ -75,24 +72,21 @@ func main() {
 	if err != nil {
 		contextLogger.Error(err)
 	}
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
-	q := query.MustParse(`tm.event = 'Tx'`)
-	txs := make(chan interface{})
-	err = nodeRpc.Subscribe(ctx, "explorer-gate", q, txs)
+
+	blocks, err := nodeRpc.Subscribe(context.TODO(), "", `tm.event = 'NewBlock'`)
 	if err != nil {
 		contextLogger.Error(err)
 	}
 
-	go handleTxs(txs, ee)
+	go handleBlocks(blocks, ee)
 
 	api.Run(config, gateService, ee)
 }
 
-func handleTxs(txs <-chan interface{}, emitter *emitter.Emitter) {
-	var re = regexp.MustCompile(`(?mi)^Tx\{(.*)\}`)
-	for e := range txs {
-		matches := re.FindStringSubmatch(e.(types.EventDataTx).Tx.String())
-		<-emitter.Emit(strings.ToUpper(matches[1]), matches[1])
+func handleBlocks(blocks <-chan core_types.ResultEvent, emitter *emitter.Emitter) {
+	for e := range blocks {
+		for _, tx := range e.Data.(types.EventDataNewBlock).Block.Txs {
+			<-emitter.Emit(fmt.Sprintf("%X", []byte(tx)), true)
+		}
 	}
 }
