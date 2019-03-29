@@ -1,11 +1,14 @@
 package handlers
 
 import (
+	"context"
+	"fmt"
 	"github.com/MinterTeam/explorer-gate/core"
 	"github.com/MinterTeam/explorer-gate/errors"
 	"github.com/gin-gonic/gin"
-	"github.com/olebedev/emitter"
 	"github.com/sirupsen/logrus"
+	"github.com/tendermint/tendermint/libs/pubsub"
+	"github.com/tendermint/tendermint/libs/pubsub/query"
 	"net/http"
 	"strings"
 	"time"
@@ -23,7 +26,6 @@ type PushTransactionRequest struct {
 }
 
 func PushTransaction(c *gin.Context) {
-
 	var err error
 	gate, ok := c.MustGet("gate").(*core.MinterGate)
 	if !ok {
@@ -35,7 +37,7 @@ func PushTransaction(c *gin.Context) {
 		})
 		return
 	}
-	ee, ok := c.MustGet("emitter").(*emitter.Emitter)
+	pubsubServer, ok := c.MustGet("pubsub").(*pubsub.Server)
 	if !ok {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": gin.H{
@@ -60,8 +62,20 @@ func PushTransaction(c *gin.Context) {
 		}).Error(err)
 		errors.SetErrorResponse(err, c)
 	} else {
+		q, _ := query.New(fmt.Sprintf("tx='%s'", strings.ToUpper(tx.Transaction)))
+		sub, err := pubsubServer.Subscribe(context.TODO(), "", q)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"error": gin.H{
+					"code": 1,
+					"log":  "Subscription error",
+				},
+			})
+			return
+		}
+
 		select {
-		case <-ee.On(strings.ToUpper(tx.Transaction), emitter.Once):
+		case <-sub.Out():
 			c.JSON(http.StatusOK, gin.H{
 				"data": gin.H{
 					"hash": &hash,
