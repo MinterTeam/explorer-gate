@@ -4,15 +4,15 @@ import (
 	"github.com/MinterTeam/explorer-gate/env"
 	"github.com/MinterTeam/explorer-gate/errors"
 	"github.com/daniildulin/minter-node-api"
-	"github.com/olebedev/emitter"
 	"github.com/sirupsen/logrus"
+	"github.com/tendermint/tendermint/libs/pubsub"
 	"strings"
 )
 
 type MinterGate struct {
 	api     *minter_node_api.MinterNodeApi
 	Config  env.Config
-	emitter *emitter.Emitter
+	emitter *pubsub.Server
 	Logger  *logrus.Entry
 }
 
@@ -22,7 +22,7 @@ type CoinEstimate struct {
 }
 
 //New instance of Minter Gate
-func New(config env.Config, e *emitter.Emitter, logger *logrus.Entry) *MinterGate {
+func New(config env.Config, e *pubsub.Server, logger *logrus.Entry) *MinterGate {
 
 	proto := `http`
 	if config.GetBool(`minterApi.isSecure`) {

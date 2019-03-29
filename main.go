@@ -8,8 +8,8 @@ import (
 	"github.com/MinterTeam/explorer-gate/core"
 	"github.com/MinterTeam/explorer-gate/env"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
-	"github.com/olebedev/emitter"
 	"github.com/sirupsen/logrus"
+	"github.com/tendermint/tendermint/libs/pubsub"
 	tmClient "github.com/tendermint/tendermint/rpc/client"
 	"github.com/tendermint/tendermint/rpc/core/types"
 	"github.com/tendermint/tendermint/types"
@@ -63,8 +63,14 @@ func main() {
 	})
 
 	var err error
-	ee := &emitter.Emitter{}
-	gateService := core.New(config, ee, contextLogger)
+
+	pubsubServer := pubsub.NewServer()
+	err = pubsubServer.Start()
+	if err != nil {
+		contextLogger.Error(err)
+	}
+
+	gateService := core.New(config, pubsubServer, contextLogger)
 
 	//Init RPC
 	nodeRpc := tmClient.NewHTTP(`tcp://`+config.GetString(`minterApi.link`)+`:26657`, `/websocket`)
@@ -78,15 +84,20 @@ func main() {
 		contextLogger.Error(err)
 	}
 
-	go handleBlocks(blocks, ee)
+	go handleBlocks(blocks, pubsubServer, contextLogger)
 
-	api.Run(config, gateService, ee)
+	api.Run(config, gateService, pubsubServer)
 }
 
-func handleBlocks(blocks <-chan core_types.ResultEvent, emitter *emitter.Emitter) {
+func handleBlocks(blocks <-chan core_types.ResultEvent, pubsubServer *pubsub.Server, logger *logrus.Entry) {
 	for e := range blocks {
 		for _, tx := range e.Data.(types.EventDataNewBlock).Block.Txs {
-			<-emitter.Emit(fmt.Sprintf("%X", []byte(tx)), true)
+			err := pubsubServer.PublishWithTags(context.TODO(), "NewTx", map[string]string{
+				"tx": fmt.Sprintf("%X", []byte(tx)),
+			})
+			if err != nil {
+				logger.Error(err)
+			}
 		}
 	}
 }
