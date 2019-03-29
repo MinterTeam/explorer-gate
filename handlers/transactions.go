@@ -62,8 +62,9 @@ func PushTransaction(c *gin.Context) {
 		}).Error(err)
 		errors.SetErrorResponse(err, c)
 	} else {
-		q, _ := query.New(fmt.Sprintf("tx='%s'", strings.ToUpper(tx.Transaction)))
-		sub, err := pubsubServer.Subscribe(context.TODO(), "", q)
+		txHex := strings.ToUpper(tx.Transaction)
+		q, _ := query.New(fmt.Sprintf("tx='%s'", txHex))
+		sub, err := pubsubServer.Subscribe(context.TODO(), txHex, q)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{
 				"error": gin.H{
@@ -73,6 +74,7 @@ func PushTransaction(c *gin.Context) {
 			})
 			return
 		}
+		defer pubsubServer.Unsubscribe(context.TODO(), txHex, q)
 
 		select {
 		case <-sub.Out():
