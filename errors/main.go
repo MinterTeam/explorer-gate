@@ -22,7 +22,8 @@ func GetNodeErrorFromResponse(r *responses.SendTransactionResponse) error {
 					return err
 				}
 				value = value.Mul(value, bip)
-				return NewInsufficientFundsError(strings.Replace(r.Error.TxResult.Log, matches[1], value.String(), -1), int32(r.Error.TxResult.Code), value.String(), matches[2])
+				strValue := value.Text('f', 10)
+				return NewInsufficientFundsError(strings.Replace(r.Error.TxResult.Log, matches[1], strValue, -1), int32(r.Error.TxResult.Code), strValue, matches[2])
 			}
 			return NewInsufficientFundsError(r.Error.TxResult.Log, int32(r.Error.TxResult.Code), "", "")
 		default:
