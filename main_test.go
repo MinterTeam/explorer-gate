@@ -8,18 +8,17 @@ import (
 	"github.com/MinterTeam/explorer-gate/core"
 	"github.com/MinterTeam/explorer-gate/env"
 	"github.com/gin-gonic/gin"
-	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
-	"github.com/olebedev/emitter"
+	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
+	"github.com/tendermint/tendermint/libs/pubsub"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"testing"
 )
 
 var (
-	db          *gorm.DB
-	ee          *emitter.Emitter
 	cfg         env.Config
 	router      *gin.Engine
 	gateService *core.MinterGate
@@ -43,9 +42,24 @@ type Resp struct {
 }
 
 func init() {
+	logger := logrus.New()
+	logger.SetFormatter(&logrus.JSONFormatter{})
+	logger.SetOutput(os.Stdout)
+	logger.SetReportCaller(true)
+	contextLogger := logger.WithFields(logrus.Fields{
+		"version": "1.3.0",
+		"app":     "Minter Gate Test",
+	})
+
+	pubsubServer := pubsub.NewServer()
+	err := pubsubServer.Start()
+	if err != nil {
+		panic(err)
+	}
+
 	cfg = env.NewViperConfig()
-	gateService = core.New(cfg, ee, db)
-	router = api.SetupRouter(cfg, gateService, ee, db)
+	gateService = core.New(cfg, pubsubServer, contextLogger)
+	router = api.SetupRouter(cfg, gateService, pubsubServer)
 }
 
 func TestPushWrongTransaction(t *testing.T) {
@@ -74,6 +88,6 @@ func TestEstimateTx(t *testing.T) {
 	assert.NotNil(t, target.Data)
 	assert.NotNil(t, target.Data.Commission)
 	if target.Data.Commission != nil && *target.Data.Commission == "" {
-		assert.NoError(t, errors.New("Empty commission value"))
+		assert.NoError(t, errors.New("empty commission value"))
 	}
 }

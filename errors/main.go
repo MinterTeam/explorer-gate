@@ -14,6 +14,26 @@ func GetNodeErrorFromResponse(r *responses.SendTransactionResponse) error {
 	bip := big.NewFloat(0.000000000000000001)
 	if r.Error != nil && r.Error.TxResult != nil {
 		switch r.Error.TxResult.Code {
+		case 103:
+			var re = regexp.MustCompile(`(?mi)^.*Has.*(\d+), require (\d+)`)
+			matches := re.FindStringSubmatch(r.Error.TxResult.Log)
+			if matches != nil {
+				valueHas, _, err := big.ParseFloat(matches[1], 10, 0, big.ToZero)
+				if err != nil {
+					return err
+				}
+				valueHas = valueHas.Mul(valueHas, bip)
+				valueRequired, _, err := big.ParseFloat(matches[2], 10, 0, big.ToZero)
+				if err != nil {
+					return err
+				}
+				valueRequired = valueRequired.Mul(valueRequired, bip)
+				replacer := strings.NewReplacer(
+					matches[1], valueHas.Text('g', 10),
+					matches[2], valueRequired.Text('g', 10))
+				return NewNodeError(replacer.Replace(r.Error.TxResult.Log), int32(r.Error.TxResult.Code))
+			}
+			return NewNodeError(r.Error.TxResult.Log, int32(r.Error.TxResult.Code))
 		case 107:
 			var re = regexp.MustCompile(`(?mi)^.*Wanted *(\d+) (\w+)`)
 			matches := re.FindStringSubmatch(r.Error.TxResult.Log)
