@@ -6,6 +6,7 @@ import (
 	"math/big"
 	"net/http"
 	"regexp"
+	"strconv"
 	"strings"
 )
 
@@ -26,6 +27,27 @@ func GetNodeErrorFromResponse(r *responses.SendTransactionResponse) error {
 				return NewInsufficientFundsError(strings.Replace(r.Error.TxResult.Log, matches[1], strValue, -1), int32(r.Error.TxResult.Code), strValue, matches[2])
 			}
 			return NewInsufficientFundsError(r.Error.TxResult.Log, int32(r.Error.TxResult.Code), "", "")
+		case 205:
+			var re = regexp.MustCompile(`(?mi)^.*between (\d+) and (\d+)`)
+			matches := re.FindStringSubmatch(r.Error.TxResult.Log)
+			if matches != nil {
+				valueFrom, _, err := big.ParseFloat(matches[1], 10, 0, big.ToZero)
+				if err != nil {
+					return err
+				}
+				valueFrom = valueFrom.Mul(valueFrom, bip)
+				valueTo, _, err := big.ParseFloat(matches[2], 10, 0, big.ToZero)
+				if err != nil {
+					return err
+				}
+				valueTo = valueTo.Mul(valueTo, bip)
+				intValTo, _ := valueTo.Int64()
+				replacer := strings.NewReplacer(
+					matches[1]+" ", valueFrom.Text('g', 10)+" ",
+					"and "+matches[2], "and "+strconv.Itoa(int(intValTo)))
+				return NewNodeError(replacer.Replace(r.Error.TxResult.Log), int32(r.Error.TxResult.Code))
+			}
+			return NewNodeError(r.Error.TxResult.Log, int32(r.Error.TxResult.Code))
 		default:
 			return NewNodeError(r.Error.TxResult.Log, int32(r.Error.TxResult.Code))
 		}
