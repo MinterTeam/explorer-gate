@@ -5,6 +5,7 @@ import (
 	"github.com/MinterTeam/explorer-gate/core"
 	"github.com/MinterTeam/explorer-gate/env"
 	"github.com/MinterTeam/explorer-gate/handlers"
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
 	"github.com/tendermint/tendermint/libs/pubsub"
@@ -33,6 +34,7 @@ func SetupRouter(config env.Config, gateService *core.MinterGate, pubsubServer *
 		ginprom.Path("/metrics"),
 	)
 	router.Use(p.Instrument())
+	router.Use(cors.Default())                           // CORS
 	router.Use(gin.ErrorLogger())                        // print all errors
 	router.Use(gin.Recovery())                           // returns 500 on any code panics
 	router.Use(apiMiddleware(gateService, pubsubServer)) // init global context
