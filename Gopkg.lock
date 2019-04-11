@@ -2,20 +2,34 @@
 
 
 [[projects]]
-  digest = "1:8f3b2a5973b2e22ef03745d9f14c0ef54a6366f0ce5028a00b8b75603e179fce"
+  digest = "1:4844af1354f1b14db6035fb216eb7db836433c802f5688ae204a348595bd7f31"
   name = "github.com/Depado/ginprom"
   packages = ["."]
   pruneopts = "UT"
-  revision = "ee66175a4606350f78ff590e745869c7846bd561"
-  version = "v1.1.0"
+  revision = "8d43ab64dad988d23994113f54dc6ffc5081d8a5"
+  version = "v1.1.1"
 
 [[projects]]
-  digest = "1:653dbb777389604ea28b558b28dbe2a15b24301d51998006859284d6b8adc0e4"
+  digest = "1:e7c9f43d6cc6da66e8fef19baa3d7ebdb54940911d581b133f4f0ff11c4a99b2"
   name = "github.com/MinterTeam/minter-explorer-tools"
-  packages = ["helpers"]
+  packages = [
+    "helpers",
+    "models",
+  ]
   pruneopts = "UT"
-  revision = "5f5ed16bdb83093a7632479b6167f06ffdb2fe3e"
-  version = "v1.3.0"
+  revision = "bce8c1ac4852ae3d14fb82291d2de41bc186e1b5"
+  version = "v1.5.2"
+
+[[projects]]
+  digest = "1:31ab6a3388ffbad61d97c94baa309b4157e2f298e805c5fa9f125f7de4f123fd"
+  name = "github.com/MinterTeam/minter-node-go-api"
+  packages = [
+    ".",
+    "responses",
+  ]
+  pruneopts = "UT"
+  revision = "d2cb87228e6ca02d894efec150f7eb7e4dbc7759"
+  version = "v1.0.0"
 
 [[projects]]
   branch = "master"
@@ -31,18 +45,7 @@
   name = "github.com/btcsuite/btcd"
   packages = ["btcec"]
   pruneopts = "UT"
-  revision = "aa6e0f35703c1438cc45860ddc0c3f6e6c633c93"
-
-[[projects]]
-  digest = "1:f60eadefda7960ccea531dabfc84ec66a7d3e56828f6a3887f7ef5976a500e1a"
-  name = "github.com/daniildulin/minter-node-api"
-  packages = [
-    ".",
-    "responses",
-  ]
-  pruneopts = "UT"
-  revision = "34937a7681cf98bfb45fa109c002e19f47c0798c"
-  version = "v1.5.1"
+  revision = "9bfb2ca0346b57e246cc96fa31074df521175240"
 
 [[projects]]
   digest = "1:ffe9824d294da03b391f44e1ae8281281b4afc1bdaa9588c9097785e3af10cec"
@@ -306,12 +309,12 @@
   version = "1.0.1"
 
 [[projects]]
-  digest = "1:95741de3af260a92cc5c7f3f3061e85273f5a81b5db20d4bd68da74bd521675e"
+  digest = "1:e0f50a07c0def90588d69f77178712c6fdc67eb6576365f551cce98b44b501bf"
   name = "github.com/pelletier/go-toml"
   packages = ["."]
   pruneopts = "UT"
-  revision = "c01d1270ff3e442a8a57cddc1c92dc1138598194"
-  version = "v1.2.0"
+  revision = "63909f0a90ab0f36909e8e044e46ace10cf13ba2"
+  version = "v1.3.0"
 
 [[projects]]
   digest = "1:cf31692c14422fa27c83a05292eb5cbe0fb2775972e8f1f8446a71549bd8980b"
@@ -358,29 +361,24 @@
     "model",
   ]
   pruneopts = "UT"
-  revision = "cfeb6f9992ffa54aaa4f2170ade4067ee478b250"
-  version = "v0.2.0"
+  revision = "a82f4c12f983cc2649298185f296632953e50d3e"
+  version = "v0.3.0"
 
 [[projects]]
   branch = "master"
-  digest = "1:c31163bd62461e0c5f7ddc7363e39ef8d9e929693e77b5c11c709b05f9cb9219"
+  digest = "1:f806b417865e83457c3659232926203f5b0d39aa741b71d9e3e4c0c774e71a5c"
   name = "github.com/prometheus/procfs"
-  packages = [
-    ".",
-    "internal/util",
-    "iostats",
-    "nfs",
-    "xfs",
-  ]
+  packages = ["."]
   pruneopts = "UT"
-  revision = "40f3c57fb1983891f95378042bd0bfd590f52384"
+  revision = "ea9eea63887261e4d8ed8315f4078e88d540c725"
 
 [[projects]]
-  digest = "1:c4556a44e350b50a490544d9b06e9fba9c286c21d6c0e47f54f3a9214597298c"
+  branch = "master"
+  digest = "1:d38f81081a389f1466ec98192cf9115a82158854d6f01e1c23e2e7554b97db71"
   name = "github.com/rcrowley/go-metrics"
   packages = ["."]
   pruneopts = "UT"
-  revision = "e2704e165165ec55d062f5919b4b29494e9fa790"
+  revision = "3113b8401b8a98917cde58f8bbd42a1b1c03b1fd"
 
 [[projects]]
   digest = "1:b0c25f00bad20d783d259af2af8666969e2fc343fa0dc9efe52936bbd67fb758"
@@ -392,23 +390,23 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:e4c72127d910a96daf869a44f3dd563b86dbe6931a172863a0e99c5ff04b59e4"
+  digest = "1:cabe9ec8289704e71e45138c18ad90275bce25a8d61145c4130b55d9d9a6d6dc"
   name = "github.com/sirupsen/logrus"
   packages = ["."]
   pruneopts = "UT"
-  revision = "dae0fa8d5b0c810a8ab733fbd5510c7cae84eca4"
+  revision = "9b3cdde74fbe9443d704467498a7dcb61a79de9b"
   source = "github.com/sirupsen/logrus"
 
 [[projects]]
-  digest = "1:3e39bafd6c2f4bf3c76c3bfd16a2e09e016510ad5db90dc02b88e2f565d6d595"
+  digest = "1:bb495ec276ab82d3dd08504bbc0594a65de8c3b22c6f2aaa92d05b73fbf3a82e"
   name = "github.com/spf13/afero"
   packages = [
     ".",
     "mem",
   ]
   pruneopts = "UT"
-  revision = "f4711e4db9e9a1d3887343acb72b2bbfc2f686f5"
-  version = "v1.2.1"
+  revision = "588a75ec4f32903aa5e39a2619ba6a4631e28424"
+  version = "v1.2.2"
 
 [[projects]]
   digest = "1:08d65904057412fc0270fc4812a1c90c594186819243160dc779a402d4b6d0bc"
@@ -480,7 +478,7 @@
   version = "v0.14.1"
 
 [[projects]]
-  digest = "1:b70ed34c12f23ba4d58a985a63153b05113d421a0d3c0360682c8bed6262e7b1"
+  digest = "1:6970cac3bdf5f1c6eac25104401ab31c0d2df5e296da107b4daa924605f91c49"
   name = "github.com/tendermint/tendermint"
   packages = [
     "abci/client",
@@ -535,16 +533,16 @@
     "version",
   ]
   pruneopts = "UT"
-  revision = "0d985ede28bd6937fa9d3613618e42cab6fc871c"
-  version = "v0.31.0"
+  revision = "6cc3f4d87cae6589aef0ac2b4707f1ebc8a669b2"
+  version = "v0.31.3"
 
 [[projects]]
-  digest = "1:4887e9e89c80299aa520d718239809fdd2a47a9aa394909b169959bfbc424ddf"
+  digest = "1:d0072748c62defde1ad99dde77f6ffce492a0e5aea9204077e497c7edfb86653"
   name = "github.com/ugorji/go"
   packages = ["codec"]
   pruneopts = "UT"
-  revision = "8fd0f8d918c8f0b52d0af210a812ba882cc31a1e"
-  version = "v1.1.2"
+  revision = "2adff0894ba3bc2eeb9f9aea45fefd49802e1a13"
+  version = "v1.1.4"
 
 [[projects]]
   digest = "1:c468422f334a6b46a19448ad59aaffdfc0a36b08fdcc1c749a0b29b6453d7e59"
@@ -568,7 +566,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:badaafb93800b5c25e5a17a8ccfcdeb7c83415edefce48a45deb1bfc977965cf"
+  digest = "1:5f3dcf686255ceb1e32541df26625687597e20bb210e3f484988820890ced655"
   name = "golang.org/x/crypto"
   packages = [
     "chacha20poly1305",
@@ -583,13 +581,13 @@
     "poly1305",
     "ripemd160",
     "salsa20/salsa",
-    "ssh/terminal",
   ]
   pruneopts = "UT"
-  revision = "a5d413f7728c81fb97d96a2b722368945f651e78"
+  revision = "38d8ce5564a5b71b2e3a00553993f1b9a7ae852f"
 
 [[projects]]
-  digest = "1:d36f55a999540d29b6ea3c2ea29d71c76b1d9853fdcd3e5c5cb4836f2ba118f1"
+  branch = "master"
+  digest = "1:ece18bebf37543e3ea16619bd9bd2b36dcec7bffa9008598dd8c4fe7803a5797"
   name = "golang.org/x/net"
   packages = [
     "context",
@@ -602,19 +600,18 @@
     "trace",
   ]
   pruneopts = "UT"
-  revision = "292b43bbf7cb8d35ddf40f8d5100ef3837cced3f"
+  revision = "eb5bcb51f2a31c7d5141d810b70815c05d9c9146"
 
 [[projects]]
   branch = "master"
-  digest = "1:51e9c8a64ecddbba456f24b2119aade9dc8e062fc6d10b30548f75f483e08b76"
+  digest = "1:13917c3d8b9b6c14a941d66af59444b7ce53a859a8b86e24891a713186f42c65"
   name = "golang.org/x/sys"
   packages = [
     "cpu",
     "unix",
-    "windows",
   ]
   pruneopts = "UT"
-  revision = "f7bb7a8bee54210937e93ec56d007d892c1f0580"
+  revision = "0ad05ae3009d6413d3363aa09b350b2ec37daf09"
 
 [[projects]]
   digest = "1:a2ab62866c75542dd18d2b069fec854577a20211d7c0ea6ae746072a1dccdd18"
@@ -645,10 +642,10 @@
   name = "google.golang.org/genproto"
   packages = ["googleapis/rpc/status"]
   pruneopts = "UT"
-  revision = "5fe7a883aa19554f42890211544aa549836af7b7"
+  revision = "64821d5d210748c883cd2b809589555ae4654203"
 
 [[projects]]
-  digest = "1:c00eb80d7b152379c3e94c38d82b29deca98b1d0f53e4e20362589b7fcbffa07"
+  digest = "1:31d87f39886fb38a2b6c097ff3b9f985d6960772170d64a68246f7790e955746"
   name = "google.golang.org/grpc"
   packages = [
     ".",
@@ -665,6 +662,7 @@
     "grpclog",
     "internal",
     "internal/backoff",
+    "internal/balancerload",
     "internal/binarylog",
     "internal/channelz",
     "internal/envconfig",
@@ -684,8 +682,8 @@
     "tap",
   ]
   pruneopts = "UT"
-  revision = "3507fb8e1a5ad030303c106fef3a47c9fdad16ad"
-  version = "v1.19.1"
+  revision = "236199dd5f8031d698fb64091194aecd1c3895b2"
+  version = "v1.20.0"
 
 [[projects]]
   digest = "1:cbc72c4c4886a918d6ab4b95e347ffe259846260f99ebdd8a198c2331cf2b2e9"
@@ -709,8 +707,8 @@
   input-imports = [
     "github.com/Depado/ginprom",
     "github.com/MinterTeam/minter-explorer-tools/helpers",
-    "github.com/daniildulin/minter-node-api",
-    "github.com/daniildulin/minter-node-api/responses",
+    "github.com/MinterTeam/minter-node-go-api",
+    "github.com/MinterTeam/minter-node-go-api/responses",
     "github.com/gin-contrib/cors",
     "github.com/gin-gonic/gin",
     "github.com/jinzhu/gorm/dialects/postgres",

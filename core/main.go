@@ -3,14 +3,14 @@ package core
 import (
 	"github.com/MinterTeam/explorer-gate/env"
 	"github.com/MinterTeam/explorer-gate/errors"
-	"github.com/daniildulin/minter-node-api"
+	"github.com/MinterTeam/minter-node-go-api"
 	"github.com/sirupsen/logrus"
 	"github.com/tendermint/tendermint/libs/pubsub"
 	"strings"
 )
 
 type MinterGate struct {
-	api     *minter_node_api.MinterNodeApi
+	api     *minter_node_go_api.MinterNodeApi
 	Config  env.Config
 	emitter *pubsub.Server
 	Logger  *logrus.Entry
@@ -31,7 +31,7 @@ func New(config env.Config, e *pubsub.Server, logger *logrus.Entry) *MinterGate 
 	apiLink := proto + `://` + config.GetString(`minterApi.link`) + `:` + config.GetString(`minterApi.port`)
 	return &MinterGate{
 		emitter: e,
-		api:     minter_node_api.New(apiLink),
+		api:     minter_node_go_api.New(apiLink),
 		Config:  config,
 		Logger:  logger,
 	}
@@ -123,6 +123,31 @@ func (mg *MinterGate) EstimateCoinSell(coinToSell string, coinToBuy string, valu
 		return nil, err
 	}
 	return &CoinEstimate{response.Result.WillGet, response.Result.Commission}, nil
+}
+
+//Return estimate of sell coin
+func (mg *MinterGate) EstimateCoinSellAll(coinToSell string, coinToBuy string, value string, gasPrice string) (*CoinEstimate, error) {
+	response, err := mg.api.GetEstimateCoinSellAll(coinToSell, coinToBuy, value, gasPrice)
+	if err != nil {
+		mg.Logger.WithFields(logrus.Fields{
+			"coinToSell": coinToSell,
+			"coinToBuy":  coinToBuy,
+			"value":      value,
+			"gasPrice":   gasPrice,
+		}).Error(err)
+		return nil, err
+	}
+	if response.Error != nil {
+		err = errors.NewNodeError(response.Error.Message, response.Error.Code)
+		mg.Logger.WithFields(logrus.Fields{
+			"coinToSell": coinToSell,
+			"coinToBuy":  coinToBuy,
+			"value":      value,
+			"gasPrice":   gasPrice,
+		}).Error(err)
+		return nil, err
+	}
+	return &CoinEstimate{response.Result.WillGet, ""}, nil
 }
 
 //Return nonce for address

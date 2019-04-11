@@ -1,7 +1,7 @@
 package errors
 
 import (
-	"github.com/daniildulin/minter-node-api/responses"
+	"github.com/MinterTeam/minter-node-go-api/responses"
 	"github.com/gin-gonic/gin"
 	"math/big"
 	"net/http"

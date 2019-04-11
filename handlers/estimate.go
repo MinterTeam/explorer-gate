@@ -86,6 +86,33 @@ func EstimateCoinSell(c *gin.Context) {
 	}
 }
 
+func EstimateCoinSellAll(c *gin.Context) {
+	gate, ok := c.MustGet("gate").(*core.MinterGate)
+	if !ok {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": gin.H{
+				"code": 1,
+				"log":  "Type cast error",
+			},
+		})
+		return
+	}
+	coinToSell := c.Query(`coinToSell`)
+	coinToBuy := c.Query(`coinToBuy`)
+	value := c.Query(`valueToSell`)
+	gasPrice := c.Query(`gasPrice`)
+	estimate, err := gate.EstimateCoinSellAll(coinToSell, coinToBuy, value, gasPrice)
+	if err != nil {
+		errors.SetErrorResponse(err, c)
+	} else {
+		c.JSON(http.StatusOK, gin.H{
+			"data": gin.H{
+				"will_get": estimate.Value,
+			},
+		})
+	}
+}
+
 func GetNonce(c *gin.Context) {
 	gate, ok := c.MustGet("gate").(*core.MinterGate)
 	if !ok {
