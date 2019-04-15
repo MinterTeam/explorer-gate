@@ -44,14 +44,14 @@ func (mg MinterGate) TxPush(transaction string) (*string, error) {
 	if err != nil {
 		mg.Logger.WithFields(logrus.Fields{
 			"transaction": transaction,
-		}).Error(err)
+		}).Warn(err)
 		return nil, err
 	}
 	if response.Error != nil || response.Result.Code != 0 {
 		err = errors.GetNodeErrorFromResponse(response)
 		mg.Logger.WithFields(logrus.Fields{
 			"transaction": transaction,
-		}).Error(err)
+		}).Warn(err)
 		return nil, err
 	}
 	hash := `Mt` + strings.ToLower(response.Result.Hash)
@@ -64,14 +64,14 @@ func (mg *MinterGate) EstimateTxCommission(transaction string) (*string, error) 
 	if err != nil {
 		mg.Logger.WithFields(logrus.Fields{
 			"transaction": transaction,
-		}).Error(err)
+		}).Warn(err)
 		return nil, err
 	}
 	if response.Error != nil {
 		err = errors.NewNodeError(response.Error.Message, response.Error.Code)
 		mg.Logger.WithFields(logrus.Fields{
 			"transaction": transaction,
-		}).Error(err)
+		}).Warn(err)
 		return nil, err
 	}
 	return &response.Result.Commission, nil
@@ -85,7 +85,7 @@ func (mg *MinterGate) EstimateCoinBuy(coinToSell string, coinToBuy string, value
 			"coinToSell": coinToSell,
 			"coinToBuy":  coinToBuy,
 			"value":      value,
-		}).Error(err)
+		}).Warn(err)
 		return nil, err
 	}
 
@@ -95,7 +95,7 @@ func (mg *MinterGate) EstimateCoinBuy(coinToSell string, coinToBuy string, value
 			"coinToSell": coinToSell,
 			"coinToBuy":  coinToBuy,
 			"value":      value,
-		}).Error(err)
+		}).Warn(err)
 		return nil, err
 	}
 
@@ -110,7 +110,7 @@ func (mg *MinterGate) EstimateCoinSell(coinToSell string, coinToBuy string, valu
 			"coinToSell": coinToSell,
 			"coinToBuy":  coinToBuy,
 			"value":      value,
-		}).Error(err)
+		}).Warn(err)
 		return nil, err
 	}
 	if response.Error != nil {
@@ -119,7 +119,7 @@ func (mg *MinterGate) EstimateCoinSell(coinToSell string, coinToBuy string, valu
 			"coinToSell": coinToSell,
 			"coinToBuy":  coinToBuy,
 			"value":      value,
-		}).Error(err)
+		}).Warn(err)
 		return nil, err
 	}
 	return &CoinEstimate{response.Result.WillGet, response.Result.Commission}, nil
@@ -134,7 +134,7 @@ func (mg *MinterGate) EstimateCoinSellAll(coinToSell string, coinToBuy string, v
 			"coinToBuy":  coinToBuy,
 			"value":      value,
 			"gasPrice":   gasPrice,
-		}).Error(err)
+		}).Warn(err)
 		return nil, err
 	}
 	if response.Error != nil {
@@ -144,7 +144,7 @@ func (mg *MinterGate) EstimateCoinSellAll(coinToSell string, coinToBuy string, v
 			"coinToBuy":  coinToBuy,
 			"value":      value,
 			"gasPrice":   gasPrice,
-		}).Error(err)
+		}).Warn(err)
 		return nil, err
 	}
 	return &CoinEstimate{response.Result.WillGet, ""}, nil
@@ -156,14 +156,14 @@ func (mg *MinterGate) GetNonce(address string) (*string, error) {
 	if err != nil {
 		mg.Logger.WithFields(logrus.Fields{
 			"address": address,
-		}).Error(err)
+		}).Warn(err)
 		return nil, err
 	}
 	if response.Error != nil {
 		err = errors.NewNodeError(response.Error.Message, response.Error.Code)
 		mg.Logger.WithFields(logrus.Fields{
 			"address": address,
-		}).Error(err)
+		}).Warn(err)
 		return nil, err
 	}
 	return &response.Result.TransactionCount, nil
