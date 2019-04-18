@@ -68,6 +68,26 @@ func GetNodeErrorFromResponse(r *responses.SendTransactionResponse) error {
 				return NewNodeError(replacer.Replace(r.Error.TxResult.Log), int32(r.Error.TxResult.Code))
 			}
 			return NewNodeError(r.Error.TxResult.Log, int32(r.Error.TxResult.Code))
+		case 302:
+			var re = regexp.MustCompile(`(?mi)^.*maximum (\d+).* spend (\d+).*`)
+			matches := re.FindStringSubmatch(r.Error.TxResult.Log)
+			if matches != nil {
+				valueWant, _, err := big.ParseFloat(matches[1], 10, 0, big.ToZero)
+				if err != nil {
+					return err
+				}
+				valueWant = valueWant.Mul(valueWant, bip)
+				valueNeed, _, err := big.ParseFloat(matches[2], 10, 0, big.ToZero)
+				if err != nil {
+					return err
+				}
+				valueNeed = valueNeed.Mul(valueNeed, bip)
+				replacer := strings.NewReplacer(
+					matches[1], valueWant.Text('g', 10),
+					matches[2], valueNeed.Text('g', 10))
+				return NewMaximumValueToSellReachedError(replacer.Replace(r.Error.TxResult.Log), int32(r.Error.TxResult.Code), matches[1], matches[2])
+			}
+			return NewNodeError(r.Error.TxResult.Log, int32(r.Error.TxResult.Code))
 		default:
 			return NewNodeError(r.Error.TxResult.Log, int32(r.Error.TxResult.Code))
 		}
@@ -101,6 +121,15 @@ func SetErrorResponse(err error, c *gin.Context) {
 				"log":   e.Error(),
 				"coin":  e.Coin(),
 				"value": e.Value(),
+			},
+		})
+	case *MaximumValueToSellReachedError:
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": gin.H{
+				"code": e.Code(),
+				"log":  e.Error(),
+				"want": e.Want(),
+				"need": e.Need(),
 			},
 		})
 	default:
