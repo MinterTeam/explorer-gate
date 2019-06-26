@@ -17,7 +17,7 @@ import (
 func Index(c *gin.Context) {
 	c.JSON(200, gin.H{
 		"name":    "Minter Explorer Gate API",
-		"version": "1.0",
+		"version": "1.3.0",
 	})
 }
 
@@ -62,7 +62,7 @@ func PushTransaction(c *gin.Context) {
 		}).Error(err)
 		errors.SetErrorResponse(err, c)
 	} else {
-		txHex := strings.ToUpper(tx.Transaction)
+		txHex := strings.ToUpper(strings.TrimSpace(tx.Transaction))
 		q, _ := query.New(fmt.Sprintf("tx='%s'", txHex))
 		sub, err := pubsubServer.Subscribe(context.TODO(), txHex, q)
 		if err != nil {

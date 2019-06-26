@@ -19,7 +19,7 @@ func EstimateTxCommission(c *gin.Context) {
 		})
 		return
 	}
-	tx := `0x` + c.Query(`transaction`)
+	tx := `0x` + strings.TrimSpace(c.Query(`transaction`))
 	commission, err := gate.EstimateTxCommission(tx)
 	if err != nil {
 		errors.SetErrorResponse(err, c)
@@ -43,9 +43,9 @@ func EstimateCoinBuy(c *gin.Context) {
 		})
 		return
 	}
-	coinToSell := c.Query(`coinToSell`)
-	coinToBuy := c.Query(`coinToBuy`)
-	value := c.Query(`valueToBuy`)
+	coinToSell := strings.TrimSpace(c.Query(`coinToSell`))
+	coinToBuy := strings.TrimSpace(c.Query(`coinToBuy`))
+	value := strings.TrimSpace(c.Query(`valueToBuy`))
 	estimate, err := gate.EstimateCoinBuy(coinToSell, coinToBuy, value)
 	if err != nil {
 		errors.SetErrorResponse(err, c)
@@ -70,9 +70,9 @@ func EstimateCoinSell(c *gin.Context) {
 		})
 		return
 	}
-	coinToSell := c.Query(`coinToSell`)
-	coinToBuy := c.Query(`coinToBuy`)
-	value := c.Query(`valueToSell`)
+	coinToSell := strings.TrimSpace(c.Query(`coinToSell`))
+	coinToBuy := strings.TrimSpace(c.Query(`coinToBuy`))
+	value := strings.TrimSpace(c.Query(`valueToSell`))
 	estimate, err := gate.EstimateCoinSell(coinToSell, coinToBuy, value)
 	if err != nil {
 		errors.SetErrorResponse(err, c)
@@ -97,10 +97,10 @@ func EstimateCoinSellAll(c *gin.Context) {
 		})
 		return
 	}
-	coinToSell := c.Query(`coinToSell`)
-	coinToBuy := c.Query(`coinToBuy`)
-	value := c.Query(`valueToSell`)
-	gasPrice := c.Query(`gasPrice`)
+	coinToSell := strings.TrimSpace(c.Query(`coinToSell`))
+	coinToBuy := strings.TrimSpace(c.Query(`coinToBuy`))
+	value := strings.TrimSpace(c.Query(`valueToSell`))
+	gasPrice := strings.TrimSpace(c.Query(`gasPrice`))
 	estimate, err := gate.EstimateCoinSellAll(coinToSell, coinToBuy, value, gasPrice)
 	if err != nil {
 		errors.SetErrorResponse(err, c)
@@ -124,7 +124,7 @@ func GetNonce(c *gin.Context) {
 		})
 		return
 	}
-	address := strings.Title(c.Param(`address`))
+	address := strings.Title(strings.TrimSpace(c.Param(`address`)))
 	nonce, err := gate.GetNonce(address)
 	if err != nil {
 		errors.SetErrorResponse(err, c)
