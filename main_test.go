@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"github.com/MinterTeam/explorer-gate/api"
 	"github.com/MinterTeam/explorer-gate/core"
 	"github.com/MinterTeam/explorer-gate/env"
@@ -13,12 +12,9 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 	"github.com/tendermint/tendermint/libs/pubsub"
-	"math/big"
 	"net/http"
 	"net/http/httptest"
 	"os"
-	"regexp"
-	"strings"
 	"testing"
 )
 
@@ -93,68 +89,5 @@ func TestEstimateTx(t *testing.T) {
 	assert.NotNil(t, target.Data.Commission)
 	if target.Data.Commission != nil && *target.Data.Commission == "" {
 		assert.NoError(t, errors.New("empty commission value"))
-	}
-}
-
-func TestErrors(t *testing.T) {
-	bip := big.NewFloat(0.000000000000000001)
-	zero := big.NewFloat(0)
-
-	//min := big.NewFloat(-10000000000)
-	//
-
-	//errorString := fmt.Sprintf("You wanted to get minimum %s, but currently you will get %s", "0", "-386524121155570000000000")
-	//errorString := fmt.Sprintf("Coin reserve balance is not sufficient for transaction. Has: %s, required %s")
-	//errorString := fmt.Sprintf("Insufficient funds for sender account: %s. Wanted %s %s")
-
-	//NO BIP
-	//101, 102 105 109 110 113 115  603 604
-	//errorString := fmt.Sprintf("Response code is not correct. Expected %d, got %d")
-	//errorString := fmt.Sprintf("Response code is not correct. Expected %d, got %d")
-	//
-	//errorString := fmt.Sprintf()
-	//
-	//errorString := fmt.Sprintf()
-
-	//604
-	//errorString := fmt.Sprintf("Not enough multisig votes. Needed %d, has %d")
-
-	//BIP
-	//107
-	//errorString := fmt.Sprintf("Gas coin reserve balance is not sufficient for transaction. Has: %s %s, required %s %s")
-	//errorString := fmt.Sprintf("Insufficient funds for sender account: %s. Wanted %s %s")
-	//114
-	//errorString := fmt.Sprintf("Gas price of tx is too low to be included in mempool. Expected %d")
-	//302
-	//errorString := fmt.Sprintf("You wanted to sell maximum %s, but currently you need to spend %s to complete tx")
-	//303
-	//errorString := fmt.Sprintf("You wanted to get minimum %s, but currently you will get %s",)
-	//
-	//errorString := fmt.Sprintf()
-	//errorString := fmt.Sprintf()
-	//errorString := fmt.Sprintf()
-
-	errorString := fmt.Sprintf("You wanted to get minimum %s, but currently you will get %s", "0", "-38652412115557")
-	var re = regexp.MustCompile(`(?mi)(Has:|required|Wanted|Expected|maximum|spend|minimum|get) -*(\d+)`)
-	matches := re.FindAllStringSubmatch(errorString, -1)
-
-	if matches != nil {
-		for _, match := range matches {
-			var valueString string
-			value, _, err := big.ParseFloat(match[2], 10, 0, big.ToZero)
-			if err != nil {
-				return
-			}
-			value = value.Mul(value, bip)
-
-			if value.Cmp(zero) == 0 {
-				valueString = "0"
-			} else {
-				valueString = value.Text('f', 10)
-			}
-			replacer := strings.NewReplacer(match[2], valueString)
-			errorString = replacer.Replace(errorString)
-		}
-		fmt.Println(errorString)
 	}
 }
