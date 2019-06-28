@@ -3,7 +3,6 @@ package errors
 import (
 	"github.com/MinterTeam/minter-node-go-api/responses"
 	"github.com/gin-gonic/gin"
-	"github.com/pkg/errors"
 	"math/big"
 	"net/http"
 	"regexp"
@@ -85,9 +84,9 @@ func formatErrorMessage(errorString string) (string, error) {
 			replacer := strings.NewReplacer(match[2], valueString)
 			errorString = replacer.Replace(errorString)
 		}
-		return errorString, nil
 	}
-	return "", errors.New("empty message")
+
+	return errorString, nil
 }
 
 func SetErrorResponse(err error, c *gin.Context) {
