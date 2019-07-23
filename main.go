@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/hex"
 	"flag"
 	"fmt"
 	"github.com/MinterTeam/explorer-gate/api"
@@ -10,10 +11,12 @@ import (
 	_ "github.com/jinzhu/gorm/dialects/postgres"
 	"github.com/sirupsen/logrus"
 	"github.com/tendermint/tendermint/libs/pubsub"
-	tmClient "github.com/tendermint/tendermint/rpc/client"
+	"github.com/MinterTeam/minter-node-go-api"
 	"github.com/tendermint/tendermint/rpc/core/types"
 	"github.com/tendermint/tendermint/types"
 	"os"
+	"strconv"
+	"time"
 )
 
 var Version string   // Version
@@ -72,19 +75,56 @@ func main() {
 
 	gateService := core.New(config, pubsubServer, contextLogger)
 
-	//Init RPC
-	nodeRpc := tmClient.NewHTTP(`tcp://`+config.GetString(`minterApi.link`)+`:26657`, `/websocket`)
-	err = nodeRpc.Start()
+	proto := `http`
+	if config.GetBool(`minterApi.isSecure`) {
+		proto = `https`
+	}
+	apiLink := proto + `://` + config.GetString(`minterApi.link`) + `:` + config.GetString(`minterApi.port`)
+
+	nodeApi := minter_node_go_api.New(apiLink)
+
+	latestBlockResponse, err := nodeApi.GetStatus()
 	if err != nil {
-		contextLogger.Error(err)
+		panic(err)
 	}
 
-	blocks, err := nodeRpc.Subscribe(context.TODO(), "", `tm.event = 'NewBlock'`)
+	latestBlock, err := strconv.Atoi(latestBlockResponse.Result.LatestBlockHeight)
 	if err != nil {
-		contextLogger.Error(err)
+		panic(err)
 	}
 
-	go handleBlocks(blocks, pubsubServer, contextLogger)
+	logger.Info("Starting with block " + strconv.Itoa(latestBlock))
+
+	go func() {
+		for {
+			block, err := nodeApi.GetBlock(uint64(latestBlock))
+			if err != nil {
+				time.Sleep(time.Second)
+				continue
+			}
+
+			if block.Error != nil {
+				logger.Error(block.Error.Message)
+				time.Sleep(time.Second)
+				continue
+			}
+
+			for _, tx := range block.Result.Transactions {
+				b, _ := hex.DecodeString(tx.RawTx)
+				err := pubsubServer.PublishWithTags(context.TODO(), "NewTx", map[string]string{
+					"tx": fmt.Sprintf("%X", b),
+				})
+				if err != nil {
+					logger.Error(err)
+				}
+			}
+
+			latestBlock++
+			logger.Info("Block " + strconv.Itoa(latestBlock))
+
+			time.Sleep(1 * time.Second)
+		}
+	}()
 
 	api.Run(config, gateService, pubsubServer)
 }
@@ -92,12 +132,7 @@ func main() {
 func handleBlocks(blocks <-chan core_types.ResultEvent, pubsubServer *pubsub.Server, logger *logrus.Entry) {
 	for e := range blocks {
 		for _, tx := range e.Data.(types.EventDataNewBlock).Block.Txs {
-			err := pubsubServer.PublishWithTags(context.TODO(), "NewTx", map[string]string{
-				"tx": fmt.Sprintf("%X", []byte(tx)),
-			})
-			if err != nil {
-				logger.Error(err)
-			}
+
 		}
 	}
 }
