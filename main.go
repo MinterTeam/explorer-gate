@@ -128,11 +128,3 @@ func main() {
 
 	api.Run(config, gateService, pubsubServer)
 }
-
-func handleBlocks(blocks <-chan core_types.ResultEvent, pubsubServer *pubsub.Server, logger *logrus.Entry) {
-	for e := range blocks {
-		for _, tx := range e.Data.(types.EventDataNewBlock).Block.Txs {
-
-		}
-	}
-}
