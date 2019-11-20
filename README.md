@@ -20,7 +20,6 @@ _NOTE: This project in active development stage so feel free to send us question
 
 Related:
 - [explorer-extender](https://github.com/MinterTeam/minter-explorer-extender)
-- [explorer-gate](https://github.com/MinterTeam/explorer-gate)
 - [explorer-api](https://github.com/MinterTeam/minter-explorer-api)
 - [explorer-validators](https://github.com/MinterTeam/minter-explorer-validators) - API for validators meta
 - [explorer-tools](https://github.com/MinterTeam/minter-explorer-tools) - common packages
