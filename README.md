@@ -18,7 +18,7 @@ _NOTE: This project in active development stage so feel free to send us question
 <p align="center" background="black"><img src="minter-explorer.jpeg" width="400"></p>
 
 ## Related services:
-- [explorer-gate](https://github.com/MinterTeam/explorer-gate)
+- [explorer-extender](https://github.com/MinterTeam/minter-explorer-extender)
 - [explorer-api](https://github.com/MinterTeam/minter-explorer-api)
 - [explorer-validators](https://github.com/MinterTeam/minter-explorer-validators) - API for validators meta
 - [explorer-tools](https://github.com/MinterTeam/minter-explorer-tools) - common packages
