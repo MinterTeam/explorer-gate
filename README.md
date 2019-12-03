@@ -9,11 +9,39 @@
 
 # Minter Gate
 
-
 The official repository of Minter Gate service.
 
 Minter Gate is a service which provides to clients publish prepared transactions to Minter Network
 
+_NOTE: This project in active development stage so feel free to send us questions, issues, and wishes_
+
+<p align="center" background="black"><img src="minter-explorer.jpeg" width="400"></p>
+
+## Related services:
+- [explorer-gate](https://github.com/MinterTeam/explorer-gate)
+- [explorer-api](https://github.com/MinterTeam/minter-explorer-api)
+- [explorer-validators](https://github.com/MinterTeam/minter-explorer-validators) - API for validators meta
+- [explorer-tools](https://github.com/MinterTeam/minter-explorer-tools) - common packages
+- [explorer-genesis-uploader](https://github.com/MinterTeam/explorer-genesis-uploader)
+
+## API Docs
+
 Don't forget to read the [documentation](https://minterteam.github.io/minter-gate-docs/)
 
-_NOTE: This project in active development stage so feel free to send us questions, issues, and wishes_
+## BUILD
+
+- dep ensure
+
+- run `make build`
+
+## USE
+
+### Setup
+
+- build and move the compiled file to the directory e.g. `/opt/minter/gate`
+
+- copy config.json.example to config.json file in extender's directory and fill with own values
+
+#### Run
+
+./gate -config=/path/to/config.json
