@@ -8,7 +8,7 @@ import (
 	"github.com/MinterTeam/explorer-gate/api"
 	"github.com/MinterTeam/explorer-gate/core"
 	"github.com/MinterTeam/explorer-gate/env"
-	"github.com/MinterTeam/minter-node-go-api"
+	sdk "github.com/MinterTeam/minter-go-sdk/api"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
 	"github.com/sirupsen/logrus"
 	"github.com/tendermint/tendermint/libs/pubsub"
@@ -79,14 +79,14 @@ func main() {
 	}
 	apiLink := proto + `://` + config.GetString(`minterApi.link`) + `:` + config.GetString(`minterApi.port`)
 
-	nodeApi := minter_node_go_api.New(apiLink)
+	nodeApi := sdk.NewApi(apiLink)
 
-	latestBlockResponse, err := nodeApi.GetStatus()
+	status, err := nodeApi.Status()
 	if err != nil {
 		panic(err)
 	}
 
-	latestBlock, err := strconv.Atoi(latestBlockResponse.Result.LatestBlockHeight)
+	latestBlock, err := strconv.Atoi(status.LatestBlockHeight)
 	if err != nil {
 		panic(err)
 	}
@@ -95,19 +95,13 @@ func main() {
 
 	go func() {
 		for {
-			block, err := nodeApi.GetBlock(uint64(latestBlock))
+			block, err := nodeApi.Block(latestBlock)
 			if err != nil {
 				time.Sleep(time.Second)
 				continue
 			}
 
-			if block.Error != nil {
-				logger.Error(block.Error.Message)
-				time.Sleep(time.Second)
-				continue
-			}
-
-			for _, tx := range block.Result.Transactions {
+			for _, tx := range block.Transactions {
 				b, _ := hex.DecodeString(tx.RawTx)
 				err := pubsubServer.PublishWithTags(context.TODO(), "NewTx", map[string]string{
 					"tx": fmt.Sprintf("%X", b),

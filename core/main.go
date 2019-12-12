@@ -2,15 +2,15 @@ package core
 
 import (
 	"github.com/MinterTeam/explorer-gate/env"
-	"github.com/MinterTeam/explorer-gate/errors"
-	"github.com/MinterTeam/minter-node-go-api"
+	"github.com/MinterTeam/minter-go-sdk/api"
+	"github.com/MinterTeam/minter-go-sdk/transaction"
 	"github.com/sirupsen/logrus"
 	"github.com/tendermint/tendermint/libs/pubsub"
 	"strings"
 )
 
 type MinterGate struct {
-	api     *minter_node_go_api.MinterNodeApi
+	api     *api.Api
 	Config  env.Config
 	emitter *pubsub.Server
 	Logger  *logrus.Entry
@@ -31,7 +31,7 @@ func New(config env.Config, e *pubsub.Server, logger *logrus.Entry) *MinterGate 
 	apiLink := proto + `://` + config.GetString(`minterApi.link`) + `:` + config.GetString(`minterApi.port`)
 	return &MinterGate{
 		emitter: e,
-		api:     minter_node_go_api.New(apiLink),
+		api:     api.NewApi(apiLink),
 		Config:  config,
 		Logger:  logger,
 	}
@@ -39,47 +39,35 @@ func New(config env.Config, e *pubsub.Server, logger *logrus.Entry) *MinterGate 
 
 //Send transaction to blockchain
 //Return transaction hash
-func (mg MinterGate) TxPush(transaction string) (*string, error) {
-	response, err := mg.api.PushTransaction(transaction)
+func (mg *MinterGate) TxPush(tx string) (*string, error) {
+	transactionObject, _ := transaction.Decode(tx)
+	result, err := mg.api.SendTransaction(transactionObject)
 	if err != nil {
 		mg.Logger.WithFields(logrus.Fields{
-			"transaction": transaction,
+			"transaction": tx,
 		}).Warn(err)
 		return nil, err
 	}
-	if response.Error != nil || response.Result.Code != 0 {
-		err = errors.GetNodeErrorFromResponse(response)
-		mg.Logger.WithFields(logrus.Fields{
-			"transaction": transaction,
-		}).Warn(err)
-		return nil, err
-	}
-	hash := `Mt` + strings.ToLower(response.Result.Hash)
+	hash := `Mt` + strings.ToLower(result.Hash)
 	return &hash, nil
 }
 
 //Return estimate of transaction
-func (mg *MinterGate) EstimateTxCommission(transaction string) (*string, error) {
-	response, err := mg.api.GetEstimateTx(transaction)
+func (mg *MinterGate) EstimateTxCommission(tx string) (*string, error) {
+	transactionObject, _ := transaction.Decode(tx)
+	result, err := mg.api.EstimateTxCommission(transactionObject)
 	if err != nil {
 		mg.Logger.WithFields(logrus.Fields{
-			"transaction": transaction,
+			"transaction": tx,
 		}).Warn(err)
 		return nil, err
 	}
-	if response.Error != nil {
-		err = errors.NewNodeError(response.Error.Message, response.Error.Code)
-		mg.Logger.WithFields(logrus.Fields{
-			"transaction": transaction,
-		}).Warn(err)
-		return nil, err
-	}
-	return &response.Result.Commission, nil
+	return &result.Commission, nil
 }
 
 //Return estimate of buy coin
 func (mg *MinterGate) EstimateCoinBuy(coinToSell string, coinToBuy string, value string) (*CoinEstimate, error) {
-	response, err := mg.api.GetEstimateCoinBuy(coinToSell, coinToBuy, value)
+	result, err := mg.api.EstimateCoinBuy(coinToSell, value, coinToBuy, 0)
 	if err != nil {
 		mg.Logger.WithFields(logrus.Fields{
 			"coinToSell": coinToSell,
@@ -89,22 +77,12 @@ func (mg *MinterGate) EstimateCoinBuy(coinToSell string, coinToBuy string, value
 		return nil, err
 	}
 
-	if response.Error != nil {
-		err = errors.NewNodeError(response.Error.Message, response.Error.Code)
-		mg.Logger.WithFields(logrus.Fields{
-			"coinToSell": coinToSell,
-			"coinToBuy":  coinToBuy,
-			"value":      value,
-		}).Warn(err)
-		return nil, err
-	}
-
-	return &CoinEstimate{response.Result.WillPay, response.Result.Commission}, nil
+	return &CoinEstimate{result.WillPay, result.Commission}, nil
 }
 
 //Return estimate of sell coin
 func (mg *MinterGate) EstimateCoinSell(coinToSell string, coinToBuy string, value string) (*CoinEstimate, error) {
-	response, err := mg.api.GetEstimateCoinSell(coinToSell, coinToBuy, value)
+	result, err := mg.api.EstimateCoinSell(coinToSell, value, coinToBuy, 0)
 	if err != nil {
 		mg.Logger.WithFields(logrus.Fields{
 			"coinToSell": coinToSell,
@@ -113,73 +91,54 @@ func (mg *MinterGate) EstimateCoinSell(coinToSell string, coinToBuy string, valu
 		}).Warn(err)
 		return nil, err
 	}
-	if response.Error != nil {
-		err = errors.NewNodeError(response.Error.Message, response.Error.Code)
-		mg.Logger.WithFields(logrus.Fields{
-			"coinToSell": coinToSell,
-			"coinToBuy":  coinToBuy,
-			"value":      value,
-		}).Warn(err)
-		return nil, err
-	}
-	return &CoinEstimate{response.Result.WillGet, response.Result.Commission}, nil
+
+	return &CoinEstimate{result.WillGet, result.Commission}, nil
 }
 
 //Return estimate of sell coin
 func (mg *MinterGate) EstimateCoinSellAll(coinToSell string, coinToBuy string, value string, gasPrice string) (*CoinEstimate, error) {
-	response, err := mg.api.GetEstimateCoinSellAll(coinToSell, coinToBuy, value, gasPrice)
-	if err != nil {
-		mg.Logger.WithFields(logrus.Fields{
-			"coinToSell": coinToSell,
-			"coinToBuy":  coinToBuy,
-			"value":      value,
-			"gasPrice":   gasPrice,
-		}).Warn(err)
-		return nil, err
-	}
-	if response.Error != nil {
-		err = errors.NewNodeError(response.Error.Message, response.Error.Code)
-		mg.Logger.WithFields(logrus.Fields{
-			"coinToSell": coinToSell,
-			"coinToBuy":  coinToBuy,
-			"value":      value,
-			"gasPrice":   gasPrice,
-		}).Warn(err)
-		return nil, err
-	}
-	return &CoinEstimate{response.Result.WillGet, ""}, nil
+	//response, err := mg.api.EstimateCoinSellAll(coinToSell, coinToBuy, value, gasPrice)
+	//if err != nil {
+	//	mg.Logger.WithFields(logrus.Fields{
+	//		"coinToSell": coinToSell,
+	//		"coinToBuy":  coinToBuy,
+	//		"value":      value,
+	//		"gasPrice":   gasPrice,
+	//	}).Warn(err)
+	//	return nil, err
+	//}
+	//if response.Error != nil {
+	//	err = errors.NewNodeError(response.Error.Message, response.Error.Code)
+	//	mg.Logger.WithFields(logrus.Fields{
+	//		"coinToSell": coinToSell,
+	//		"coinToBuy":  coinToBuy,
+	//		"value":      value,
+	//		"gasPrice":   gasPrice,
+	//	}).Warn(err)
+	//	return nil, err
+	//}
+	return &CoinEstimate{"0", ""}, nil
 }
 
 //Return nonce for address
-func (mg *MinterGate) GetNonce(address string) (*string, error) {
-	response, err := mg.api.GetAddress(address)
+func (mg *MinterGate) GetNonce(address string) (uint64, error) {
+	nonce, err := mg.api.Nonce(address)
 	if err != nil {
 		mg.Logger.WithFields(logrus.Fields{
 			"address": address,
 		}).Warn(err)
-		return nil, err
+		return 0, err
 	}
-	if response.Error != nil {
-		err = errors.NewNodeError(response.Error.Message, response.Error.Code)
-		mg.Logger.WithFields(logrus.Fields{
-			"address": address,
-		}).Warn(err)
-		return nil, err
-	}
-	return &response.Result.TransactionCount, nil
+	return nonce, nil
 }
 
 //Return nonce for address
 func (mg *MinterGate) GetMinGas() (*string, error) {
-	response, err := mg.api.GetMinGasPrice()
+	gasPrice, err := mg.api.MinGasPrice()
 	if err != nil {
 		mg.Logger.Error(err)
 		return nil, err
 	}
-	if response.Error != nil {
-		err = errors.NewNodeError(response.Error.Message, response.Error.Code)
-		mg.Logger.Error(err)
-		return nil, err
-	}
-	return &response.Result, nil
+
+	return &gasPrice, nil
 }

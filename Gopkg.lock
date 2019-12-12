@@ -29,17 +29,6 @@
   version = "v1.5.2"
 
 [[projects]]
-  digest = "1:ba8e8e4da7583d9e40c33d258ac4e88ab10141d1ab43e693cb0bea6e2787aa04"
-  name = "github.com/MinterTeam/minter-node-go-api"
-  packages = [
-    ".",
-    "responses",
-  ]
-  pruneopts = "UT"
-  revision = "0cce96829aa695f2ad13b75e1c541a983913face"
-  version = "v1.2.3"
-
-[[projects]]
   digest = "1:d6afaeed1502aa28e80a4ed0981d570ad91b2579193404256ce672ed0a609e0d"
   name = "github.com/beorn7/perks"
   packages = ["quantile"]
@@ -721,8 +710,6 @@
   input-imports = [
     "github.com/Depado/ginprom",
     "github.com/MinterTeam/minter-explorer-tools/helpers",
-    "github.com/MinterTeam/minter-node-go-api",
-    "github.com/MinterTeam/minter-node-go-api/responses",
     "github.com/gin-contrib/cors",
     "github.com/gin-gonic/gin",
     "github.com/jinzhu/gorm/dialects/postgres",

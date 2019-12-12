@@ -62,6 +62,11 @@
   branch = "master"
   source = "github.com/sirupsen/logrus"
 
+[[constraint]]
+  name = "github.com/MinterTeam/minter-go-sdk"
+  branch = "master"
+  source = "github.com/MinterTeam/minter-go-sdk"
+
 [prune]
   go-tests = true
   unused-packages = true
