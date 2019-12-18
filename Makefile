@@ -21,14 +21,6 @@ check: check_tools ensure_deps
 all: check test build
 
 ### Tools & dependencies ####
-check_tools:
-	@# https://stackoverflow.com/a/25668869
-	@echo "Found tools: $(foreach tool,$(notdir $(GOTOOLS)),\
-        $(if $(shell which $(tool)),$(tool),$(error "No $(tool) in PATH")))"
-
-get_tools:
-	@echo "--> Installing tools"
-	./get_tools.sh
 
 #Run this from CI
 get_vendor_deps:
