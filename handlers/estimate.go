@@ -1,8 +1,8 @@
 package handlers
 
 import (
-	"github.com/MinterTeam/explorer-gate/core"
-	"github.com/MinterTeam/explorer-gate/errors"
+	"github.com/MinterTeam/explorer-gate/v2/core"
+	"github.com/MinterTeam/explorer-gate/v2/errors"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strings"

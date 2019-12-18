@@ -5,9 +5,9 @@ import (
 	"encoding/hex"
 	"flag"
 	"fmt"
-	"github.com/MinterTeam/explorer-gate/api"
-	"github.com/MinterTeam/explorer-gate/core"
-	"github.com/MinterTeam/explorer-gate/env"
+	"github.com/MinterTeam/explorer-gate/v2/api"
+	"github.com/MinterTeam/explorer-gate/v2/core"
+	"github.com/MinterTeam/explorer-gate/v2/env"
 	sdk "github.com/MinterTeam/minter-go-sdk/api"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
 	"github.com/sirupsen/logrus"
@@ -29,7 +29,7 @@ var version = flag.Bool(`v`, false, `Prints current version`)
 func init() {
 	config = env.NewViperConfig()
 	AppName = config.GetString(`name`)
-	Version = `1.3.0`
+	Version = `2.0.0`
 
 	if config.GetBool(`debug`) {
 		fmt.Println(`Service RUN on DEBUG mode`)
@@ -112,8 +112,6 @@ func main() {
 			}
 
 			latestBlock++
-			logger.Info("Block " + strconv.Itoa(latestBlock))
-
 			time.Sleep(1 * time.Second)
 		}
 	}()

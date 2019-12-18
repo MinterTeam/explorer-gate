@@ -1,7 +1,7 @@
 package core
 
 import (
-	"github.com/MinterTeam/explorer-gate/env"
+	"github.com/MinterTeam/explorer-gate/v2/env"
 	"github.com/MinterTeam/minter-go-sdk/api"
 	"github.com/MinterTeam/minter-go-sdk/transaction"
 	"github.com/sirupsen/logrus"

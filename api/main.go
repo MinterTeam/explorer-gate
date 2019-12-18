@@ -2,12 +2,11 @@ package api
 
 import (
 	"github.com/Depado/ginprom"
-	"github.com/MinterTeam/explorer-gate/core"
-	"github.com/MinterTeam/explorer-gate/env"
-	"github.com/MinterTeam/explorer-gate/handlers"
+	"github.com/MinterTeam/explorer-gate/v2/core"
+	"github.com/MinterTeam/explorer-gate/v2/env"
+	"github.com/MinterTeam/explorer-gate/v2/handlers"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
-	_ "github.com/jinzhu/gorm/dialects/postgres"
 	"github.com/tendermint/tendermint/libs/pubsub"
 	"net/http"
 )

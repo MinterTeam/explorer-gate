@@ -44,10 +44,10 @@ ensure_deps:
 
 ### Build ###################
 build: clean
-	GOOS=${GOOS} go build -ldflags $(BUILD_FLAGS) -o ./builds/$(APP)
+	GOOS=${GOOS} GOARCH=amd64 go build -ldflags $(BUILD_FLAGS) -o ./builds/$(APP)
 
 install:
-	GOOS=${GOOS} go install -ldflags $(BUILD_FLAGS)
+	GOOS=${GOOS} GOARCH=amd64 go install -ldflags $(BUILD_FLAGS)
 
 clean:
 	@rm -f $(BINARY)
