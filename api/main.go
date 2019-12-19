@@ -45,7 +45,6 @@ func SetupRouter(config env.Config, gateService *core.MinterGate, pubsubServer *
 		v1.GET(`/estimate/tx-commission`, handlers.EstimateTxCommission)
 		v1.GET(`/estimate/coin-buy`, handlers.EstimateCoinBuy)
 		v1.GET(`/estimate/coin-sell`, handlers.EstimateCoinSell)
-		v1.GET(`/estimate/coin-sell-all`, handlers.EstimateCoinSellAll)
 		v1.GET(`/nonce/:address`, handlers.GetNonce)
 		v1.GET(`/min-gas`, handlers.GetMinGas)
 		v1.POST(`/transaction/push`, handlers.PushTransaction)

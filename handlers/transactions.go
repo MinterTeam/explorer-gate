@@ -55,7 +55,6 @@ func PushTransaction(c *gin.Context) {
 		return
 	}
 	hash, err := gate.TxPush(tx.Transaction)
-
 	if err != nil {
 		gate.Logger.WithFields(logrus.Fields{
 			"transaction": tx,

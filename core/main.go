@@ -41,6 +41,12 @@ func New(config env.Config, e *pubsub.Server, logger *logrus.Entry) *MinterGate 
 //Return transaction hash
 func (mg *MinterGate) TxPush(tx string) (*string, error) {
 	transactionObject, err := transaction.Decode("0x" + tx)
+	if err != nil {
+		mg.Logger.WithFields(logrus.Fields{
+			"transaction": tx,
+		}).Warn(err)
+		return nil, err
+	}
 	result, err := mg.api.SendTransaction(transactionObject)
 	if err != nil {
 		mg.Logger.WithFields(logrus.Fields{
@@ -93,31 +99,6 @@ func (mg *MinterGate) EstimateCoinSell(coinToSell string, coinToBuy string, valu
 	}
 
 	return &CoinEstimate{result.WillGet, result.Commission}, nil
-}
-
-//Return estimate of sell coin
-func (mg *MinterGate) EstimateCoinSellAll(coinToSell string, coinToBuy string, value string, gasPrice string) (*CoinEstimate, error) {
-	//response, err := mg.api.EstimateCoinSellAll(coinToSell, coinToBuy, value, gasPrice)
-	//if err != nil {
-	//	mg.Logger.WithFields(logrus.Fields{
-	//		"coinToSell": coinToSell,
-	//		"coinToBuy":  coinToBuy,
-	//		"value":      value,
-	//		"gasPrice":   gasPrice,
-	//	}).Warn(err)
-	//	return nil, err
-	//}
-	//if response.Error != nil {
-	//	err = errors.NewNodeError(response.Error.Message, response.Error.Code)
-	//	mg.Logger.WithFields(logrus.Fields{
-	//		"coinToSell": coinToSell,
-	//		"coinToBuy":  coinToBuy,
-	//		"value":      value,
-	//		"gasPrice":   gasPrice,
-	//	}).Warn(err)
-	//	return nil, err
-	//}
-	return &CoinEstimate{"0", ""}, nil
 }
 
 //Return nonce for address
