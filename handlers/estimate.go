@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"fmt"
 	"github.com/MinterTeam/explorer-gate/v2/core"
 	"github.com/MinterTeam/explorer-gate/v2/errors"
 	"github.com/gin-gonic/gin"
@@ -104,7 +105,7 @@ func GetNonce(c *gin.Context) {
 	} else {
 		c.JSON(http.StatusOK, gin.H{
 			"data": gin.H{
-				"nonce": nonce,
+				"nonce": fmt.Sprintf("%d", nonce),
 			},
 		})
 	}
