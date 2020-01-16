@@ -6,7 +6,7 @@ require (
 	github.com/Depado/ginprom v1.2.0
 	github.com/MinterTeam/explorer-gate v1.2.8
 	github.com/MinterTeam/minter-explorer-tools v1.5.2
-	github.com/MinterTeam/minter-go-sdk v0.2.4
+	github.com/MinterTeam/minter-go-sdk v0.2.5-0.20191225145506-e3a4d77d1716
 	github.com/daniildulin/minter-node-api v1.7.0 // indirect
 	github.com/fortytw2/leaktest v1.3.0 // indirect
 	github.com/gin-contrib/cors v1.3.0

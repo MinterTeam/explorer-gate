@@ -13,6 +13,8 @@ github.com/MinterTeam/minter-explorer-tools v1.5.2 h1:p+MIw4jaddH4NRM9DXdQjUsGVG
 github.com/MinterTeam/minter-explorer-tools v1.5.2/go.mod h1:owuL/5tZGB+sGlQh88XFyCB5RobQGc5yWs5jm2BqQl4=
 github.com/MinterTeam/minter-go-sdk v0.2.4 h1:UVEcXRuVUL1BvlWh826BSjq4QcYyeOuQ2997FanwkRQ=
 github.com/MinterTeam/minter-go-sdk v0.2.4/go.mod h1:Z5ME+sAHF9YAXU48uPRhe480Xb9ICfcDow47qQniAec=
+github.com/MinterTeam/minter-go-sdk v0.2.5-0.20191225145506-e3a4d77d1716 h1:EeP+aFzxTTcg9Wm3tik5RVTQb5RDfkF4T5TZkr3KErQ=
+github.com/MinterTeam/minter-go-sdk v0.2.5-0.20191225145506-e3a4d77d1716/go.mod h1:Z5ME+sAHF9YAXU48uPRhe480Xb9ICfcDow47qQniAec=
 github.com/OneOfOne/xxhash v1.2.2/go.mod h1:HSdplMjZKSmBqAxg5vPj2TmRDmfkzw+cTzAElWljhcU=
 github.com/Shopify/sarama v1.19.0/go.mod h1:FVkBWblsNy7DGZRfXLU0O9RCGt5g3g3yEuWXgklEdEo=
 github.com/Shopify/toxiproxy v2.1.4+incompatible/go.mod h1:OXgGpZ6Cli1/URJOF1DMxUHB2q5Ap20/P/eIdh4G0pI=
