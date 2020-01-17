@@ -30,7 +30,9 @@ Don't forget to read the [documentation](https://minterteam.github.io/minter-gat
 
 ## BUILD
 
-- dep ensure
+- If you OS is MacOS change GOOS variable in Makefile to `darwin`
+
+- run `dep ensure`
 
 - run `make build`
 
@@ -40,8 +42,12 @@ Don't forget to read the [documentation](https://minterteam.github.io/minter-gat
 
 - build and move the compiled file to the directory e.g. `/opt/minter/gate`
 
-- copy config.json.example to config.json file in extender's directory and fill with own values
+- copy .env.dist to .env file in extender's directory and fill with own values
 
 #### Run
 
-./gate -config=/path/to/config.json
+./gate
+
+## Docker
+
+Change the port in `docker-compose.yml` if you want to use a different port and run  `docker-compose up`

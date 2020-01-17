@@ -7,9 +7,9 @@ import (
 	"fmt"
 	"github.com/MinterTeam/explorer-gate/v2/api"
 	"github.com/MinterTeam/explorer-gate/v2/core"
-	"github.com/MinterTeam/explorer-gate/v2/env"
 	sdk "github.com/MinterTeam/minter-go-sdk/api"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
+	"github.com/joho/godotenv"
 	"github.com/sirupsen/logrus"
 	"github.com/tendermint/tendermint/libs/pubsub"
 	"os"
@@ -21,20 +21,8 @@ var Version string   // Version
 var GitCommit string // Git commit
 var BuildDate string // Build date
 var AppName string   // Application name
-var config env.Config
 
 var version = flag.Bool(`v`, false, `Prints current version`)
-
-// Initialize app.
-func init() {
-	config = env.NewViperConfig()
-	AppName = config.GetString(`name`)
-	Version = `2.0.0`
-
-	if config.GetBool(`debug`) {
-		fmt.Println(`Service RUN on DEBUG mode`)
-	}
-}
 
 func main() {
 	flag.Parse()
@@ -43,12 +31,17 @@ func main() {
 		os.Exit(0)
 	}
 
+	err := godotenv.Load()
+	if err != nil {
+		panic("Error loading .env file")
+	}
+
 	//Init Logger
 	logger := logrus.New()
 	logger.SetFormatter(&logrus.JSONFormatter{})
 	logger.SetOutput(os.Stdout)
 	logger.SetReportCaller(true)
-	if config.GetBool(`debug`) {
+	if os.Getenv("DEBUG") != "1" {
 		logger.SetFormatter(&logrus.TextFormatter{
 			DisableColors: false,
 			FullTimestamp: true,
@@ -59,11 +52,9 @@ func main() {
 	}
 
 	contextLogger := logger.WithFields(logrus.Fields{
-		"version": "1.3.0",
+		"version": "2.1.0",
 		"app":     "Minter Gate",
 	})
-
-	var err error
 
 	pubsubServer := pubsub.NewServer()
 	err = pubsubServer.Start()
@@ -71,15 +62,9 @@ func main() {
 		contextLogger.Error(err)
 	}
 
-	gateService := core.New(config, pubsubServer, contextLogger)
+	gateService := core.New(pubsubServer, contextLogger)
 
-	proto := `http`
-	if config.GetBool(`minterApi.isSecure`) {
-		proto = `https`
-	}
-	apiLink := proto + `://` + config.GetString(`minterApi.link`) + `:` + config.GetString(`minterApi.port`)
-
-	nodeApi := sdk.NewApi(apiLink)
+	nodeApi := sdk.NewApi(os.Getenv("NODE_URL"))
 
 	status, err := nodeApi.Status()
 	if err != nil {
@@ -95,7 +80,7 @@ func main() {
 
 	go func() {
 		for {
-			block, err := nodeApi.Block(latestBlock)
+			block, err := nodeApi.Block()
 			if err != nil {
 				time.Sleep(time.Second)
 				continue
@@ -116,5 +101,5 @@ func main() {
 		}
 	}()
 
-	api.Run(config, gateService, pubsubServer)
+	api.Run(gateService, pubsubServer)
 }

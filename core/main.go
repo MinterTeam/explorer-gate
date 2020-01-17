@@ -1,17 +1,16 @@
 package core
 
 import (
-	"github.com/MinterTeam/explorer-gate/v2/env"
 	"github.com/MinterTeam/minter-go-sdk/api"
 	"github.com/MinterTeam/minter-go-sdk/transaction"
 	"github.com/sirupsen/logrus"
 	"github.com/tendermint/tendermint/libs/pubsub"
+	"os"
 	"strings"
 )
 
 type MinterGate struct {
 	api     *api.Api
-	Config  env.Config
 	emitter *pubsub.Server
 	Logger  *logrus.Entry
 }
@@ -22,17 +21,10 @@ type CoinEstimate struct {
 }
 
 //New instance of Minter Gate
-func New(config env.Config, e *pubsub.Server, logger *logrus.Entry) *MinterGate {
-
-	proto := `http`
-	if config.GetBool(`minterApi.isSecure`) {
-		proto = `https`
-	}
-	apiLink := proto + `://` + config.GetString(`minterApi.link`) + `:` + config.GetString(`minterApi.port`)
+func New(e *pubsub.Server, logger *logrus.Entry) *MinterGate {
 	return &MinterGate{
 		emitter: e,
-		api:     api.NewApi(apiLink),
-		Config:  config,
+		api:     api.NewApi(os.Getenv("NODE_URL")),
 		Logger:  logger,
 	}
 }
@@ -73,7 +65,7 @@ func (mg *MinterGate) EstimateTxCommission(tx string) (*string, error) {
 
 //Return estimate of buy coin
 func (mg *MinterGate) EstimateCoinBuy(coinToSell string, coinToBuy string, value string) (*CoinEstimate, error) {
-	result, err := mg.api.EstimateCoinBuy(coinToSell, value, coinToBuy, 0)
+	result, err := mg.api.EstimateCoinBuy(coinToSell, value, coinToBuy)
 	if err != nil {
 		mg.Logger.WithFields(logrus.Fields{
 			"coinToSell": coinToSell,
@@ -88,7 +80,7 @@ func (mg *MinterGate) EstimateCoinBuy(coinToSell string, coinToBuy string, value
 
 //Return estimate of sell coin
 func (mg *MinterGate) EstimateCoinSell(coinToSell string, coinToBuy string, value string) (*CoinEstimate, error) {
-	result, err := mg.api.EstimateCoinSell(coinToSell, value, coinToBuy, 0)
+	result, err := mg.api.EstimateCoinSell(coinToSell, value, coinToBuy)
 	if err != nil {
 		mg.Logger.WithFields(logrus.Fields{
 			"coinToSell": coinToSell,
@@ -120,6 +112,5 @@ func (mg *MinterGate) GetMinGas() (*string, error) {
 		mg.Logger.Error(err)
 		return nil, err
 	}
-
 	return &gasPrice, nil
 }

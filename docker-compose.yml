@@ -1,0 +1,9 @@
+version: '3.6'
+
+services:
+  gate:
+    build: ./
+    ports:
+      - 80:9000
+    volumes:
+      - ./:/app
