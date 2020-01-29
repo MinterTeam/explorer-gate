@@ -9,7 +9,6 @@ import (
 	"github.com/MinterTeam/explorer-gate/v2/core"
 	sdk "github.com/MinterTeam/minter-go-sdk/api"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
-	"github.com/joho/godotenv"
 	"github.com/sirupsen/logrus"
 	"github.com/tendermint/tendermint/libs/pubsub"
 	"os"
@@ -29,11 +28,6 @@ func main() {
 	if *version {
 		fmt.Printf(`%s v%s Commit %s builded %s`, AppName, Version, GitCommit, BuildDate)
 		os.Exit(0)
-	}
-
-	err := godotenv.Load()
-	if err != nil {
-		panic("Error loading .env file")
 	}
 
 	//Init Logger
@@ -57,7 +51,7 @@ func main() {
 	})
 
 	pubsubServer := pubsub.NewServer()
-	err = pubsubServer.Start()
+	err := pubsubServer.Start()
 	if err != nil {
 		contextLogger.Error(err)
 	}

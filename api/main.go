@@ -14,7 +14,11 @@ import (
 // Run API
 func Run(gateService *core.MinterGate, pubSubServer *pubsub.Server) {
 	router := SetupRouter(gateService, pubSubServer)
-	err := router.Run(":" + os.Getenv("GATE_PORT"))
+	port := "9000"
+	if os.Getenv("GATE_PORT") != "" {
+		port = os.Getenv("GATE_PORT")
+	}
+	err := router.Run(":" + port)
 	if err != nil {
 		panic(err)
 	}
