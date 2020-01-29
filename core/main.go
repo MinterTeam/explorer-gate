@@ -65,7 +65,7 @@ func (mg *MinterGate) EstimateTxCommission(tx string) (*string, error) {
 
 //Return estimate of buy coin
 func (mg *MinterGate) EstimateCoinBuy(coinToSell string, coinToBuy string, value string) (*CoinEstimate, error) {
-	result, err := mg.api.EstimateCoinBuy(coinToSell, value, coinToBuy)
+	result, err := mg.api.EstimateCoinBuy(coinToSell, value, coinToBuy, 0)
 	if err != nil {
 		mg.Logger.WithFields(logrus.Fields{
 			"coinToSell": coinToSell,
@@ -80,7 +80,7 @@ func (mg *MinterGate) EstimateCoinBuy(coinToSell string, coinToBuy string, value
 
 //Return estimate of sell coin
 func (mg *MinterGate) EstimateCoinSell(coinToSell string, coinToBuy string, value string) (*CoinEstimate, error) {
-	result, err := mg.api.EstimateCoinSell(coinToSell, value, coinToBuy)
+	result, err := mg.api.EstimateCoinSell(coinToSell, value, coinToBuy, 0)
 	if err != nil {
 		mg.Logger.WithFields(logrus.Fields{
 			"coinToSell": coinToSell,

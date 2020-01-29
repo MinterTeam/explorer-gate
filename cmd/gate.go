@@ -52,7 +52,7 @@ func main() {
 	}
 
 	contextLogger := logger.WithFields(logrus.Fields{
-		"version": "2.1.0",
+		"version": "2.0.0",
 		"app":     "Minter Gate",
 	})
 
@@ -80,7 +80,7 @@ func main() {
 
 	go func() {
 		for {
-			block, err := nodeApi.Block()
+			block, err := nodeApi.Block(latestBlock)
 			if err != nil {
 				time.Sleep(time.Second)
 				continue

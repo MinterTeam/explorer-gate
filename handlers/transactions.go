@@ -11,6 +11,7 @@ import (
 	"github.com/tendermint/tendermint/libs/pubsub/query"
 	"net/http"
 	"os"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -18,7 +19,7 @@ import (
 func Index(c *gin.Context) {
 	c.JSON(200, gin.H{
 		"name":    "Minter Explorer Gate API",
-		"version": "2.1.0",
+		"version": "2.0.0",
 	})
 }
 
@@ -30,10 +31,11 @@ func PushTransaction(c *gin.Context) {
 	var err error
 	gate, ok := c.MustGet("gate").(*core.MinterGate)
 
-	timeOut, err := time.ParseDuration(os.Getenv("NODE_API_TIMEOUT"))
+	var timeOut int64
+	timeOut, err = strconv.ParseInt(os.Getenv("NODE_API_TIMEOUT"), 10, 64)
 	if err != nil {
 		gate.Logger.Error(err)
-		panic(err)
+		timeOut = 30 //default value
 	}
 
 	if !ok {
@@ -90,7 +92,7 @@ func PushTransaction(c *gin.Context) {
 					"hash": &hash,
 				},
 			})
-		case <-time.After(timeOut * time.Second):
+		case <-time.After(time.Duration(timeOut) * time.Second):
 			gate.Logger.WithFields(logrus.Fields{
 				"transaction": tx,
 				"code":        504,
