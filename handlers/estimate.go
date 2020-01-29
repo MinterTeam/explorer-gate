@@ -1,8 +1,9 @@
 package handlers
 
 import (
-	"github.com/MinterTeam/explorer-gate/core"
-	"github.com/MinterTeam/explorer-gate/errors"
+	"fmt"
+	"github.com/MinterTeam/explorer-gate/v2/core"
+	"github.com/MinterTeam/explorer-gate/v2/errors"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strings"
@@ -86,33 +87,6 @@ func EstimateCoinSell(c *gin.Context) {
 	}
 }
 
-func EstimateCoinSellAll(c *gin.Context) {
-	gate, ok := c.MustGet("gate").(*core.MinterGate)
-	if !ok {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": gin.H{
-				"code": 1,
-				"log":  "Type cast error",
-			},
-		})
-		return
-	}
-	coinToSell := strings.TrimSpace(c.Query(`coinToSell`))
-	coinToBuy := strings.TrimSpace(c.Query(`coinToBuy`))
-	value := strings.TrimSpace(c.Query(`valueToSell`))
-	gasPrice := strings.TrimSpace(c.Query(`gasPrice`))
-	estimate, err := gate.EstimateCoinSellAll(coinToSell, coinToBuy, value, gasPrice)
-	if err != nil {
-		errors.SetErrorResponse(err, c)
-	} else {
-		c.JSON(http.StatusOK, gin.H{
-			"data": gin.H{
-				"will_get": estimate.Value,
-			},
-		})
-	}
-}
-
 func GetNonce(c *gin.Context) {
 	gate, ok := c.MustGet("gate").(*core.MinterGate)
 	if !ok {
@@ -131,7 +105,7 @@ func GetNonce(c *gin.Context) {
 	} else {
 		c.JSON(http.StatusOK, gin.H{
 			"data": gin.H{
-				"nonce": nonce,
+				"nonce": fmt.Sprintf("%d", nonce),
 			},
 		})
 	}

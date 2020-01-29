@@ -5,10 +5,9 @@ import (
 	"encoding/hex"
 	"flag"
 	"fmt"
-	"github.com/MinterTeam/explorer-gate/api"
-	"github.com/MinterTeam/explorer-gate/core"
-	"github.com/MinterTeam/explorer-gate/env"
-	"github.com/MinterTeam/minter-node-go-api"
+	"github.com/MinterTeam/explorer-gate/v2/api"
+	"github.com/MinterTeam/explorer-gate/v2/core"
+	sdk "github.com/MinterTeam/minter-go-sdk/api"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
 	"github.com/sirupsen/logrus"
 	"github.com/tendermint/tendermint/libs/pubsub"
@@ -21,20 +20,8 @@ var Version string   // Version
 var GitCommit string // Git commit
 var BuildDate string // Build date
 var AppName string   // Application name
-var config env.Config
 
 var version = flag.Bool(`v`, false, `Prints current version`)
-
-// Initialize app.
-func init() {
-	config = env.NewViperConfig()
-	AppName = config.GetString(`name`)
-	Version = `1.3.0`
-
-	if config.GetBool(`debug`) {
-		fmt.Println(`Service RUN on DEBUG mode`)
-	}
-}
 
 func main() {
 	flag.Parse()
@@ -48,7 +35,7 @@ func main() {
 	logger.SetFormatter(&logrus.JSONFormatter{})
 	logger.SetOutput(os.Stdout)
 	logger.SetReportCaller(true)
-	if config.GetBool(`debug`) {
+	if os.Getenv("DEBUG") != "1" {
 		logger.SetFormatter(&logrus.TextFormatter{
 			DisableColors: false,
 			FullTimestamp: true,
@@ -59,34 +46,26 @@ func main() {
 	}
 
 	contextLogger := logger.WithFields(logrus.Fields{
-		"version": "1.3.0",
+		"version": "2.0.0",
 		"app":     "Minter Gate",
 	})
 
-	var err error
-
 	pubsubServer := pubsub.NewServer()
-	err = pubsubServer.Start()
+	err := pubsubServer.Start()
 	if err != nil {
 		contextLogger.Error(err)
 	}
 
-	gateService := core.New(config, pubsubServer, contextLogger)
+	gateService := core.New(pubsubServer, contextLogger)
 
-	proto := `http`
-	if config.GetBool(`minterApi.isSecure`) {
-		proto = `https`
-	}
-	apiLink := proto + `://` + config.GetString(`minterApi.link`) + `:` + config.GetString(`minterApi.port`)
+	nodeApi := sdk.NewApi(os.Getenv("NODE_URL"))
 
-	nodeApi := minter_node_go_api.New(apiLink)
-
-	latestBlockResponse, err := nodeApi.GetStatus()
+	status, err := nodeApi.Status()
 	if err != nil {
 		panic(err)
 	}
 
-	latestBlock, err := strconv.Atoi(latestBlockResponse.Result.LatestBlockHeight)
+	latestBlock, err := strconv.Atoi(status.LatestBlockHeight)
 	if err != nil {
 		panic(err)
 	}
@@ -95,19 +74,13 @@ func main() {
 
 	go func() {
 		for {
-			block, err := nodeApi.GetBlock(uint64(latestBlock))
+			block, err := nodeApi.Block(latestBlock)
 			if err != nil {
 				time.Sleep(time.Second)
 				continue
 			}
 
-			if block.Error != nil {
-				logger.Error(block.Error.Message)
-				time.Sleep(time.Second)
-				continue
-			}
-
-			for _, tx := range block.Result.Transactions {
+			for _, tx := range block.Transactions {
 				b, _ := hex.DecodeString(tx.RawTx)
 				err := pubsubServer.PublishWithTags(context.TODO(), "NewTx", map[string]string{
 					"tx": fmt.Sprintf("%X", b),
@@ -118,11 +91,9 @@ func main() {
 			}
 
 			latestBlock++
-			logger.Info("Block " + strconv.Itoa(latestBlock))
-
 			time.Sleep(1 * time.Second)
 		}
 	}()
 
-	api.Run(config, gateService, pubsubServer)
+	api.Run(gateService, pubsubServer)
 }

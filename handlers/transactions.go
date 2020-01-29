@@ -3,13 +3,15 @@ package handlers
 import (
 	"context"
 	"fmt"
-	"github.com/MinterTeam/explorer-gate/core"
-	"github.com/MinterTeam/explorer-gate/errors"
+	"github.com/MinterTeam/explorer-gate/v2/core"
+	"github.com/MinterTeam/explorer-gate/v2/errors"
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
 	"github.com/tendermint/tendermint/libs/pubsub"
 	"github.com/tendermint/tendermint/libs/pubsub/query"
 	"net/http"
+	"os"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -17,7 +19,7 @@ import (
 func Index(c *gin.Context) {
 	c.JSON(200, gin.H{
 		"name":    "Minter Explorer Gate API",
-		"version": "1.3.0",
+		"version": "2.0.0",
 	})
 }
 
@@ -28,6 +30,14 @@ type PushTransactionRequest struct {
 func PushTransaction(c *gin.Context) {
 	var err error
 	gate, ok := c.MustGet("gate").(*core.MinterGate)
+
+	var timeOut int64
+	timeOut, err = strconv.ParseInt(os.Getenv("NODE_API_TIMEOUT"), 10, 64)
+	if err != nil {
+		gate.Logger.Error(err)
+		timeOut = 30 //default value
+	}
+
 	if !ok {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": gin.H{
@@ -55,7 +65,6 @@ func PushTransaction(c *gin.Context) {
 		return
 	}
 	hash, err := gate.TxPush(tx.Transaction)
-
 	if err != nil {
 		gate.Logger.WithFields(logrus.Fields{
 			"transaction": tx,
@@ -83,7 +92,7 @@ func PushTransaction(c *gin.Context) {
 					"hash": &hash,
 				},
 			})
-		case <-time.After(time.Duration(gate.Config.GetInt("minterApi.timeOut")) * time.Second):
+		case <-time.After(time.Duration(timeOut) * time.Second):
 			gate.Logger.WithFields(logrus.Fields{
 				"transaction": tx,
 				"code":        504,

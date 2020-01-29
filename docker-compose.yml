@@ -1,0 +1,17 @@
+version: '3.6'
+
+services:
+  gate:
+    build: ./
+    ports:
+      - 9000:9000
+    volumes:
+      - ./:/app
+    env_file:
+      - .env
+#    environment:
+#      DEBUG: ${DEBUG}
+#      BASE_CON: ${BASE_CON}
+#      NODE_URL: ${NODE_URL}
+#      NODE_API_TIMEOUT: ${NODE_API_TIMEOUT}
+#      GATE_PORT: ${GATE_PORT}
