@@ -1,10 +1,10 @@
-FROM golang:1.13.5-alpine
+FROM golang:1.13.5
 
 WORKDIR /app
 
 COPY ./ /app
 
-RUN apk add --no-cache make gcc musl-dev linux-headers git
+RUN apt-get install -y make gcc
 
 RUN go mod download
 
