@@ -22,9 +22,10 @@ type CoinEstimate struct {
 
 //New instance of Minter Gate
 func New(e *pubsub.Server, logger *logrus.Entry) *MinterGate {
+	link := os.Getenv("NODE_API")
 	return &MinterGate{
 		emitter: e,
-		api:     api.NewApi(os.Getenv("NODE_URL")),
+		api:     api.NewApi(link),
 		Logger:  logger,
 	}
 }

@@ -26,7 +26,7 @@ func Run(gateService *core.MinterGate, pubSubServer *pubsub.Server) {
 
 //Setup router
 func SetupRouter(gateService *core.MinterGate, pubSubServer *pubsub.Server) *gin.Engine {
-	if os.Getenv("DEBUG") != "1" {
+	if os.Getenv("GATE_DEBUG") != "1" {
 		gin.SetMode(gin.ReleaseMode)
 	}
 	router := gin.Default()

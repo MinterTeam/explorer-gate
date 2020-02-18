@@ -10,8 +10,8 @@ services:
     env_file:
       - .env
 #    environment:
-#      DEBUG: ${DEBUG}
-#      BASE_CON: ${BASE_CON}
-#      NODE_URL: ${NODE_URL}
+#      BASE_COIN: ${BASE_COIN}
+#      NODE_API: ${NODE_API}
 #      NODE_API_TIMEOUT: ${NODE_API_TIMEOUT}
+#      GATE_DEBUG: ${GATE_DEBUG}
 #      GATE_PORT: ${GATE_PORT}

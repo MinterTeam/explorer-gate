@@ -9,8 +9,10 @@ import (
 	"github.com/MinterTeam/explorer-gate/v2/core"
 	sdk "github.com/MinterTeam/minter-go-sdk/api"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
+	"github.com/joho/godotenv"
 	"github.com/sirupsen/logrus"
 	"github.com/tendermint/tendermint/libs/pubsub"
+	"log"
 	"os"
 	"strconv"
 	"time"
@@ -30,12 +32,17 @@ func main() {
 		os.Exit(0)
 	}
 
+	err := godotenv.Load()
+	if err != nil {
+		log.Println(".env file not found")
+	}
+
 	//Init Logger
 	logger := logrus.New()
 	logger.SetFormatter(&logrus.JSONFormatter{})
 	logger.SetOutput(os.Stdout)
 	logger.SetReportCaller(true)
-	if os.Getenv("DEBUG") != "1" {
+	if os.Getenv("GATE_DEBUG") != "1" {
 		logger.SetFormatter(&logrus.TextFormatter{
 			DisableColors: false,
 			FullTimestamp: true,
@@ -51,14 +58,14 @@ func main() {
 	})
 
 	pubsubServer := pubsub.NewServer()
-	err := pubsubServer.Start()
+	err = pubsubServer.Start()
 	if err != nil {
 		contextLogger.Error(err)
 	}
 
 	gateService := core.New(pubsubServer, contextLogger)
 
-	nodeApi := sdk.NewApi(os.Getenv("NODE_URL"))
+	nodeApi := sdk.NewApi(os.Getenv("NODE_API"))
 
 	status, err := nodeApi.Status()
 	if err != nil {
