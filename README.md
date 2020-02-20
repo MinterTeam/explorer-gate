@@ -5,6 +5,9 @@
         <img src="https://img.shields.io/packagist/l/doctrine/orm.svg" alt="License">
     </a>
     <img alt="undefined" src="https://img.shields.io/github/last-commit/MinterTeam/explorer-gate.svg">
+    <a href="https://hub.docker.com/r/minterteam/explorer-gate">
+        <img alt="Docker Pulls" src="https://img.shields.io/docker/pulls/minterteam/explorer-gate">
+   </a>
 </p>
 
 # Minter Gate
@@ -16,6 +19,7 @@ Minter Gate is a service which provides to clients publish prepared transactions
 _NOTE: This project in active development stage so feel free to send us questions, issues, and wishes_
 
 <p align="center" background="black"><img src="minter-explorer.jpeg" width="400"></p>
+
 
 ## Related services:
 - [explorer-extender](https://github.com/MinterTeam/minter-explorer-extender)
