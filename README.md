@@ -34,8 +34,6 @@ Don't forget to read the [documentation](https://minterteam.github.io/minter-gat
 
 ## BUILD
 
-- If your OS is macOS change GOOS variable in Makefile to `darwin`
-
 - run `go mod download`
 
 - run `make build`
