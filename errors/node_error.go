@@ -8,6 +8,13 @@ func NewNodeError(text string, code int) error {
 	}
 }
 
+func GetOldNodeError(text string, code int) error {
+	return &OldNodeError{
+		Log:  text,
+		Code: code,
+	}
+}
+
 type TxResult struct {
 }
 
@@ -43,4 +50,13 @@ func (e *NodeError) GetMessage() string {
 }
 func (e *NodeError) GetLog() string {
 	return e.TxResult.Log
+}
+
+type OldNodeError struct {
+	Log  string `json:"log"`
+	Code int    `json:"code"`
+}
+
+func (e *OldNodeError) Error() string {
+	return e.Log
 }

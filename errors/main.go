@@ -192,10 +192,23 @@ func getNodeErrorFromResponse(r *api.ResponseError) error {
 		}
 		return NewNodeError(nodeError.Error.TxResult.Log, nodeError.Error.TxResult.Code)
 	default:
+		var code int
+		if nodeError.Error.TxResult.Code != 0 {
+			code = nodeError.Error.TxResult.Code
+		} else {
+			code = nodeError.Error.Code
+		}
+
 		msg, err := formatErrorMessage(nodeError.Error.TxResult.Log)
 		if err != nil {
 			return err
 		}
-		return NewNodeError(msg, nodeError.Error.TxResult.Code)
+		if msg == "" {
+			msg = nodeError.Error.Message
+		}
+
+		//Will use in next version
+		//return NewNodeError(msg, code)
+		return GetOldNodeError(msg, code)
 	}
 }
