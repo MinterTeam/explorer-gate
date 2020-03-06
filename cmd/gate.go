@@ -12,7 +12,6 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/sirupsen/logrus"
 	"github.com/tendermint/tendermint/libs/pubsub"
-	"log"
 	"os"
 	"strconv"
 	"time"
@@ -34,7 +33,7 @@ func main() {
 
 	err := godotenv.Load()
 	if err != nil {
-		log.Println(".env file not found")
+		panic("Error loading .env file")
 	}
 
 	//Init Logger
@@ -42,7 +41,7 @@ func main() {
 	logger.SetFormatter(&logrus.JSONFormatter{})
 	logger.SetOutput(os.Stdout)
 	logger.SetReportCaller(true)
-	if os.Getenv("GATE_DEBUG") != "1" {
+	if os.Getenv("GATE_DEBUG") != "1" && os.Getenv("GATE_DEBUG") != "true" {
 		logger.SetFormatter(&logrus.TextFormatter{
 			DisableColors: false,
 			FullTimestamp: true,
@@ -53,7 +52,7 @@ func main() {
 	}
 
 	contextLogger := logger.WithFields(logrus.Fields{
-		"version": "2.0.0",
+		"version": "2.1.1",
 		"app":     "Minter Gate",
 	})
 
@@ -65,7 +64,8 @@ func main() {
 
 	gateService := core.New(pubsubServer, contextLogger)
 
-	nodeApi := sdk.NewApi(os.Getenv("NODE_API"))
+	link := os.Getenv("NODE_API")
+	nodeApi := sdk.NewApi(link)
 
 	status, err := nodeApi.Status()
 	if err != nil {

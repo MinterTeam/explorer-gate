@@ -1,8 +1,8 @@
 package errors
 
 // New returns an error that formats as the given text.
-func NewNodeTimeOutError(text string, code int32) error {
-	return &NodeError{text, code}
+func NewNodeTimeOutError(text string, code int) error {
+	return &NodeError{Message: text, Code: code}
 }
 
 type NodeTimeOutError struct {

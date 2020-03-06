@@ -14,11 +14,7 @@ import (
 // Run API
 func Run(gateService *core.MinterGate, pubSubServer *pubsub.Server) {
 	router := SetupRouter(gateService, pubSubServer)
-	port := "9000"
-	if os.Getenv("GATE_PORT") != "" {
-		port = os.Getenv("GATE_PORT")
-	}
-	err := router.Run(":" + port)
+	err := router.Run(":" + os.Getenv("GATE_PORT"))
 	if err != nil {
 		panic(err)
 	}
@@ -26,20 +22,22 @@ func Run(gateService *core.MinterGate, pubSubServer *pubsub.Server) {
 
 //Setup router
 func SetupRouter(gateService *core.MinterGate, pubSubServer *pubsub.Server) *gin.Engine {
-	if os.Getenv("GATE_DEBUG") != "1" {
+	router := gin.Default()
+	if os.Getenv("GATE_DEBUG") != "1" && os.Getenv("GATE_DEBUG") != "true" {
 		gin.SetMode(gin.ReleaseMode)
 	}
-	router := gin.Default()
 
 	p := ginprom.New(
 		ginprom.Engine(router),
 		ginprom.Subsystem("gin"),
 		ginprom.Path("/metrics"),
 	)
+	if os.Getenv("GATE_DEBUG") != "1" && os.Getenv("GATE_DEBUG") != "true" {
+		router.Use(gin.Recovery()) // returns 500 on any code panics
+	}
 	router.Use(p.Instrument())
 	router.Use(cors.Default())                           // CORS
 	router.Use(gin.ErrorLogger())                        // print all errors
-	router.Use(gin.Recovery())                           // returns 500 on any code panics
 	router.Use(apiMiddleware(gateService, pubSubServer)) // init global context
 
 	router.GET(`/`, handlers.Index)

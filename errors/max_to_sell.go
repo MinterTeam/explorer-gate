@@ -2,12 +2,12 @@ package errors
 
 type MaximumValueToSellReachedError struct {
 	log  string
-	code int32
+	code int
 	want string
 	need string
 }
 
-func NewMaximumValueToSellReachedError(text string, code int32, want string, need string) error {
+func NewMaximumValueToSellReachedError(text string, code int, want string, need string) error {
 	return &MaximumValueToSellReachedError{text, code, want, need}
 }
 
@@ -15,7 +15,7 @@ func (e *MaximumValueToSellReachedError) Error() string {
 	return e.log
 }
 
-func (e *MaximumValueToSellReachedError) Code() int32 {
+func (e *MaximumValueToSellReachedError) Code() int {
 	return e.code
 }
 

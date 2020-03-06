@@ -22,10 +22,9 @@ type CoinEstimate struct {
 
 //New instance of Minter Gate
 func New(e *pubsub.Server, logger *logrus.Entry) *MinterGate {
-	link := os.Getenv("NODE_API")
 	return &MinterGate{
 		emitter: e,
-		api:     api.NewApi(link),
+		api:     api.NewApi(os.Getenv("NODE_API")),
 		Logger:  logger,
 	}
 }
@@ -66,7 +65,7 @@ func (mg *MinterGate) EstimateTxCommission(tx string) (*string, error) {
 
 //Return estimate of buy coin
 func (mg *MinterGate) EstimateCoinBuy(coinToSell string, coinToBuy string, value string) (*CoinEstimate, error) {
-	result, err := mg.api.EstimateCoinBuy(coinToSell, value, coinToBuy, 0)
+	result, err := mg.api.EstimateCoinBuy(coinToSell, value, coinToBuy)
 	if err != nil {
 		mg.Logger.WithFields(logrus.Fields{
 			"coinToSell": coinToSell,
@@ -81,7 +80,7 @@ func (mg *MinterGate) EstimateCoinBuy(coinToSell string, coinToBuy string, value
 
 //Return estimate of sell coin
 func (mg *MinterGate) EstimateCoinSell(coinToSell string, coinToBuy string, value string) (*CoinEstimate, error) {
-	result, err := mg.api.EstimateCoinSell(coinToSell, value, coinToBuy, 0)
+	result, err := mg.api.EstimateCoinSell(coinToSell, value, coinToBuy)
 	if err != nil {
 		mg.Logger.WithFields(logrus.Fields{
 			"coinToSell": coinToSell,

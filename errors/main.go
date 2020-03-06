@@ -1,6 +1,7 @@
 package errors
 
 import (
+	"encoding/json"
 	"github.com/MinterTeam/minter-go-sdk/api"
 	"github.com/gin-gonic/gin"
 	"math/big"
@@ -30,13 +31,10 @@ func formatErrorMessage(errorString string) (string, error) {
 				valueString = "0"
 			} else {
 				valueString = value.Text('f', 10)
-				newValue, err := strconv.ParseFloat(valueString, 64)
-				if err != nil {
-					return "", err
-				}
-				valueString = strconv.FormatFloat(newValue, 'f', -1, 64)
 			}
-			replacer := strings.NewReplacer(match[2], valueString)
+
+			f, err := strconv.ParseFloat(valueString, 10)
+			replacer := strings.NewReplacer(match[2], strconv.FormatFloat(f, 'f', -1, 64))
 			errorString = replacer.Replace(errorString)
 		}
 	}
@@ -45,75 +43,113 @@ func formatErrorMessage(errorString string) (string, error) {
 }
 
 func SetErrorResponse(err error, c *gin.Context) {
-	switch er := err.(type) {
-	case *api.TxError:
-		formError := GetNodeErrorFromResponse(er)
-		strError, _ := formatErrorMessage(er.TxResult.Log)
-		switch e := formError.(type) {
-		case *NodeError:
-			c.JSON(http.StatusBadRequest, gin.H{
-				"error": gin.H{
-					"code": e.Code(),
-					"log":  strError,
-				},
-			})
-		case *NodeTimeOutError:
-			c.JSON(http.StatusRequestTimeout, gin.H{
-				"error": gin.H{
-					"code": e.Code(),
-					"log":  strError,
-				},
-			})
-		case *InsufficientFundsError:
-			c.JSON(http.StatusBadRequest, gin.H{
-				"error": gin.H{
-					"code":  e.Code(),
-					"log":   strError,
-					"coin":  e.Coin(),
-					"value": e.Value(),
-				},
-			})
-		case *MaximumValueToSellReachedError:
-			c.JSON(http.StatusBadRequest, gin.H{
-				"error": gin.H{
-					"code": e.Code(),
-					"log":  strError,
-					"want": e.Want(),
-					"need": e.Need(),
-				},
-			})
-		default:
-			c.JSON(http.StatusInternalServerError, gin.H{
-				"error": gin.H{
-					"code": -1,
-					"log":  e.Error(),
-				},
-			})
-		}
-	case *api.Error:
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": gin.H{
-				"code": er.Code,
-				"log":  er.Message,
-			},
-		})
+	switch e := err.(type) {
+	case *api.ResponseError:
+		//TODO: use it in next version
+		//nodeError := new(NodeErrorResponse)
+		//er := json.Unmarshal(e.Body(), nodeError)
+		//if er != nil {
+		//	c.JSON(http.StatusInternalServerError, gin.H{
+		//		"error": gin.H{
+		//			"code": -1,
+		//			"log":  e.Error(),
+		//		},
+		//	})
+		//} else {
+		//	HandleNodeError(nodeError.GetNodeError(), c)
+		//}
+
+		// Here for support old error format
+		// Will remove next version
+		HandleNodeError(getNodeErrorFromResponse(e), c)
 	default:
-		c.JSON(http.StatusInternalServerError, gin.H{
+		c.JSON(http.StatusBadRequest, gin.H{
 			"error": gin.H{
-				"code": 1,
-				"log":  er.Error(),
+				"code": -1,
+				"log":  e.Error(),
 			},
 		})
 	}
-
 }
 
-func GetNodeErrorFromResponse(r *api.TxError) error {
+func HandleNodeError(err error, c *gin.Context) {
+	switch e := err.(type) {
+	case *NodeError:
+		msg, err := formatErrorMessage(e.GetMessage())
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"error": err,
+			})
+			break
+		}
+
+		log, err := formatErrorMessage(e.GetLog())
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"error": err,
+			})
+			break
+		}
+
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": gin.H{
+				"message": msg,
+				"code":    e.GetCode(),
+				"tx_result": gin.H{
+					"code": e.GetTxCode(),
+					"log":  log,
+				},
+			},
+		})
+	case *NodeTimeOutError:
+		c.JSON(http.StatusRequestTimeout, gin.H{
+			"error": gin.H{
+				"code": e.Code(),
+				"log":  e.Error(),
+			},
+		})
+	case *InsufficientFundsError:
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": gin.H{
+				"code":  e.Code(),
+				"log":   e.Error(),
+				"coin":  e.Coin(),
+				"value": e.Value(),
+			},
+		})
+	case *MaximumValueToSellReachedError:
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": gin.H{
+				"code": e.Code(),
+				"log":  e.Error(),
+				"want": e.Want(),
+				"need": e.Need(),
+			},
+		})
+	default:
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": err,
+		})
+	}
+}
+
+// Here for support old error format
+// Will remove next version
+func getNodeErrorFromResponse(r *api.ResponseError) error {
+
+	nodeError := new(NodeErrorResponse)
+	er := json.Unmarshal(r.Body(), nodeError)
+
+	if er != nil {
+		return er
+	}
+
 	bip := big.NewFloat(0.000000000000000001)
-	switch r.TxResult.Code {
+
+	switch nodeError.Error.TxResult.Code {
 	case 107:
 		var re = regexp.MustCompile(`(?mi)^.*Wanted *(\d+) (\w+)`)
-		matches := re.FindStringSubmatch(r.TxResult.Log)
+		matches := re.FindStringSubmatch(nodeError.Error.TxResult.Log)
 		if matches != nil {
 			value, _, err := big.ParseFloat(matches[1], 10, 0, big.ToZero)
 			if err != nil {
@@ -122,17 +158,17 @@ func GetNodeErrorFromResponse(r *api.TxError) error {
 			value = value.Mul(value, bip)
 			strValue := value.Text('f', 10)
 
-			newValue, err := strconv.ParseFloat(strValue, 64)
+			text, err := formatErrorMessage(nodeError.Error.TxResult.Log)
 			if err != nil {
 				return err
 			}
-			strValue = strconv.FormatFloat(newValue, 'f', -1, 64)
-			return NewInsufficientFundsError(strings.Replace(r.TxResult.Log, matches[1], strValue, -1), int32(r.TxResult.Code), strValue, matches[2])
+
+			return NewInsufficientFundsError(text, int32(nodeError.Error.TxResult.Code), strValue, matches[2])
 		}
-		return NewInsufficientFundsError(r.TxResult.Log, int32(r.TxResult.Code), "", "")
+		return NewInsufficientFundsError(nodeError.Error.TxResult.Log, int32(nodeError.Error.TxResult.Code), "", "")
 	case 302:
 		var re = regexp.MustCompile(`(?mi)^.*maximum (\d+).* spend (\d+).*`)
-		matches := re.FindStringSubmatch(r.TxResult.Log)
+		matches := re.FindStringSubmatch(nodeError.Error.TxResult.Log)
 		if matches != nil {
 			valueWant, _, err := big.ParseFloat(matches[1], 10, 0, big.ToZero)
 			if err != nil {
@@ -147,14 +183,19 @@ func GetNodeErrorFromResponse(r *api.TxError) error {
 			replacer := strings.NewReplacer(
 				matches[1], valueWant.Text('g', 10),
 				matches[2], valueNeed.Text('g', 10))
-			return NewMaximumValueToSellReachedError(replacer.Replace(r.TxResult.Log), int32(r.TxResult.Code), matches[1], matches[2])
+
+			text, err := formatErrorMessage(nodeError.Error.TxResult.Log)
+			if err != nil {
+				return err
+			}
+			return NewMaximumValueToSellReachedError(replacer.Replace(text), nodeError.Error.TxResult.Code, matches[1], matches[2])
 		}
-		return NewNodeError(r.TxResult.Log, int32(r.TxResult.Code))
+		return NewNodeError(nodeError.Error.TxResult.Log, nodeError.Error.TxResult.Code)
 	default:
-		msg, err := formatErrorMessage(r.TxResult.Log)
+		msg, err := formatErrorMessage(nodeError.Error.TxResult.Log)
 		if err != nil {
 			return err
 		}
-		return NewNodeError(msg, int32(r.TxResult.Code))
+		return NewNodeError(msg, nodeError.Error.TxResult.Code)
 	}
 }
