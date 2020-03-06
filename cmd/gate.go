@@ -41,7 +41,7 @@ func main() {
 	logger.SetFormatter(&logrus.JSONFormatter{})
 	logger.SetOutput(os.Stdout)
 	logger.SetReportCaller(true)
-	if os.Getenv("DEBUG") != "1" {
+	if os.Getenv("GATE_DEBUG") != "1" && os.Getenv("GATE_DEBUG") != "true" {
 		logger.SetFormatter(&logrus.TextFormatter{
 			DisableColors: false,
 			FullTimestamp: true,
@@ -64,7 +64,8 @@ func main() {
 
 	gateService := core.New(pubsubServer, contextLogger)
 
-	nodeApi := sdk.NewApi(os.Getenv("NODE_URL"))
+	link := os.Getenv("NODE_API")
+	nodeApi := sdk.NewApi(link)
 
 	status, err := nodeApi.Status()
 	if err != nil {
