@@ -52,7 +52,7 @@ func main() {
 	}
 
 	contextLogger := logger.WithFields(logrus.Fields{
-		"version": "2.1.1",
+		"version": "2.1.2",
 		"app":     "Minter Gate",
 	})
 
