@@ -28,6 +28,7 @@ func (ner *NodeErrorResponse) GetNodeError() error {
 
 type NodeError struct {
 	Message  string `json:"message"`
+	Data     string `json:"data"`
 	Code     int    `json:"code"`
 	TxResult struct {
 		Code int    `json:"code"`
