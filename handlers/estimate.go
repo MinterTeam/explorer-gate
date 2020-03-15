@@ -20,7 +20,11 @@ func EstimateTxCommission(c *gin.Context) {
 		})
 		return
 	}
-	tx := `0x` + strings.TrimSpace(c.Query(`transaction`))
+	tx := strings.TrimSpace(c.Query(`transaction`))
+	if tx[:2] != "0x" {
+		tx = `0x` + tx
+	}
+
 	commission, err := gate.EstimateTxCommission(tx)
 	if err != nil {
 		errors.SetErrorResponse(err, c)
