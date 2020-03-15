@@ -31,10 +31,15 @@ func main() {
 		os.Exit(0)
 	}
 
-	err := godotenv.Load()
-	if err != nil {
-		panic("Error loading .env file")
+	path, err := os.Getwd()
+	if fileExists(path + ".env") {
+		fmt.Printf(`loading .env file: %s`, path + ".env")
+		err := godotenv.Load()
+		if err != nil {
+			panic("Error loading .env file")
+		}
 	}
+
 
 	//Init Logger
 	logger := logrus.New()
@@ -103,4 +108,12 @@ func main() {
 	}()
 
 	api.Run(gateService, pubsubServer)
+}
+
+func fileExists(filename string) bool {
+    info, err := os.Stat(filename)
+    if os.IsNotExist(err) {
+        return false
+    }
+    return !info.IsDir()
 }

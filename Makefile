@@ -33,4 +33,7 @@ clean:
 fmt:
 	@go fmt ./...
 
+docker_build:
+	docker build -f .docker/gate/Dockerfile .
+
 .PHONY: get_deps build install clean fmt all
