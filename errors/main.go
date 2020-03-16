@@ -204,6 +204,9 @@ func getNodeErrorFromResponse(r *api.ResponseError) error {
 			return err
 		}
 		if msg == "" {
+			msg = nodeError.Error.Data
+		}
+		if msg == "" {
 			msg = nodeError.Error.Message
 		}
 
