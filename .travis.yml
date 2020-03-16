@@ -47,9 +47,9 @@ after_success:
       docker tag $CI_IMAGE ${DOCKERHUB_ORGANIZATION}/${APP_NAME}:pr-${TRAVIS_PULL_REQUEST};
       docker push ${DOCKERHUB_ORGANIZATION}/${APP_NAME}:pr-${TRAVIS_PULL_REQUEST}
       docker run -v $PWD:/workspace \
-        -e DOCKERHUB_USERNAME='$DOCKER_USERNAME' \
-        -e DOCKERHUB_PASSWORD='$DOCKER_PASSWORD' \
-        -e DOCKERHUB_REPOSITORY='$DOCKERHUB_ORGANIZATION' \
+        -e DOCKERHUB_USERNAME=$DOCKER_USERNAME \
+        -e DOCKERHUB_PASSWORD=$DOCKER_PASSWORD \
+        -e DOCKERHUB_REPOSITORY=$DOCKERHUB_ORGANIZATION \
         -e README_FILEPATH='/workspace/.docker/dockerhub.md' \
         peterevans/dockerhub-description:2.1.0
     fi
