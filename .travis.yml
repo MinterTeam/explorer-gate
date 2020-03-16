@@ -86,8 +86,7 @@ deploy:
   # Releases (which are tagged) go to github
   - provider: releases
     skip_cleanup: true
-    api_key:
-      secure: $GITHUB_OAUTH_TOKEN
+    api_key: $GITHUB_OAUTH_TOKEN
     file:
       - gate
     on:
