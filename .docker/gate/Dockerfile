@@ -1,4 +1,6 @@
-FROM golang:1.13.7-alpine as builder
+ARG GO_VER
+
+FROM golang:${PHP_VER}-alpine as builder
 
 RUN apk add --no-cache make gcc musl-dev linux-headers
 WORKDIR /app

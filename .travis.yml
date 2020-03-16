@@ -1,12 +1,65 @@
-language: go
+##################################################
+## Prerequisites:
+## - $DOCKER_USERNAME and $DOCKER_PASSWORD must
+##   be set in the project settings in Travis-CI
+##   and their values must be properly escaped
+##   for bash.
+## - $DOCKERHUB_ORGANIZATION must be set in the
+##   project settings in Travis-CI. This should
+##   be the organization or user to use for
+##   publishing images.
+##################################################
+sudo: required
+language: bash
+services:
+  - docker
+env:
+  global:
+    # Used for specifying the build context relative to this file
+    # Likely, this is "."
+    - CONTEXT_RELATIVE_PATH=.
 
-go:
-  - 1.10.x
-  - 1.11.x
+    # Relative path from $CONTEXT_RELATIVE_PATH to target Dockerfile
+    # Examples: "src/App/Dockerfile", "Dockerfile"
+    - DOCKERFILE_RELATIVE_PATH=.docker/gate/Dockerfile
 
-before_install:
-  - make get_tools
-  - sh pre_test.sh
+    # Name used for built and published images
+    # Must be compliant with docker image name rules
+    # (see https://docs.docker.com/engine/reference/commandline/tag/#extended-description)
+    - APP_NAME=explorer-gate
 
-install:
-  - make all
+    # Image name and tag used for CI only
+    - CI_IMAGE=${APP_NAME}:ci #DO NOT CHANGE
+
+    # Published image base name (user/image) without tag
+    # Correct tag is added later
+    - BASE_IMAGE=${DOCKER_USERNAME}/${APP_NAME} #DO NOT CHANGE
+  matrix:
+    - GO_VER=1.10
+    - GO_VER=1.11
+script:
+  - docker build -t $CI_IMAGE -f $DOCKERFILE_RELATIVE_PATH $CONTEXT_RELATIVE_PATH
+after_success:
+  # Tag pull request builds with ":pr-XXX" where "XXX" is the pull request number
+  - |
+    if [ "${TRAVIS_PULL_REQUEST}" != "false" ]; then
+      echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
+      docker tag $CI_IMAGE ${DOCKERHUB_ORGANIZATION}/${APP_NAME}:pr-${TRAVIS_PULL_REQUEST};
+      docker push ${DOCKERHUB_ORGANIZATION}/${APP_NAME}:pr-${TRAVIS_PULL_REQUEST}
+    fi
+  # Tag git tag builds with the git tag
+  - |
+    if [ -n "$TRAVIS_TAG" ]; then
+      echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
+      docker tag $CI_IMAGE ${DOCKERHUB_ORGANIZATION}/${APP_NAME}:${TRAVIS_TAG}
+      docker push ${DOCKERHUB_ORGANIZATION}/${APP_NAME}:${TRAVIS_TAG}
+    fi
+  # Tag pushes on master with ":latest"
+  - |
+    if [ "$TRAVIS_BRANCH" = "master" -a "$TRAVIS_PULL_REQUEST" = "false" ]; then
+      echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
+      docker tag $CI_IMAGE ${DOCKERHUB_ORGANIZATION}/${APP_NAME}:latest
+      docker push ${DOCKERHUB_ORGANIZATION}/${APP_NAME}:latest
+    fi
+notifications:
+  email: false
