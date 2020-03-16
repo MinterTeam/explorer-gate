@@ -49,7 +49,7 @@ after_success:
       docker run -v $PWD:/workspace \
         -e DOCKERHUB_USERNAME=$DOCKER_USERNAME \
         -e DOCKERHUB_PASSWORD=$DOCKER_PASSWORD \
-        -e DOCKERHUB_REPOSITORY='${DOCKERHUB_ORGANIZATION}/${APP_NAME}' \
+        -e DOCKERHUB_REPOSITORY=${DOCKERHUB_ORGANIZATION}/${APP_NAME} \
         -e README_FILEPATH='/workspace/.docker/dockerhub.md' \
         peterevans/dockerhub-description:2.1.0
     fi
