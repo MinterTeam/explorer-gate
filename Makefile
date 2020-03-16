@@ -1,3 +1,6 @@
+include .env
+export
+
 APP ?= gate
 VERSION ?= $(strip $(shell cat VERSION))
 GOOS ?= linux
@@ -34,6 +37,6 @@ fmt:
 	@go fmt ./...
 
 docker_build:
-	docker build -f .docker/gate/Dockerfile .
+	docker build -f .docker/gate/Dockerfile --build-arg DOKCER_GO_VER=$(DOKCER_GO_VER) .
 
 .PHONY: get_deps build install clean fmt all

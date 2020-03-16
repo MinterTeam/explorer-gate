@@ -35,10 +35,10 @@ env:
     # Correct tag is added later
     - BASE_IMAGE=${DOCKER_USERNAME}/${APP_NAME} #DO NOT CHANGE
   matrix:
-    - GO_VER=1.10
-    - GO_VER=1.11
+    - DOKCER_GO_VER=1.13
+    - DOKCER_GO_VER=1.14
 script:
-  - docker build --build-arg GO_VER=${GO_VER} -t $CI_IMAGE -f $DOCKERFILE_RELATIVE_PATH $CONTEXT_RELATIVE_PATH
+  - docker build --build-arg DOKCER_GO_VER=${DOKCER_GO_VER} -t $CI_IMAGE -f $DOCKERFILE_RELATIVE_PATH $CONTEXT_RELATIVE_PATH
 after_success:
   # Tag pull request builds with ":pr-XXX" where "XXX" is the pull request number
   - |

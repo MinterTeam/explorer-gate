@@ -1,6 +1,6 @@
-ARG GO_VER
+ARG DOKCER_GO_VER
 
-FROM golang:${GO_VER}-alpine as builder
+FROM golang:${DOKCER_GO_VER}-alpine as builder
 
 RUN apk add --no-cache make gcc musl-dev linux-headers git
 WORKDIR /app
