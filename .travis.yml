@@ -46,12 +46,6 @@ after_success:
       echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
       docker tag $CI_IMAGE ${DOCKERHUB_ORGANIZATION}/${APP_NAME}:pr-${TRAVIS_PULL_REQUEST};
       docker push ${DOCKERHUB_ORGANIZATION}/${APP_NAME}:pr-${TRAVIS_PULL_REQUEST}
-      docker run -v $PWD:/workspace \
-        -e DOCKERHUB_USERNAME=$DOCKER_USERNAME \
-        -e DOCKERHUB_PASSWORD=$DOCKER_PASSWORD \
-        -e DOCKERHUB_REPOSITORY=${DOCKERHUB_ORGANIZATION}/${APP_NAME} \
-        -e README_FILEPATH='/workspace/.docker/dockerhub.md' \
-        peterevans/dockerhub-description:2.1.0
     fi
   # Tag git tag builds with the git tag
   - |
@@ -67,9 +61,9 @@ after_success:
       docker tag $CI_IMAGE ${DOCKERHUB_ORGANIZATION}/${APP_NAME}:latest
       docker push ${DOCKERHUB_ORGANIZATION}/${APP_NAME}:latest
       docker run -v $PWD:/workspace \
-        -e DOCKERHUB_USERNAME='${DOCKER_USERNAME}' \
-        -e DOCKERHUB_PASSWORD='${DOCKER_PASSWORD}' \
-        -e DOCKERHUB_REPOSITORY='${DOCKERHUB_ORGANIZATION}/${APP_NAME}' \
+        -e DOCKERHUB_USERNAME=$DOCKER_USERNAME \
+        -e DOCKERHUB_PASSWORD=$DOCKER_PASSWORD \
+        -e DOCKERHUB_REPOSITORY=${DOCKERHUB_ORGANIZATION}/${APP_NAME} \
         -e README_FILEPATH='/workspace/.docker/dockerhub.md' \
         peterevans/dockerhub-description:2.1.0
     fi
