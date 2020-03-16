@@ -26,7 +26,7 @@ env:
     # Name used for built and published images
     # Must be compliant with docker image name rules
     # (see https://docs.docker.com/engine/reference/commandline/tag/#extended-description)
-    - APP_NAME=explorer-gate
+    - APP_NAME=minter-explorer-gate
 
     # Image name and tag used for CI only
     - CI_IMAGE=${APP_NAME}:ci #DO NOT CHANGE
@@ -38,7 +38,7 @@ env:
     - GO_VER=1.10
     - GO_VER=1.11
 script:
-  - docker build -t $CI_IMAGE -f $DOCKERFILE_RELATIVE_PATH $CONTEXT_RELATIVE_PATH
+  - docker build --build-arg GO_VER=${GO_VER} -t $CI_IMAGE -f $DOCKERFILE_RELATIVE_PATH $CONTEXT_RELATIVE_PATH
 after_success:
   # Tag pull request builds with ":pr-XXX" where "XXX" is the pull request number
   - |
