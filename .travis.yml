@@ -79,7 +79,7 @@ notifications:
 # We run ~10 builds, but only the one that deploys needs a .app bundle or .deb file
 before_deploy:
   - docker run --name temp-container-name $CI_IMAGE /bin/true
-  - docker cp temp-container-name:/usr/bin/gate ./gate
+  - docker cp temp-container-name:/etc/hosts ./gate
   - docker rm temp-container-name
 
 deploy:
