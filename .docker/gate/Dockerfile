@@ -2,7 +2,7 @@ ARG GO_VER
 
 FROM golang:${GO_VER}-alpine as builder
 
-RUN apk add --no-cache make gcc musl-dev linux-headers
+RUN apk add --no-cache make gcc musl-dev linux-headers git
 WORKDIR /app
 COPY . /app
 RUN go mod download
