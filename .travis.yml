@@ -1,12 +1,87 @@
-language: go
+##################################################
+## Prerequisites:
+## - $DOCKER_USERNAME and $DOCKER_PASSWORD must
+##   be set in the project settings in Travis-CI
+##   and their values must be properly escaped
+##   for bash.
+## - $DOCKERHUB_ORGANIZATION must be set in the
+##   project settings in Travis-CI. This should
+##   be the organization or user to use for
+##   publishing images.
+##################################################
+sudo: required
+language: bash
+services:
+  - docker
+env:
+  global:
+    # Used for specifying the build context relative to this file
+    # Likely, this is "."
+    - CONTEXT_RELATIVE_PATH=.
 
-go:
-  - 1.10.x
-  - 1.11.x
+    # Relative path from $CONTEXT_RELATIVE_PATH to target Dockerfile
+    # Examples: "src/App/Dockerfile", "Dockerfile"
+    - DOCKERFILE_RELATIVE_PATH=.docker/gate/Dockerfile
 
-before_install:
-  - make get_tools
-  - sh pre_test.sh
+    # Name used for built and published images
+    # Must be compliant with docker image name rules
+    # (see https://docs.docker.com/engine/reference/commandline/tag/#extended-description)
+    - APP_NAME=minter-explorer-gate
 
-install:
-  - make all
+    # Image name and tag used for CI only
+    - CI_IMAGE=${APP_NAME}:ci #DO NOT CHANGE
+
+    # Published image base name (user/image) without tag
+    # Correct tag is added later
+    - BASE_IMAGE=${DOCKER_USERNAME}/${APP_NAME} #DO NOT CHANGE
+  matrix:
+    - DOKCER_GO_VER=1.13
+    - DOKCER_GO_VER=1.14
+script:
+  - docker build --build-arg DOKCER_GO_VER=${DOKCER_GO_VER} -t $CI_IMAGE -f $DOCKERFILE_RELATIVE_PATH $CONTEXT_RELATIVE_PATH
+after_success:
+  # Tag pull request builds with ":pr-XXX" where "XXX" is the pull request number
+  - |
+    if [ "${TRAVIS_PULL_REQUEST}" != "false" ]; then
+      echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
+      docker tag $CI_IMAGE ${DOCKERHUB_ORGANIZATION}/${APP_NAME}:pr-${TRAVIS_PULL_REQUEST};
+      docker push ${DOCKERHUB_ORGANIZATION}/${APP_NAME}:pr-${TRAVIS_PULL_REQUEST}
+    fi
+  # Tag git tag builds with the git tag
+  - |
+    if [ -n "$TRAVIS_TAG" ]; then
+      echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
+      docker tag $CI_IMAGE ${DOCKERHUB_ORGANIZATION}/${APP_NAME}:${TRAVIS_TAG}
+      docker push ${DOCKERHUB_ORGANIZATION}/${APP_NAME}:${TRAVIS_TAG}
+    fi
+  # Tag pushes on master with ":latest"
+  - |
+    if [ "$TRAVIS_BRANCH" = "master" -a "$TRAVIS_PULL_REQUEST" = "false" ]; then
+      echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
+      docker tag $CI_IMAGE ${DOCKERHUB_ORGANIZATION}/${APP_NAME}:latest
+      docker push ${DOCKERHUB_ORGANIZATION}/${APP_NAME}:latest
+      docker run -v $PWD:/workspace \
+        -e DOCKERHUB_USERNAME=$DOCKER_USERNAME \
+        -e DOCKERHUB_PASSWORD=$DOCKER_PASSWORD \
+        -e DOCKERHUB_REPOSITORY=${DOCKERHUB_ORGANIZATION}/${APP_NAME} \
+        -e README_FILEPATH='/workspace/.docker/dockerhub.md' \
+        peterevans/dockerhub-description:2.1.0
+    fi
+notifications:
+  email: false
+
+# We run ~10 builds, but only the one that deploys needs a .app bundle or .deb file
+before_deploy:
+  - docker run --name temp-container-name $CI_IMAGE /bin/true
+  - docker cp temp-container-name:/usr/bin/gate ./gate
+  - docker rm temp-container-name
+
+deploy:
+  # Releases (which are tagged) go to github
+  - provider: releases
+    skip_cleanup: true
+    api_key: $GITHUB_OAUTH_TOKEN
+    file:
+      - gate
+    on:
+      tags: true
