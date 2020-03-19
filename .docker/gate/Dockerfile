@@ -2,7 +2,7 @@ ARG DOKCER_GO_VER
 
 FROM golang:${DOKCER_GO_VER}-alpine as builder
 
-RUN apk add --no-cache make gcc musl-dev linux-headers git
+RUN apk add --no-cache make gcc musl-dev linux-headers
 WORKDIR /app
 COPY . /app
 RUN go mod download

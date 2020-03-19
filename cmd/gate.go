@@ -32,14 +32,14 @@ func main() {
 	}
 
 	path, err := os.Getwd()
-	if fileExists(path + ".env") {
-		fmt.Printf(`loading .env file: %s`, path + ".env")
+
+	if fileExists(path + "/.env") {
+		fmt.Printf(`loading .env file: %s`, path+".env")
 		err := godotenv.Load()
 		if err != nil {
 			panic("Error loading .env file")
 		}
 	}
-
 
 	//Init Logger
 	logger := logrus.New()
@@ -57,7 +57,7 @@ func main() {
 	}
 
 	contextLogger := logger.WithFields(logrus.Fields{
-		"version": "2.1.3",
+		"version": "2.1.4",
 		"app":     "Minter Gate",
 	})
 
@@ -111,9 +111,9 @@ func main() {
 }
 
 func fileExists(filename string) bool {
-    info, err := os.Stat(filename)
-    if os.IsNotExist(err) {
-        return false
-    }
-    return !info.IsDir()
+	info, err := os.Stat(filename)
+	if os.IsNotExist(err) {
+		return false
+	}
+	return !info.IsDir()
 }

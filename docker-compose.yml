@@ -7,7 +7,6 @@ services:
       dockerfile: .docker/go/Dockerfile
     ports:
       - 2345:2345
-      - 9000:9000
     volumes:
       - ~/pkg/mod/:/go/pkg/mod:rw
       - ./:/app
@@ -17,6 +16,8 @@ services:
     build:
       context: .
       dockerfile: .docker/gate/Dockerfile
+    ports:
+      - 9000:9000
     volumes:
       - ~/pkg/mod/:/go/pkg/mod:rw
     env_file:
