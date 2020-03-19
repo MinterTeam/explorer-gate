@@ -18,6 +18,6 @@ jobs:
           USERNAME: ${{ secrets.DOCKER_HUB_USER }}
           PASSWORD: ${{ secrets.DOCKER_HUB_PASSWORD }}
           IMAGE_NAME: "minterteam/explorer-gate"
-          BUILD_PATH: ".docker/gate/"
+          DOCKERFILE: ".docker/gate/Dockerfile"
           LATEST: "true"
           TAG_NAME: "v2.1.4"
