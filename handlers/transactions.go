@@ -64,14 +64,20 @@ func PushTransaction(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	hash, err := gate.TxPush(tx.Transaction)
+
+	txn := strings.TrimSpace(tx.Transaction)
+	if txn[:2] != "0x" {
+		txn = `0x` + txn
+	}
+
+	hash, err := gate.TxPush(txn)
 	if err != nil {
 		gate.Logger.WithFields(logrus.Fields{
 			"transaction": tx,
 		}).Error(err)
 		errors.SetErrorResponse(err, c)
 	} else {
-		txHex := strings.ToUpper(strings.TrimSpace(tx.Transaction))
+		txHex := strings.ToUpper(txn[2:])
 		q, _ := query.New(fmt.Sprintf("tx='%s'", txHex))
 		sub, err := pubsubServer.Subscribe(context.TODO(), txHex, q)
 		if err != nil {

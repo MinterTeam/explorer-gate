@@ -13,7 +13,6 @@ jobs:
 
       - name: Build & Push to Docker Hub
         uses: opspresso/action-docker@master
-        buildArgs: DOKCER_GO_VER=1.13.7
         env:
           USERNAME: ${{ secrets.DOCKER_HUB_USER }}
           PASSWORD: ${{ secrets.DOCKER_HUB_PASSWORD }}
