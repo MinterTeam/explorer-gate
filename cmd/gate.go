@@ -5,8 +5,8 @@ import (
 	"encoding/hex"
 	"flag"
 	"fmt"
-	"github.com/MinterTeam/explorer-gate/v2/api"
-	"github.com/MinterTeam/explorer-gate/v2/core"
+	"github.com/MinterTeam/explorer-gate/v2/src/api"
+	"github.com/MinterTeam/explorer-gate/v2/src/core"
 	sdk "github.com/MinterTeam/minter-go-sdk/api"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
 	"github.com/joho/godotenv"
@@ -57,7 +57,7 @@ func main() {
 	}
 
 	contextLogger := logger.WithFields(logrus.Fields{
-		"version": "2.1.4",
+		"version": Version,
 		"app":     "Minter Gate",
 	})
 

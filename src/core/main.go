@@ -1,31 +1,32 @@
 package core
 
 import (
+	"github.com/MinterTeam/explorer-gate/v2/src/domain"
 	"github.com/MinterTeam/minter-go-sdk/api"
 	"github.com/MinterTeam/minter-go-sdk/transaction"
+	"github.com/go-resty/resty/v2"
 	"github.com/sirupsen/logrus"
 	"github.com/tendermint/tendermint/libs/pubsub"
 	"os"
+	"strconv"
 	"strings"
+	"time"
 )
 
 type MinterGate struct {
-	api     *api.Api
-	emitter *pubsub.Server
-	Logger  *logrus.Entry
-}
-
-type CoinEstimate struct {
-	Value      string
-	Commission string
+	api      *api.Api
+	emitter  *pubsub.Server
+	IsActive bool
+	Logger   *logrus.Entry
 }
 
 //New instance of Minter Gate
 func New(e *pubsub.Server, logger *logrus.Entry) *MinterGate {
 	return &MinterGate{
-		emitter: e,
-		api:     api.NewApi(os.Getenv("NODE_API")),
-		Logger:  logger,
+		emitter:  e,
+		api:      api.NewApi(os.Getenv("NODE_API")),
+		IsActive: true,
+		Logger:   logger,
 	}
 }
 
@@ -64,7 +65,7 @@ func (mg *MinterGate) EstimateTxCommission(tx string) (*string, error) {
 }
 
 //Return estimate of buy coin
-func (mg *MinterGate) EstimateCoinBuy(coinToSell string, coinToBuy string, value string) (*CoinEstimate, error) {
+func (mg *MinterGate) EstimateCoinBuy(coinToSell string, coinToBuy string, value string) (*domain.CoinEstimate, error) {
 	result, err := mg.api.EstimateCoinBuy(coinToSell, value, coinToBuy)
 	if err != nil {
 		mg.Logger.WithFields(logrus.Fields{
@@ -75,11 +76,11 @@ func (mg *MinterGate) EstimateCoinBuy(coinToSell string, coinToBuy string, value
 		return nil, err
 	}
 
-	return &CoinEstimate{result.WillPay, result.Commission}, nil
+	return &domain.CoinEstimate{Value: result.WillPay, Commission: result.Commission}, nil
 }
 
 //Return estimate of sell coin
-func (mg *MinterGate) EstimateCoinSell(coinToSell string, coinToBuy string, value string) (*CoinEstimate, error) {
+func (mg *MinterGate) EstimateCoinSell(coinToSell string, coinToBuy string, value string) (*domain.CoinEstimate, error) {
 	result, err := mg.api.EstimateCoinSell(coinToSell, value, coinToBuy)
 	if err != nil {
 		mg.Logger.WithFields(logrus.Fields{
@@ -90,7 +91,7 @@ func (mg *MinterGate) EstimateCoinSell(coinToSell string, coinToBuy string, valu
 		return nil, err
 	}
 
-	return &CoinEstimate{result.WillGet, result.Commission}, nil
+	return &domain.CoinEstimate{Value: result.WillGet, Commission: result.Commission}, nil
 }
 
 //Return nonce for address
@@ -113,4 +114,51 @@ func (mg *MinterGate) GetMinGas() (*string, error) {
 		return nil, err
 	}
 	return &gasPrice, nil
+}
+
+func (mg *MinterGate) ExplorerStatusChecker() {
+
+	sleepTime, err := strconv.ParseInt(os.Getenv("EXPLORER_CHECK_SEC"), 10, 64)
+	if err != nil {
+		mg.Logger.Error(err)
+		return
+	}
+	diff, err := strconv.ParseFloat(os.Getenv("LAST_BLOCK_DIF_SEC"), 64)
+	if err != nil {
+		mg.Logger.Error(err)
+		return
+	}
+	client := resty.New().SetHostURL(os.Getenv("EXPLORER_API"))
+
+	for {
+		resp, err := client.R().
+			SetResult(domain.ExplorerStatusResponse{}).
+			SetError(domain.ExplorerErrorResponse{}).
+			Get("/api/v1/status")
+
+		if err != nil {
+			time.Sleep(time.Duration(sleepTime) * time.Second)
+			continue
+		}
+
+		if resp.IsError() {
+			mg.Logger.Error(resp.Error().(*domain.ExplorerErrorResponse).Error.Message)
+			time.Sleep(time.Duration(sleepTime) * time.Second)
+			continue
+		}
+
+		lastBlockTime := resp.Result().(*domain.ExplorerStatusResponse).Data.LatestBlockTime
+		isActive := !(time.Since(lastBlockTime).Seconds() > diff)
+
+		if !isActive {
+			mg.Logger.Error("Minter Gate is disabled")
+		}
+		if isActive && !mg.IsActive {
+			mg.Logger.Error("Minter Gate is enabled")
+		}
+
+		mg.IsActive = isActive
+		time.Sleep(time.Duration(sleepTime) * time.Second)
+	}
+
 }
