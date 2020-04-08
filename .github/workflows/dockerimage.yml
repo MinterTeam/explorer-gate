@@ -11,7 +11,7 @@ jobs:
         with:
           fetch-depth: 1
 
-      - name: Versioning
+      - name: Version
         uses: pCYSl5EDgo/cat@master
         id: version
         with:
@@ -25,6 +25,6 @@ jobs:
           IMAGE_NAME: "minterteam/explorer-gate"
           DOCKERFILE: ".docker/gate/Dockerfile"
           LATEST: "true"
-          VERSION: ${{ steps.version.outputs.VERSION }}
-          TAG_NAME: "v"${{ steps.version.outputs.VERSION }}
+          VERSION: "2.5.0"
+          TAG_NAME: "v2.5.0"
         buildargs: VERSION
