@@ -3,8 +3,8 @@ package handlers
 import (
 	"context"
 	"fmt"
-	"github.com/MinterTeam/explorer-gate/v2/core"
-	"github.com/MinterTeam/explorer-gate/v2/errors"
+	"github.com/MinterTeam/explorer-gate/v2/src/core"
+	"github.com/MinterTeam/explorer-gate/v2/src/errors"
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
 	"github.com/tendermint/tendermint/libs/pubsub"
@@ -16,13 +16,6 @@ import (
 	"time"
 )
 
-func Index(c *gin.Context) {
-	c.JSON(200, gin.H{
-		"name":    "Minter Explorer Gate API",
-		"version": "2.0.0",
-	})
-}
-
 type PushTransactionRequest struct {
 	Transaction string `form:"transaction" json:"transaction" binding:"required"`
 }
@@ -30,6 +23,24 @@ type PushTransactionRequest struct {
 func PushTransaction(c *gin.Context) {
 	var err error
 	gate, ok := c.MustGet("gate").(*core.MinterGate)
+	if !ok {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": gin.H{
+				"code": 1,
+				"log":  "Type cast error",
+			},
+		})
+		return
+	}
+	if !gate.IsActive {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": gin.H{
+				"code": 1,
+				"log":  "Explorer is down",
+			},
+		})
+		return
+	}
 
 	var timeOut int64
 	timeOut, err = strconv.ParseInt(os.Getenv("NODE_API_TIMEOUT"), 10, 64)
@@ -47,7 +58,7 @@ func PushTransaction(c *gin.Context) {
 		})
 		return
 	}
-	pubsubServer, ok := c.MustGet("pubsub").(*pubsub.Server)
+	pubSubServer, ok := c.MustGet("pubsub").(*pubsub.Server)
 	if !ok {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": gin.H{
@@ -79,7 +90,7 @@ func PushTransaction(c *gin.Context) {
 	} else {
 		txHex := strings.ToUpper(txn[2:])
 		q, _ := query.New(fmt.Sprintf("tx='%s'", txHex))
-		sub, err := pubsubServer.Subscribe(context.TODO(), txHex, q)
+		sub, err := pubSubServer.Subscribe(context.TODO(), txHex, q)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{
 				"error": gin.H{
@@ -89,7 +100,7 @@ func PushTransaction(c *gin.Context) {
 			})
 			return
 		}
-		defer pubsubServer.Unsubscribe(context.TODO(), txHex, q)
+		defer pubSubServer.Unsubscribe(context.TODO(), txHex, q)
 
 		select {
 		case <-sub.Out():

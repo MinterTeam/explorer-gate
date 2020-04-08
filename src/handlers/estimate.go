@@ -2,8 +2,8 @@ package handlers
 
 import (
 	"fmt"
-	"github.com/MinterTeam/explorer-gate/v2/core"
-	"github.com/MinterTeam/explorer-gate/v2/errors"
+	"github.com/MinterTeam/explorer-gate/v2/src/core"
+	"github.com/MinterTeam/explorer-gate/v2/src/errors"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strings"
@@ -20,6 +20,17 @@ func EstimateTxCommission(c *gin.Context) {
 		})
 		return
 	}
+
+	if !gate.IsActive {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": gin.H{
+				"code": 1,
+				"log":  "Explorer is down",
+			},
+		})
+		return
+	}
+
 	tx := strings.TrimSpace(c.Query(`transaction`))
 	if tx[:2] != "0x" {
 		tx = `0x` + tx
@@ -44,6 +55,15 @@ func EstimateCoinBuy(c *gin.Context) {
 			"error": gin.H{
 				"code": 1,
 				"log":  "Type cast error",
+			},
+		})
+		return
+	}
+	if !gate.IsActive {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": gin.H{
+				"code": 1,
+				"log":  "Explorer is down",
 			},
 		})
 		return
@@ -75,6 +95,15 @@ func EstimateCoinSell(c *gin.Context) {
 		})
 		return
 	}
+	if !gate.IsActive {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": gin.H{
+				"code": 1,
+				"log":  "Explorer is down",
+			},
+		})
+		return
+	}
 	coinToSell := strings.TrimSpace(c.Query(`coinToSell`))
 	coinToBuy := strings.TrimSpace(c.Query(`coinToBuy`))
 	value := strings.TrimSpace(c.Query(`valueToSell`))
@@ -102,6 +131,15 @@ func GetNonce(c *gin.Context) {
 		})
 		return
 	}
+	if !gate.IsActive {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": gin.H{
+				"code": 1,
+				"log":  "Explorer is down",
+			},
+		})
+		return
+	}
 	address := strings.Title(strings.TrimSpace(c.Param(`address`)))
 	nonce, err := gate.GetNonce(address)
 	if err != nil {
@@ -122,6 +160,15 @@ func GetMinGas(c *gin.Context) {
 			"error": gin.H{
 				"code": 1,
 				"log":  "Type cast error",
+			},
+		})
+		return
+	}
+	if !gate.IsActive {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": gin.H{
+				"code": 1,
+				"log":  "Explorer is down",
 			},
 		})
 		return
