@@ -17,7 +17,6 @@ type Error struct {
 
 type ExplorerStatusData struct {
 	AverageBlockTime      float64   `json:"averageBlockTime"`
-	BipPriceChange        int       `json:"bipPriceChange"`
 	BipPriceUsd           float64   `json:"bipPriceUsd"`
 	LatestBlockHeight     int       `json:"latestBlockHeight"`
 	LatestBlockTime       time.Time `json:"latestBlockTime"`
