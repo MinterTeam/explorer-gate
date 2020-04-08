@@ -27,4 +27,3 @@ jobs:
           LATEST: "true"
           VERSION: "2.5.0"
           TAG_NAME: "v2.5.0"
-        buildargs: VERSION
