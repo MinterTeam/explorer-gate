@@ -84,7 +84,7 @@ func index(c *gin.Context) {
 		return
 	}
 	c.JSON(200, gin.H{
-		"name":    "Minter Explorer Gate API",
+		"name":    "Minter Gate API",
 		"version": Version,
 		"active":  gate.IsActive,
 	})
