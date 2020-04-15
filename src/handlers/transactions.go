@@ -103,12 +103,29 @@ func PushTransaction(c *gin.Context) {
 		defer pubSubServer.Unsubscribe(context.TODO(), txHex, q)
 
 		select {
-		case <-sub.Out():
-			c.JSON(http.StatusOK, gin.H{
-				"data": gin.H{
-					"hash": &hash,
-				},
-			})
+		case msg := <-sub.Out():
+			gate.Logger.Log(logrus.DebugLevel, msg)
+			if msg.Data() == "FailTx" {
+				tags := msg.Tags()
+
+				gate.Logger.WithFields(logrus.Fields{
+					"transaction": tx,
+					"code":        1,
+				}).Error(tags["error"])
+
+				c.JSON(http.StatusBadRequest, gin.H{
+					"error": gin.H{
+						"log":  tags["error"],
+						"code": 1,
+					},
+				})
+			} else {
+				c.JSON(http.StatusOK, gin.H{
+					"data": gin.H{
+						"hash": &hash,
+					},
+				})
+			}
 		case <-time.After(time.Duration(timeOut) * time.Second):
 			gate.Logger.WithFields(logrus.Fields{
 				"transaction": tx,

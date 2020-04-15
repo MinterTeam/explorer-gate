@@ -93,6 +93,16 @@ func main() {
 			}
 
 			for _, tx := range block.Transactions {
+				if tx.Code != 0 {
+					err := pubsubServer.PublishWithTags(context.TODO(), "FailTx", map[string]string{
+						"error": fmt.Sprintf("%X", tx.Log),
+					})
+					if err != nil {
+						logger.Error(err)
+					}
+					continue
+				}
+
 				b, _ := hex.DecodeString(tx.RawTx)
 				err := pubsubServer.PublishWithTags(context.TODO(), "NewTx", map[string]string{
 					"tx": fmt.Sprintf("%X", b),
@@ -101,7 +111,6 @@ func main() {
 					logger.Error(err)
 				}
 			}
-
 			latestBlock++
 			time.Sleep(1 * time.Second)
 		}
