@@ -24,8 +24,8 @@ github.com/FactomProject/basen v0.0.0-20150613233007-fe3947df716e/go.mod h1:kGUq
 github.com/FactomProject/btcutilecc v0.0.0-20130527213604-d3a63a5752ec h1:1Qb69mGp/UtRPn422BH4/Y4Q3SLUrD9KHuDkm8iodFc=
 github.com/FactomProject/btcutilecc v0.0.0-20130527213604-d3a63a5752ec/go.mod h1:CD8UlnlLDiqb36L110uqiP2iSflVjx9g/3U9hCI4q2U=
 github.com/Knetic/govaluate v3.0.0+incompatible/go.mod h1:r7JcOSlj0wfOMncg0iLm8Leh48TZaKVeNIfJntJ2wa0=
-github.com/MinterTeam/minter-go-sdk v1.0.2 h1:/FDqn1Y6BMd0+oFgFi2AD/1REIkW7Y+lL+JnYkAV25U=
-github.com/MinterTeam/minter-go-sdk v1.0.2/go.mod h1:IVoupdNnGyzfdprQ32x2ZI9MaA6XpXDirH16H6GqBTY=
+github.com/MinterTeam/minter-go-sdk v1.0.8 h1:DLGldS4zOQKWAqXtgZqo7q1pkAuHNyDAF+4bQrXG3GY=
+github.com/MinterTeam/minter-go-sdk v1.0.8/go.mod h1:IVoupdNnGyzfdprQ32x2ZI9MaA6XpXDirH16H6GqBTY=
 github.com/OneOfOne/xxhash v1.2.2/go.mod h1:HSdplMjZKSmBqAxg5vPj2TmRDmfkzw+cTzAElWljhcU=
 github.com/OneOfOne/xxhash v1.2.5/go.mod h1:eZbhyaAYD41SGSSsnmcpxVoRiQ/MPUTjUdIIOT9Um7Q=
 github.com/Shopify/sarama v1.19.0/go.mod h1:FVkBWblsNy7DGZRfXLU0O9RCGt5g3g3yEuWXgklEdEo=

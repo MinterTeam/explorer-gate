@@ -2,8 +2,8 @@ package handlers
 
 import (
 	"fmt"
-	"github.com/MinterTeam/explorer-gate/v2/core"
-	"github.com/MinterTeam/explorer-gate/v2/errors"
+	"github.com/MinterTeam/explorer-gate/v2/src/core"
+	"github.com/MinterTeam/explorer-gate/v2/src/errors"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strings"
@@ -20,6 +20,7 @@ func EstimateTxCommission(c *gin.Context) {
 		})
 		return
 	}
+
 	tx := strings.TrimSpace(c.Query(`transaction`))
 	if tx[:2] != "0x" {
 		tx = `0x` + tx

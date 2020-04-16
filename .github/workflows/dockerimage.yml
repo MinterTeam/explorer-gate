@@ -11,6 +11,12 @@ jobs:
         with:
           fetch-depth: 1
 
+      - name: Version
+        uses: pCYSl5EDgo/cat@master
+        id: version
+        with:
+          path: VERSION
+
       - name: Build & Push to Docker Hub
         uses: opspresso/action-docker@master
         env:
@@ -19,4 +25,5 @@ jobs:
           IMAGE_NAME: "minterteam/explorer-gate"
           DOCKERFILE: ".docker/gate/Dockerfile"
           LATEST: "true"
-          TAG_NAME: "v2.1.4"
+          VERSION: "2.5.0"
+          TAG_NAME: "v2.5.0"

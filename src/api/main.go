@@ -2,8 +2,8 @@ package api
 
 import (
 	"github.com/Depado/ginprom"
-	"github.com/MinterTeam/explorer-gate/v2/core"
-	"github.com/MinterTeam/explorer-gate/v2/handlers"
+	"github.com/MinterTeam/explorer-gate/v2/src/core"
+	"github.com/MinterTeam/explorer-gate/v2/src/handlers"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/tendermint/tendermint/libs/pubsub"
@@ -11,8 +11,13 @@ import (
 	"os"
 )
 
+var Version string
+
 // Run API
 func Run(gateService *core.MinterGate, pubSubServer *pubsub.Server) {
+	if os.Getenv("EXPLORER_CHECK") == "true" || os.Getenv("EXPLORER_CHECK") == "1" {
+		go gateService.ExplorerStatusChecker()
+	}
 	router := SetupRouter(gateService, pubSubServer)
 	err := router.Run(":" + os.Getenv("GATE_PORT"))
 	if err != nil {
@@ -40,7 +45,7 @@ func SetupRouter(gateService *core.MinterGate, pubSubServer *pubsub.Server) *gin
 	router.Use(gin.ErrorLogger())                        // print all errors
 	router.Use(apiMiddleware(gateService, pubSubServer)) // init global context
 
-	router.GET(`/`, handlers.Index)
+	router.GET(`/`, index)
 
 	v1 := router.Group("/api/v1")
 	{
@@ -65,4 +70,22 @@ func apiMiddleware(gate *core.MinterGate, pubSubServer *pubsub.Server) gin.Handl
 		c.Set("pubsub", pubSubServer)
 		c.Next()
 	}
+}
+
+func index(c *gin.Context) {
+	gate, ok := c.MustGet("gate").(*core.MinterGate)
+	if !ok {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": gin.H{
+				"code": 1,
+				"log":  "Type cast error",
+			},
+		})
+		return
+	}
+	c.JSON(200, gin.H{
+		"name":    "Minter Gate API",
+		"version": Version,
+		"active":  gate.IsActive,
+	})
 }
