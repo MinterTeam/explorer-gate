@@ -7,14 +7,14 @@ Content-Type: application/json
 ###
 ### Params: coinToSell=MINTERCAT&valueToBuy=1230000000000000000000000000000000000&coinToBuy=MNT
 
-GET    http://localhost:9000/api/v1/estimate/coin-buy
+GET    http://localhost:9000/api/v1/estimate/coin-buy?
 Accept: */*
 Cache-Control: no-cache
 Content-Type: application/json
 
 ### Estimate coin sell
 ### Params: coinToSell=MINTERCAT&valueToSell=1230000000000000000000000000000000000&coinToBuy=MNT
-GET    http://localhost:9000/api/v1/estimate/coin-sell?coinToSell=MINTERCAT&valueToSell=1230000000000000000000000000000000000&coinToBuy=MNT
+GET    http://localhost:9000/api/v1/estimate/coin-sell?
 Accept: */*
 Cache-Control: no-cache
 Content-Type: application/json
@@ -37,5 +37,5 @@ Accept: */*
 Cache-Control: no-cache
 Content-Type: application/json
 
-{"transaction" : "0xf8841702018a4d4e540000000000000001aae98a4d4e5400000000000000942f574419b6cba6d886341b5cd4110d2b02eafe8e880de0b6b3a7640000808001b845f8431ba00878cdc29b6df49c4d95000cbcfa235def48d2b158c619910890c57db54a3ea8a02c63e3e3189d8365639666f44922fd28e495ec24dc9acb646f4fa0d9c0e41b1f"}
+{"transaction" : ""}
 

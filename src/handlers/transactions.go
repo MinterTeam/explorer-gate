@@ -125,6 +125,7 @@ func PushTransaction(c *gin.Context) {
 				tags := msg.Tags()
 				data := new(api.TransactionResult)
 				err = json.Unmarshal([]byte(tags["txData"]), data)
+				data.Height = tags["height"]
 				c.JSON(http.StatusOK, gin.H{
 					"data": gin.H{
 						"hash":        &hash,

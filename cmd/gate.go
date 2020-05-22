@@ -115,6 +115,7 @@ func main() {
 				err = pubsubServer.PublishWithTags(context.TODO(), "NewTx", map[string]string{
 					"tx":     fmt.Sprintf("%X", b),
 					"txData": string(txJson),
+					"height": block.Height,
 				})
 				if err != nil {
 					logger.Error(err)
