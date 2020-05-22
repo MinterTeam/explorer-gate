@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"encoding/hex"
+	"encoding/json"
 	"flag"
 	"fmt"
 	"github.com/MinterTeam/explorer-gate/v2/src/api"
@@ -104,8 +105,16 @@ func main() {
 				}
 
 				b, _ := hex.DecodeString(tx.RawTx)
-				err := pubsubServer.PublishWithTags(context.TODO(), "NewTx", map[string]string{
-					"tx": fmt.Sprintf("%X", b),
+
+				txJson, err := json.Marshal(tx)
+				if err != nil {
+					logger.Error(err)
+					continue
+				}
+
+				err = pubsubServer.PublishWithTags(context.TODO(), "NewTx", map[string]string{
+					"tx":     fmt.Sprintf("%X", b),
+					"txData": string(txJson),
 				})
 				if err != nil {
 					logger.Error(err)

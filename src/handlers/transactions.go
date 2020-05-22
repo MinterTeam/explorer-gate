@@ -2,9 +2,11 @@ package handlers
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"github.com/MinterTeam/explorer-gate/v2/src/core"
 	"github.com/MinterTeam/explorer-gate/v2/src/errors"
+	"github.com/MinterTeam/minter-go-sdk/api"
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
 	"github.com/tendermint/tendermint/libs/pubsub"
@@ -120,9 +122,13 @@ func PushTransaction(c *gin.Context) {
 					},
 				})
 			} else {
+				tags := msg.Tags()
+				data := new(api.TransactionResult)
+				err = json.Unmarshal([]byte(tags["txData"]), data)
 				c.JSON(http.StatusOK, gin.H{
 					"data": gin.H{
-						"hash": &hash,
+						"hash":        &hash,
+						"transaction": data,
 					},
 				})
 			}
