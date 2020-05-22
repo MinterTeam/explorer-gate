@@ -202,11 +202,7 @@ func getNodeErrorFromResponse(r *api.ResponseError) error {
 			code = nodeError.Error.Code
 		}
 
-		if r.IsError() {
-			msg, err = formatErrorMessage(nodeError.Error.Message)
-		} else {
-			msg, err = formatErrorMessage(nodeError.Error.TxResult.Log)
-		}
+		msg, err = formatErrorMessage(nodeError.Error.TxResult.Log)
 
 		if err != nil {
 			return err
