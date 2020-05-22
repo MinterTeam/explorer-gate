@@ -1,0 +1,41 @@
+###
+GET    http://localhost:9000/api/v1/estimate/tx-commission
+Accept: */*
+Cache-Control: no-cache
+Content-Type: application/json
+
+###
+### Params: coinToSell=MINTERCAT&valueToBuy=1230000000000000000000000000000000000&coinToBuy=MNT
+
+GET    http://localhost:9000/api/v1/estimate/coin-buy?
+Accept: */*
+Cache-Control: no-cache
+Content-Type: application/json
+
+### Estimate coin sell
+### Params: coinToSell=MINTERCAT&valueToSell=1230000000000000000000000000000000000&coinToBuy=MNT
+GET    http://localhost:9000/api/v1/estimate/coin-sell?
+Accept: */*
+Cache-Control: no-cache
+Content-Type: application/json
+
+###
+GET    http://localhost:9000/api/v1/nonce/:address
+Accept: */*
+Cache-Control: no-cache
+Content-Type: application/json
+
+###
+GET    http://localhost:9000/api/v1/min-gas
+Accept: */*
+Cache-Control: no-cache
+Content-Type: application/json
+
+###
+POST   http://localhost:9000/api/v1/transaction/push
+Accept: */*
+Cache-Control: no-cache
+Content-Type: application/json
+
+{"transaction" : ""}
+
