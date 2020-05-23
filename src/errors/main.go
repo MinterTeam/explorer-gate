@@ -202,16 +202,18 @@ func getNodeErrorFromResponse(r *api.ResponseError) error {
 			code = nodeError.Error.Code
 		}
 
-		msg, err = formatErrorMessage(nodeError.Error.TxResult.Log)
+		msg = nodeError.Error.TxResult.Log
 
-		if err != nil {
-			return err
-		}
 		if msg == "" {
 			msg = nodeError.Error.Data
 		}
 		if msg == "" {
 			msg = nodeError.Error.Message
+		}
+
+		msg, err = formatErrorMessage(msg)
+		if err != nil {
+			return err
 		}
 
 		//Will use in next version
