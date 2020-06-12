@@ -117,24 +117,24 @@ func GetNonce(c *gin.Context) {
 }
 
 func GetMinGas(c *gin.Context) {
-	gate, ok := c.MustGet("gate").(*core.MinterGate)
-	if !ok {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": gin.H{
-				"code": 1,
-				"log":  "Type cast error",
-			},
-		})
-		return
-	}
-	gas, err := gate.GetMinGas()
-	if err != nil {
-		errors.SetErrorResponse(err, c)
-	} else {
-		c.JSON(http.StatusOK, gin.H{
-			"data": gin.H{
-				"gas": gas,
-			},
-		})
-	}
+	//gate, ok := c.MustGet("gate").(*core.MinterGate)
+	//if !ok {
+	//	c.JSON(http.StatusInternalServerError, gin.H{
+	//		"error": gin.H{
+	//			"code": 1,
+	//			"log":  "Type cast error",
+	//		},
+	//	})
+	//	return
+	//}
+	//gas, err := gate.GetMinGas()
+	//if err != nil {
+	//	errors.SetErrorResponse(err, c)
+	//} else {
+	c.JSON(http.StatusOK, gin.H{
+		"data": gin.H{
+			"gas": `2`,
+		},
+	})
+	//}
 }
