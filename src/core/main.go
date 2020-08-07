@@ -33,14 +33,7 @@ func New(e *pubsub.Server, logger *logrus.Entry) *MinterGate {
 //Send transaction to blockchain
 //Return transaction hash
 func (mg *MinterGate) TxPush(tx string) (*string, error) {
-	transactionObject, err := transaction.Decode(tx)
-	if err != nil {
-		mg.Logger.WithFields(logrus.Fields{
-			"transaction": tx,
-		}).Warn(err)
-		return nil, err
-	}
-	result, err := mg.api.SendTransaction(transactionObject)
+	result, err := mg.api.SendRawTransaction(tx)
 	if err != nil {
 		mg.Logger.WithFields(logrus.Fields{
 			"transaction": tx,
