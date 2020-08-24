@@ -29,7 +29,7 @@ spec:
           env:
             - name: DEBUG
               value: {{ .Values.env.debug | quote }}
-            - name: API_PORT
+            - name: GATE_PORT
               value: {{ .Values.env.port | quote }}
             - name: NODE_API
               value: {{ .Values.env.nodeApi | quote }}
