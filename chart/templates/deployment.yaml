@@ -1,0 +1,71 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "chart.fullname" . }}
+  labels:
+  {{- include "chart.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+  {{- include "chart.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+    {{- include "chart.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+      {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "chart.serviceAccountName" . }}
+      securityContext:
+      {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext: {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+            - name: DEBUG
+              value: {{ .Values.env.debug | quote }}
+            - name: API_PORT
+              value: {{ .Values.env.port | quote }}
+            - name: NODE_API
+              value: {{ .Values.env.nodeApi | quote }}
+            - name: NODE_API_TIMEOUT
+              value: {{ .Values.env.nodeApiTimeout | quote }}
+            - name: EXPLORER_API
+              value: {{ .Values.env.explorerApi | quote }}
+            - name: EXPLORER_CHECK
+              value: {{ .Values.env.explorerCheck | quote }}
+            - name: EXPLORER_CHECK_SEC
+              value: {{ .Values.env.explorerCheckTimeout | quote }}
+            - name: LAST_BLOCK_DIF_SEC
+              value: {{ .Values.env.lastBlockDifTime | quote }}
+          ports:
+            - name: http
+              containerPort: {{.Values.service.port}}
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+          resources:
+      {{- toYaml .Values.resources | nindent 12 }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+      {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+      {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+  {{- toYaml . | nindent 8 }}
+  {{- end }}

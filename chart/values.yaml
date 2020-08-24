@@ -1,0 +1,45 @@
+replicaCount: 1
+
+image:
+  repository: registry.minter.network/minter-gate
+  pullPolicy: IfNotPresent
+
+imagePullSecrets:
+  - name: registry.minter.network
+
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  create: true
+
+podSecurityContext: { }
+
+securityContext: { }
+
+service:
+  port: 9000
+
+ingress:
+  domain: gate-api.chilinet.minter.network
+  tls:
+    secret: "wildcard"
+  servicename: static
+
+resources: { }
+
+nodeSelector: { }
+
+tolerations: [ ]
+
+affinity: { }
+
+env:
+  debug: { DEBUG }
+  port: { PORT }
+  nodeApi: { NODE_API }
+  nodeApiTimeout: { NODE_API_TIMEOUT }
+  explorerApi: { EXPLORER_API }
+  explorerCheck: { EXPLORER_CHECK }
+  explorerCheckTimeout: { EXPLORER_CHECK_TIMEOUT }
+  lastBlockDifTime: { LAST_BLOCK_DIF_TIME }

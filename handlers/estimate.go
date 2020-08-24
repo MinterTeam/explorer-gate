@@ -2,8 +2,8 @@ package handlers
 
 import (
 	"fmt"
-	"github.com/MinterTeam/explorer-gate/v2/src/core"
-	"github.com/MinterTeam/explorer-gate/v2/src/errors"
+	"github.com/MinterTeam/explorer-gate/v2/core"
+	"github.com/MinterTeam/explorer-gate/v2/errors"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strings"

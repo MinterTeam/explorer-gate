@@ -1,7 +1,7 @@
 package core
 
 import (
-	"github.com/MinterTeam/explorer-gate/v2/src/domain"
+	"github.com/MinterTeam/explorer-gate/v2/domain"
 	"github.com/MinterTeam/minter-go-sdk/api"
 	"github.com/MinterTeam/minter-go-sdk/transaction"
 	"github.com/go-resty/resty/v2"
