@@ -21,7 +21,7 @@ service:
   port: 9000
 
 ingress:
-  domain: gate-api.chilinet.minter.network
+  domain: { GATE_HOST }
   tls:
     secret: "wildcard"
   servicename: static
