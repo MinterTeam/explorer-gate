@@ -27,3 +27,4 @@ jobs:
           LATEST: "true"
           VERSION: "${{ steps.version.outputs.text }}"
           TAG_NAME: "v${{ steps.version.outputs.text }}"
+          DOCKER_BUILD_ARGS: --build-arg VERSION=${{ steps.version.outputs.text }}
