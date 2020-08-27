@@ -25,5 +25,5 @@ jobs:
           IMAGE_NAME: "minterteam/explorer-gate"
           DOCKERFILE: ".docker/gate/Dockerfile"
           LATEST: "true"
-          VERSION: "2.5.0"
-          TAG_NAME: "v2.5.0"
+          VERSION: "${{ steps.version.outputs.VERSION }}"
+          TAG_NAME: "v${{ steps.version.outputs.VERSION }}"
