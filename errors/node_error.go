@@ -8,6 +8,13 @@ func NewNodeError(text string, code int) error {
 	}
 }
 
+type GateError struct {
+	Error   string              `json:"error"`
+	Code    int                 `json:"code"`
+	Message string              `json:"message"`
+	Details []map[string]string `json:"details"`
+}
+
 func GetOldNodeError(text string, code int) error {
 	return &OldNodeError{
 		Log:  text,

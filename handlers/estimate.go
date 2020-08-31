@@ -5,6 +5,7 @@ import (
 	"github.com/MinterTeam/explorer-gate/v2/core"
 	"github.com/MinterTeam/explorer-gate/v2/errors"
 	"github.com/gin-gonic/gin"
+	"github.com/sirupsen/logrus"
 	"net/http"
 	"strings"
 )
@@ -12,12 +13,13 @@ import (
 func EstimateTxCommission(c *gin.Context) {
 	gate, ok := c.MustGet("gate").(*core.MinterGate)
 	if !ok {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": gin.H{
-				"code": 1,
-				"log":  "Type cast error",
-			},
-		})
+		err := errors.GateError{
+			Error:   "",
+			Code:    1,
+			Message: "Type cast error",
+			Details: nil,
+		}
+		c.JSON(http.StatusInternalServerError, err)
 		return
 	}
 
@@ -31,9 +33,7 @@ func EstimateTxCommission(c *gin.Context) {
 		errors.SetErrorResponse(err, c)
 	} else {
 		c.JSON(http.StatusOK, gin.H{
-			"data": gin.H{
-				"commission": &commission,
-			},
+			"commission": &commission,
 		})
 	}
 }
@@ -41,12 +41,13 @@ func EstimateTxCommission(c *gin.Context) {
 func EstimateCoinBuy(c *gin.Context) {
 	gate, ok := c.MustGet("gate").(*core.MinterGate)
 	if !ok {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": gin.H{
-				"code": 1,
-				"log":  "Type cast error",
-			},
-		})
+		err := errors.GateError{
+			Error:   "",
+			Code:    1,
+			Message: "Type cast error",
+			Details: nil,
+		}
+		c.JSON(http.StatusInternalServerError, err)
 		return
 	}
 	coinToSell := strings.TrimSpace(c.Query(`coinToSell`))
@@ -54,13 +55,16 @@ func EstimateCoinBuy(c *gin.Context) {
 	value := strings.TrimSpace(c.Query(`valueToBuy`))
 	estimate, err := gate.EstimateCoinBuy(coinToSell, coinToBuy, value)
 	if err != nil {
+		gate.Logger.WithFields(logrus.Fields{
+			"coinToSell": coinToSell,
+			"coinToBuy":  coinToBuy,
+			"value":      value,
+		}).Warn(err)
 		errors.SetErrorResponse(err, c)
 	} else {
 		c.JSON(http.StatusOK, gin.H{
-			"data": gin.H{
-				"commission": estimate.Commission,
-				"will_pay":   estimate.Value,
-			},
+			"commission": estimate.Commission,
+			"will_pay":   estimate.Value,
 		})
 	}
 }
@@ -68,12 +72,13 @@ func EstimateCoinBuy(c *gin.Context) {
 func EstimateCoinSell(c *gin.Context) {
 	gate, ok := c.MustGet("gate").(*core.MinterGate)
 	if !ok {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": gin.H{
-				"code": 1,
-				"log":  "Type cast error",
-			},
-		})
+		err := errors.GateError{
+			Error:   "",
+			Code:    1,
+			Message: "Type cast error",
+			Details: nil,
+		}
+		c.JSON(http.StatusInternalServerError, err)
 		return
 	}
 	coinToSell := strings.TrimSpace(c.Query(`coinToSell`))
@@ -81,13 +86,17 @@ func EstimateCoinSell(c *gin.Context) {
 	value := strings.TrimSpace(c.Query(`valueToSell`))
 	estimate, err := gate.EstimateCoinSell(coinToSell, coinToBuy, value)
 	if err != nil {
+		gate.Logger.WithFields(logrus.Fields{
+			"coinToSell": coinToSell,
+			"coinToBuy":  coinToBuy,
+			"value":      value,
+		}).Warn(err)
+
 		errors.SetErrorResponse(err, c)
 	} else {
 		c.JSON(http.StatusOK, gin.H{
-			"data": gin.H{
-				"commission": estimate.Commission,
-				"will_get":   estimate.Value,
-			},
+			"commission": estimate.Commission,
+			"will_get":   estimate.Value,
 		})
 	}
 }
@@ -95,12 +104,13 @@ func EstimateCoinSell(c *gin.Context) {
 func GetNonce(c *gin.Context) {
 	gate, ok := c.MustGet("gate").(*core.MinterGate)
 	if !ok {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": gin.H{
-				"code": 1,
-				"log":  "Type cast error",
-			},
-		})
+		err := errors.GateError{
+			Error:   "",
+			Code:    1,
+			Message: "Type cast error",
+			Details: nil,
+		}
+		c.JSON(http.StatusInternalServerError, err)
 		return
 	}
 	address := strings.Title(strings.TrimSpace(c.Param(`address`)))
@@ -109,9 +119,7 @@ func GetNonce(c *gin.Context) {
 		errors.SetErrorResponse(err, c)
 	} else {
 		c.JSON(http.StatusOK, gin.H{
-			"data": gin.H{
-				"nonce": fmt.Sprintf("%d", nonce),
-			},
+			"nonce": fmt.Sprintf("%d", nonce),
 		})
 	}
 }
@@ -119,12 +127,13 @@ func GetNonce(c *gin.Context) {
 func GetMinGas(c *gin.Context) {
 	gate, ok := c.MustGet("gate").(*core.MinterGate)
 	if !ok {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": gin.H{
-				"code": 1,
-				"log":  "Type cast error",
-			},
-		})
+		err := errors.GateError{
+			Error:   "",
+			Code:    1,
+			Message: "Type cast error",
+			Details: nil,
+		}
+		c.JSON(http.StatusInternalServerError, err)
 		return
 	}
 	gas, err := gate.GetMinGas()
@@ -132,9 +141,7 @@ func GetMinGas(c *gin.Context) {
 		errors.SetErrorResponse(err, c)
 	} else {
 		c.JSON(http.StatusOK, gin.H{
-			"data": gin.H{
-				"gas": gas,
-			},
+			"gas": gas,
 		})
 	}
 }

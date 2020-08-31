@@ -31,6 +31,8 @@ spec:
               value: {{ .Values.env.debug | quote }}
             - name: API_PORT
               value: {{ .Values.env.port | quote }}
+            - name: BASE_COIN
+              value: {{ .Values.env.baseCoin | quote }}
             - name: NODE_API
               value: {{ .Values.env.nodeApi | quote }}
             - name: NODE_API_TIMEOUT

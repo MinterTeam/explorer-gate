@@ -37,6 +37,7 @@ affinity: { }
 env:
   debug: { DEBUG }
   port: { PORT }
+  baseCoin: { BASE_COIN }
   nodeApi: { NODE_API }
   nodeApiTimeout: { NODE_API_TIMEOUT }
   explorerApi: { EXPLORER_API }

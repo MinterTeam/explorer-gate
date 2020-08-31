@@ -3,6 +3,7 @@ package api
 import (
 	"github.com/Depado/ginprom"
 	"github.com/MinterTeam/explorer-gate/v2/core"
+	"github.com/MinterTeam/explorer-gate/v2/errors"
 	"github.com/MinterTeam/explorer-gate/v2/handlers"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -75,12 +76,13 @@ func apiMiddleware(gate *core.MinterGate, pubSubServer *pubsub.Server) gin.Handl
 func index(c *gin.Context) {
 	gate, ok := c.MustGet("gate").(*core.MinterGate)
 	if !ok {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": gin.H{
-				"code": 1,
-				"log":  "Type cast error",
-			},
-		})
+		err := errors.GateError{
+			Error:   "",
+			Code:    1,
+			Message: "Type cast error",
+			Details: nil,
+		}
+		c.JSON(http.StatusInternalServerError, err)
 		return
 	}
 	c.JSON(200, gin.H{

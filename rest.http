@@ -14,7 +14,7 @@ Content-Type: application/json
 
 ### Estimate coin sell
 ### Params: coinToSell=MINTERCAT&valueToSell=1230000000000000000000000000000000000&coinToBuy=MNT
-GET    http://localhost:9000/api/v1/estimate/coin-sell?
+GET    http://localhost:9000/api/v1/estimate/coin-sell?coinToSell=SUPERTEST4&valueToSell=1230000000000000000000000000000000000&coinToBuy=MNT
 Accept: */*
 Cache-Control: no-cache
 Content-Type: application/json

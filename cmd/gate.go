@@ -8,8 +8,7 @@ import (
 	"fmt"
 	"github.com/MinterTeam/explorer-gate/v2/api"
 	"github.com/MinterTeam/explorer-gate/v2/core"
-	sdk "github.com/MinterTeam/minter-go-sdk/api"
-	_ "github.com/jinzhu/gorm/dialects/postgres"
+	"github.com/MinterTeam/minter-go-sdk/v2/api/grpc_client"
 	"github.com/joho/godotenv"
 	"github.com/sirupsen/logrus"
 	"github.com/tendermint/tendermint/libs/pubsub"
@@ -68,10 +67,10 @@ func main() {
 		contextLogger.Error(err)
 	}
 
-	gateService := core.New(pubsubServer, contextLogger)
-
-	link := os.Getenv("NODE_API")
-	nodeApi := sdk.NewApi(link)
+	nodeApi, err := grpc_client.New(os.Getenv("NODE_API"))
+	if err != nil {
+		logrus.Fatal(err)
+	}
 
 	status, err := nodeApi.Status()
 	if err != nil {
@@ -85,6 +84,8 @@ func main() {
 
 	logger.Info("Starting with block " + strconv.Itoa(latestBlock))
 
+	gateService := core.New(nodeApi, pubsubServer, contextLogger)
+
 	go func() {
 		for {
 			block, err := nodeApi.Block(latestBlock)
@@ -94,7 +95,7 @@ func main() {
 			}
 
 			for _, tx := range block.Transactions {
-				if tx.Code != 0 {
+				if tx.Code != "0" {
 					err := pubsubServer.PublishWithTags(context.TODO(), "FailTx", map[string]string{
 						"error": fmt.Sprintf("%X", tx.Log),
 					})
