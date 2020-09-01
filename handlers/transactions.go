@@ -26,12 +26,12 @@ func PushTransaction(c *gin.Context) {
 	var err error
 	gate, ok := c.MustGet("gate").(*core.MinterGate)
 	if !ok {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": gin.H{
-				"code": 1,
-				"log":  "Type cast error",
-			},
-		})
+		err := errors.GateError{
+			Error:   "",
+			Code:    1,
+			Message: "Type cast error",
+		}
+		c.JSON(http.StatusInternalServerError, err)
 		return
 	}
 	if !gate.IsActive {
@@ -52,30 +52,37 @@ func PushTransaction(c *gin.Context) {
 	}
 
 	if !ok {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": gin.H{
-				"code": 1,
-				"log":  "Type cast error",
-			},
-		})
+		err := errors.GateError{
+			Error:   "",
+			Code:    1,
+			Message: "Type cast error",
+		}
+		c.JSON(http.StatusInternalServerError, err)
 		return
 	}
 	pubSubServer, ok := c.MustGet("pubsub").(*pubsub.Server)
 	if !ok {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": gin.H{
-				"code": 1,
-				"log":  "Type cast error",
-			},
-		})
+		err := errors.GateError{
+			Error:   "",
+			Code:    1,
+			Message: "Type cast error",
+		}
+		c.JSON(http.StatusInternalServerError, err)
 		return
 	}
 
 	var tx PushTransactionRequest
 	if err = c.ShouldBindJSON(&tx); err != nil {
 		gate.Logger.Error(err)
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+
+		e := errors.GateError{
+			Error:   "",
+			Code:    1,
+			Message: err.Error(),
+		}
+		c.JSON(http.StatusBadRequest, e)
 		return
+
 	}
 
 	txn := strings.TrimSpace(tx.Transaction)
@@ -94,12 +101,12 @@ func PushTransaction(c *gin.Context) {
 		q, _ := query.New(fmt.Sprintf("tx='%s'", txHex))
 		sub, err := pubSubServer.Subscribe(context.TODO(), txHex, q)
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{
-				"error": gin.H{
-					"code": 1,
-					"log":  "Subscription error",
-				},
-			})
+			err := errors.GateError{
+				Error:   "",
+				Code:    1,
+				Message: "Subscription error",
+			}
+			c.JSON(http.StatusInternalServerError, err)
 			return
 		}
 		defer pubSubServer.Unsubscribe(context.TODO(), txHex, q)
@@ -115,12 +122,12 @@ func PushTransaction(c *gin.Context) {
 					"code":        1,
 				}).Error(tags["error"])
 
-				c.JSON(http.StatusBadRequest, gin.H{
-					"error": gin.H{
-						"log":  tags["error"],
-						"code": 1,
-					},
-				})
+				err := errors.GateError{
+					Error:   "",
+					Code:    1,
+					Message: tags["error"],
+				}
+				c.JSON(http.StatusBadRequest, err)
 			} else {
 				tags := msg.Tags()
 				data := new(api.TransactionResult)
@@ -138,12 +145,13 @@ func PushTransaction(c *gin.Context) {
 				"transaction": tx,
 				"code":        504,
 			}).Error(`Time out waiting for transaction to be included in block`)
-			c.JSON(http.StatusRequestTimeout, gin.H{
-				"error": gin.H{
-					"code": 1,
-					"log":  `Time out waiting for transaction to be included in block`,
-				},
-			})
+
+			err := errors.GateError{
+				Error:   "",
+				Code:    504,
+				Message: "Time out waiting for transaction to be included in block",
+			}
+			c.JSON(http.StatusRequestTimeout, err)
 		}
 	}
 }

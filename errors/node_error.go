@@ -12,7 +12,7 @@ type GateError struct {
 	Error   string              `json:"error"`
 	Code    int                 `json:"code"`
 	Message string              `json:"message"`
-	Details []map[string]string `json:"details"`
+	Details []map[string]string `json:"details,omitempty"`
 }
 
 func GetOldNodeError(text string, code int) error {

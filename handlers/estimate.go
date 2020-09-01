@@ -17,7 +17,6 @@ func EstimateTxCommission(c *gin.Context) {
 			Error:   "",
 			Code:    1,
 			Message: "Type cast error",
-			Details: nil,
 		}
 		c.JSON(http.StatusInternalServerError, err)
 		return
@@ -45,7 +44,6 @@ func EstimateCoinBuy(c *gin.Context) {
 			Error:   "",
 			Code:    1,
 			Message: "Type cast error",
-			Details: nil,
 		}
 		c.JSON(http.StatusInternalServerError, err)
 		return
@@ -76,7 +74,6 @@ func EstimateCoinSell(c *gin.Context) {
 			Error:   "",
 			Code:    1,
 			Message: "Type cast error",
-			Details: nil,
 		}
 		c.JSON(http.StatusInternalServerError, err)
 		return
@@ -108,7 +105,6 @@ func GetNonce(c *gin.Context) {
 			Error:   "",
 			Code:    1,
 			Message: "Type cast error",
-			Details: nil,
 		}
 		c.JSON(http.StatusInternalServerError, err)
 		return
@@ -131,7 +127,6 @@ func GetMinGas(c *gin.Context) {
 			Error:   "",
 			Code:    1,
 			Message: "Type cast error",
-			Details: nil,
 		}
 		c.JSON(http.StatusInternalServerError, err)
 		return
