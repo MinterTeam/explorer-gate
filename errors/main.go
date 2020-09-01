@@ -41,12 +41,27 @@ func formatErrorMessage(errorString string) (string, error) {
 }
 
 func SetErrorResponse(err error, c *gin.Context) {
-	result := GateError{
-		Error:   "",
-		Code:    1,
-		Message: err.Error(),
-		Details: nil,
+
+	var result GateError
+	splitMsg := strings.Split(err.Error(), "=")
+	msg, e := formatErrorMessage(splitMsg[len(splitMsg)-1])
+
+	if e != nil {
+		result = GateError{
+			Error:   "",
+			Code:    1,
+			Message: e.Error(),
+			Details: nil,
+		}
+	} else {
+		result = GateError{
+			Error:   "",
+			Code:    1,
+			Message: msg,
+			Details: nil,
+		}
 	}
+
 	c.JSON(http.StatusBadRequest, result)
 }
 
