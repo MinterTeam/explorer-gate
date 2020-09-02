@@ -4,7 +4,7 @@ import (
 	"github.com/Depado/ginprom"
 	"github.com/MinterTeam/explorer-gate/v2/core"
 	"github.com/MinterTeam/explorer-gate/v2/errors"
-	"github.com/MinterTeam/explorer-gate/v2/handlers"
+	"github.com/MinterTeam/explorer-gate/v2/handlers/v1"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/tendermint/tendermint/libs/pubsub"
@@ -48,14 +48,14 @@ func SetupRouter(gateService *core.MinterGate, pubSubServer *pubsub.Server) *gin
 
 	router.GET(`/`, index)
 
-	v1 := router.Group("/api/v1")
+	apiV1 := router.Group("/api/v1")
 	{
-		v1.GET(`/estimate/tx-commission`, handlers.EstimateTxCommission)
-		v1.GET(`/estimate/coin-buy`, handlers.EstimateCoinBuy)
-		v1.GET(`/estimate/coin-sell`, handlers.EstimateCoinSell)
-		v1.GET(`/nonce/:address`, handlers.GetNonce)
-		v1.GET(`/min-gas`, handlers.GetMinGas)
-		v1.POST(`/transaction/push`, handlers.PushTransaction)
+		apiV1.GET(`/estimate/tx-commission`, v1.EstimateTxCommission)
+		apiV1.GET(`/estimate/coin-buy`, v1.EstimateCoinBuy)
+		apiV1.GET(`/estimate/coin-sell`, v1.EstimateCoinSell)
+		apiV1.GET(`/nonce/:address`, v1.GetNonce)
+		apiV1.GET(`/min-gas`, v1.GetMinGas)
+		apiV1.POST(`/transaction/push`, v1.PushTransaction)
 	}
 	// Default handler 404
 	router.NoRoute(func(c *gin.Context) {

@@ -1,4 +1,4 @@
-package handlers
+package v1
 
 import (
 	"fmt"
@@ -32,7 +32,9 @@ func EstimateTxCommission(c *gin.Context) {
 		errors.SetErrorResponse(err, c)
 	} else {
 		c.JSON(http.StatusOK, gin.H{
-			"commission": &commission,
+			"data": gin.H{
+				"commission": &commission,
+			},
 		})
 	}
 }
@@ -61,8 +63,10 @@ func EstimateCoinBuy(c *gin.Context) {
 		errors.SetErrorResponse(err, c)
 	} else {
 		c.JSON(http.StatusOK, gin.H{
-			"commission": estimate.Commission,
-			"will_pay":   estimate.Value,
+			"data": gin.H{
+				"commission": estimate.Commission,
+				"will_pay":   estimate.Value,
+			},
 		})
 	}
 }
@@ -92,8 +96,10 @@ func EstimateCoinSell(c *gin.Context) {
 		errors.SetErrorResponse(err, c)
 	} else {
 		c.JSON(http.StatusOK, gin.H{
-			"commission": estimate.Commission,
-			"will_get":   estimate.Value,
+			"data": gin.H{
+				"commission": estimate.Commission,
+				"will_get":   estimate.Value,
+			},
 		})
 	}
 }
@@ -115,7 +121,9 @@ func GetNonce(c *gin.Context) {
 		errors.SetErrorResponse(err, c)
 	} else {
 		c.JSON(http.StatusOK, gin.H{
-			"nonce": fmt.Sprintf("%d", nonce),
+			"data": gin.H{
+				"nonce": fmt.Sprintf("%d", nonce),
+			},
 		})
 	}
 }
@@ -136,7 +144,9 @@ func GetMinGas(c *gin.Context) {
 		errors.SetErrorResponse(err, c)
 	} else {
 		c.JSON(http.StatusOK, gin.H{
-			"gas": gas,
+			"data": gin.H{
+				"gas": gas,
+			},
 		})
 	}
 }
