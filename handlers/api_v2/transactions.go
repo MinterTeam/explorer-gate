@@ -121,8 +121,10 @@ func PushTransaction(c *gin.Context) {
 				err = json.Unmarshal([]byte(tags["txData"]), data)
 				data.Height = tags["height"]
 				c.JSON(http.StatusOK, gin.H{
-					"hash":        &hash,
-					"transaction": data,
+					"hash": &hash,
+					"data": data,
+					"code": "",
+					"log":  "",
 				})
 			}
 		case <-time.After(time.Duration(timeOut) * time.Second):
@@ -253,10 +255,10 @@ func PostTransaction(c *gin.Context) {
 				err = json.Unmarshal([]byte(tags["txData"]), data)
 				data.Height = tags["height"]
 				c.JSON(http.StatusOK, gin.H{
-					"data": gin.H{
-						"hash":        &hash,
-						"transaction": data,
-					},
+					"hash": &hash,
+					"data": data,
+					"code": "",
+					"log":  "",
 				})
 			}
 		case <-time.After(time.Duration(timeOut) * time.Second):
