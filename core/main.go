@@ -3,6 +3,7 @@ package core
 import (
 	"github.com/MinterTeam/explorer-gate/v2/domain"
 	"github.com/MinterTeam/minter-go-sdk/v2/api/grpc_client"
+	"github.com/MinterTeam/node-grpc-gateway/api_pb"
 	"github.com/go-resty/resty/v2"
 	"github.com/sirupsen/logrus"
 	"github.com/tendermint/tendermint/libs/pubsub"
@@ -162,6 +163,10 @@ func (mg *MinterGate) ExplorerStatusChecker() {
 		time.Sleep(time.Duration(sleepTime) * time.Second)
 	}
 
+}
+
+func (mg *MinterGate) CoinInfo(symbol string) (*api_pb.CoinInfoResponse, error) {
+	return mg.nodeClient.CoinInfo(symbol)
 }
 
 func (mg *MinterGate) getCoinId(symbol string) (uint64, error) {

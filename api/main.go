@@ -63,9 +63,10 @@ func SetupRouter(gateService *core.MinterGate, pubSubServer *pubsub.Server) *gin
 	{
 		apiV2.GET(`/estimate_tx_commission/:tx`, api_v2.EstimateTxCommission)
 		apiV2.GET(`/estimate_coin_buy`, api_v2.EstimateCoinBuy)
-		apiV2.GET(`/estimate/coin-sell`, api_v2.EstimateCoinSell)
+		apiV2.GET(`/estimate_coin_sell`, api_v2.EstimateCoinSell)
 		apiV2.GET(`/nonce/:address`, api_v2.GetNonce)
 		apiV2.GET(`/min_gas_price`, api_v2.GetMinGas)
+		apiV2.GET(`/coin_info/:symbol`, api_v2.CoinInfo)
 		apiV2.GET(`/send_transaction/:tx`, api_v2.PushTransaction)
 		apiV2.POST(`/send_transaction`, api_v2.PostTransaction)
 	}
