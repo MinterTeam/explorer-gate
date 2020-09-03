@@ -51,7 +51,7 @@ func EstimateCoinBuy(c *gin.Context) {
 	coinToSell := strings.TrimSpace(c.Query(`coin_to_sell`))
 	coinToBuy := strings.TrimSpace(c.Query(`coin_to_buy`))
 	value := strings.TrimSpace(c.Query(`value_to_buy`))
-	estimate, err := gate.EstimateCoinBuy(coinToSell, coinToBuy, value)
+	estimate, err := gate.EstimateCoinBuy(coinToSell, "", coinToBuy, "", value)
 	if err != nil {
 		gate.Logger.WithFields(logrus.Fields{
 			"coinToSell": coinToSell,
@@ -80,8 +80,12 @@ func EstimateCoinSell(c *gin.Context) {
 	}
 	coinToSell := strings.TrimSpace(c.Query(`coin_to_sell`))
 	coinToBuy := strings.TrimSpace(c.Query(`coin_to_buy`))
+
+	coinIdToSell := strings.TrimSpace(c.Query(`coin_id_to_sell`))
+	coinIdToBuy := strings.TrimSpace(c.Query(`coin_id_to_buy`))
+
 	value := strings.TrimSpace(c.Query(`value_to_sell`))
-	estimate, err := gate.EstimateCoinSell(coinToSell, coinToBuy, value)
+	estimate, err := gate.EstimateCoinSell(coinToSell, coinIdToSell, coinToBuy, coinIdToBuy, value)
 	if err != nil {
 		gate.Logger.WithFields(logrus.Fields{
 			"coinToSell": coinToSell,
@@ -136,7 +140,7 @@ func GetMinGas(c *gin.Context) {
 		errors.SetErrorResponse(err, c)
 	} else {
 		c.JSON(http.StatusOK, gin.H{
-			"gas": gas,
+			"result": gas,
 		})
 	}
 }

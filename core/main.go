@@ -57,15 +57,32 @@ func (mg *MinterGate) EstimateTxCommission(tx string, optionalHeight ...int) (*s
 }
 
 //Return estimate of buy coin
-func (mg *MinterGate) EstimateCoinBuy(coinToSell string, coinToBuy string, value string) (*domain.CoinEstimate, error) {
-	coinToSellInfoId, err := mg.getCoinId(coinToSell)
-	if err != nil {
-		return nil, err
+func (mg *MinterGate) EstimateCoinBuy(coinToSell, coinIdToSell, coinToBuy, coinIdToBuy, value string) (*domain.CoinEstimate, error) {
+	var coinToSellInfoId, coinToBuyInfoId uint64
+	var err error
+
+	if coinIdToSell != "" {
+		coinToSellInfoId, err = strconv.ParseUint(coinIdToSell, 10, 64)
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		coinToSellInfoId, err = mg.getCoinId(coinToSell)
+		if err != nil {
+			return nil, err
+		}
 	}
 
-	coinToBuyInfoId, err := mg.getCoinId(coinToBuy)
-	if err != nil {
-		return nil, err
+	if coinIdToBuy != "" {
+		coinToBuyInfoId, err = strconv.ParseUint(coinIdToBuy, 10, 64)
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		coinToBuyInfoId, err = mg.getCoinId(coinToBuy)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	result, err := mg.nodeClient.EstimateCoinBuy(uint32(coinToSellInfoId), uint32(coinToBuyInfoId), value)
@@ -77,15 +94,33 @@ func (mg *MinterGate) EstimateCoinBuy(coinToSell string, coinToBuy string, value
 }
 
 //Return estimate of sell coin
-func (mg *MinterGate) EstimateCoinSell(coinToSell string, coinToBuy string, value string) (*domain.CoinEstimate, error) {
-	coinToSellInfoId, err := mg.getCoinId(coinToSell)
-	if err != nil {
-		return nil, err
+func (mg *MinterGate) EstimateCoinSell(coinToSell, coinIdToSell, coinToBuy, coinIdToBuy, value string) (*domain.CoinEstimate, error) {
+
+	var coinToSellInfoId, coinToBuyInfoId uint64
+	var err error
+
+	if coinIdToSell != "" {
+		coinToSellInfoId, err = strconv.ParseUint(coinIdToSell, 10, 64)
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		coinToSellInfoId, err = mg.getCoinId(coinToSell)
+		if err != nil {
+			return nil, err
+		}
 	}
 
-	coinToBuyInfoId, err := mg.getCoinId(coinToBuy)
-	if err != nil {
-		return nil, err
+	if coinIdToBuy != "" {
+		coinToBuyInfoId, err = strconv.ParseUint(coinIdToBuy, 10, 64)
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		coinToBuyInfoId, err = mg.getCoinId(coinToBuy)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	result, err := mg.nodeClient.EstimateCoinSell(uint32(coinToBuyInfoId), uint32(coinToSellInfoId), value)
