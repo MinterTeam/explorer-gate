@@ -131,6 +131,49 @@ func (mg *MinterGate) EstimateCoinSell(coinToSell, coinIdToSell, coinToBuy, coin
 	return &domain.CoinEstimate{Value: result.WillGet, Commission: result.Commission}, nil
 }
 
+//Return estimate of sell coin
+func (mg *MinterGate) EstimateCoinSellAll(coinToSell, coinIdToSell, coinToBuy, coinIdToBuy, value, gasPrice string) (*domain.CoinEstimate, error) {
+
+	var coinToSellInfoId, coinToBuyInfoId uint64
+	var err error
+
+	if coinIdToSell != "" {
+		coinToSellInfoId, err = strconv.ParseUint(coinIdToSell, 10, 64)
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		coinToSellInfoId, err = mg.getCoinId(coinToSell)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	if coinIdToBuy != "" {
+		coinToBuyInfoId, err = strconv.ParseUint(coinIdToBuy, 10, 64)
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		coinToBuyInfoId, err = mg.getCoinId(coinToBuy)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	gp, err := strconv.ParseInt(gasPrice, 10, 64)
+	if err != nil {
+		return nil, err
+	}
+
+	result, err := mg.nodeClient.EstimateCoinSellAll(uint32(coinToBuyInfoId), uint32(coinToSellInfoId), value, int(gp))
+	if err != nil {
+		return nil, err
+	}
+
+	return &domain.CoinEstimate{Value: result.WillGet}, nil
+}
+
 //Return nonce for address
 func (mg *MinterGate) GetNonce(address string) (uint64, error) {
 	nonce, err := mg.nodeClient.Nonce(address)

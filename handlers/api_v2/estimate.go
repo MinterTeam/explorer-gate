@@ -102,6 +102,40 @@ func EstimateCoinSell(c *gin.Context) {
 	}
 }
 
+func EstimateCoinSellAll(c *gin.Context) {
+	gate, ok := c.MustGet("gate").(*core.MinterGate)
+	if !ok {
+		err := errors.GateError{
+			Error:   "",
+			Code:    1,
+			Message: "Type cast error",
+		}
+		c.JSON(http.StatusInternalServerError, err)
+		return
+	}
+	coinToSell := strings.TrimSpace(c.Query(`coin_to_sell`))
+	coinToBuy := strings.TrimSpace(c.Query(`coin_to_buy`))
+	coinIdToSell := strings.TrimSpace(c.Query(`coin_id_to_sell`))
+	coinIdToBuy := strings.TrimSpace(c.Query(`coin_id_to_buy`))
+	gasPrice := strings.TrimSpace(c.Query(`gas_price`))
+	value := strings.TrimSpace(c.Query(`value_to_sell`))
+
+	estimate, err := gate.EstimateCoinSellAll(coinToSell, coinIdToSell, coinToBuy, coinIdToBuy, value, gasPrice)
+	if err != nil {
+		gate.Logger.WithFields(logrus.Fields{
+			"coinToSell": coinToSell,
+			"coinToBuy":  coinToBuy,
+			"value":      value,
+		}).Warn(err)
+
+		errors.SetErrorResponse(err, c)
+	} else {
+		c.JSON(http.StatusOK, gin.H{
+			"will_get": estimate.Value,
+		})
+	}
+}
+
 func GetNonce(c *gin.Context) {
 	gate, ok := c.MustGet("gate").(*core.MinterGate)
 	if !ok {
