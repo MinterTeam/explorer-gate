@@ -1,4 +1,4 @@
-package v1
+package api_v2
 
 import (
 	"context"
@@ -35,12 +35,13 @@ func PushTransaction(c *gin.Context) {
 		return
 	}
 	if !gate.IsActive {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": gin.H{
-				"code": 1,
-				"log":  "Explorer is down",
-			},
-		})
+		err := errors.GateError{
+			Error:   "",
+			Code:    1,
+			Message: "Type cast error",
+		}
+
+		c.JSON(http.StatusBadRequest, err)
 		return
 	}
 
@@ -71,33 +72,19 @@ func PushTransaction(c *gin.Context) {
 		return
 	}
 
-	var tx PushTransactionRequest
-	if err = c.ShouldBindJSON(&tx); err != nil {
-		gate.Logger.Error(err)
-
-		e := errors.GateError{
-			Error:   "",
-			Code:    1,
-			Message: err.Error(),
-		}
-		c.JSON(http.StatusBadRequest, e)
-		return
-
+	tx := strings.TrimSpace(c.Param(`tx`))
+	if tx[:2] != "0x" {
+		tx = `0x` + tx
 	}
 
-	txn := strings.TrimSpace(tx.Transaction)
-	if txn[:2] != "0x" {
-		txn = `0x` + txn
-	}
-
-	hash, err := gate.TxPush(txn)
+	hash, err := gate.TxPush(tx)
 	if err != nil {
 		gate.Logger.WithFields(logrus.Fields{
-			"transaction": tx,
+			"tx": tx,
 		}).Error(err)
 		errors.SetErrorResponse(err, c)
 	} else {
-		txHex := strings.ToUpper(txn[2:])
+		txHex := strings.ToUpper(tx[2:])
 		q, _ := query.New(fmt.Sprintf("tx='%s'", txHex))
 		sub, err := pubSubServer.Subscribe(context.TODO(), txHex, q)
 		if err != nil {
@@ -134,10 +121,8 @@ func PushTransaction(c *gin.Context) {
 				err = json.Unmarshal([]byte(tags["txData"]), data)
 				data.Height = tags["height"]
 				c.JSON(http.StatusOK, gin.H{
-					"data": gin.H{
-						"hash":        &hash,
-						"transaction": data,
-					},
+					"hash":        &hash,
+					"transaction": data,
 				})
 			}
 		case <-time.After(time.Duration(timeOut) * time.Second):

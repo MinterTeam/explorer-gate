@@ -44,8 +44,8 @@ func (mg *MinterGate) TxPush(tx string) (*string, error) {
 }
 
 //Return estimate of transaction
-func (mg *MinterGate) EstimateTxCommission(tx string) (*string, error) {
-	result, err := mg.nodeClient.EstimateTxCommissionTx(tx)
+func (mg *MinterGate) EstimateTxCommission(tx string, optionalHeight ...int) (*string, error) {
+	result, err := mg.nodeClient.EstimateTxCommissionTx(tx, optionalHeight...)
 	if err != nil {
 		mg.Logger.WithFields(logrus.Fields{
 			"transaction": tx,

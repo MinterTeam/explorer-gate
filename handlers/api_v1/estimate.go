@@ -1,4 +1,4 @@
-package v1
+package api_v1
 
 import (
 	"fmt"
