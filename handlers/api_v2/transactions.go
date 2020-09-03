@@ -123,8 +123,8 @@ func PushTransaction(c *gin.Context) {
 				c.JSON(http.StatusOK, gin.H{
 					"hash": &hash,
 					"data": data,
-					"code": "",
-					"log":  "",
+					"code": data.Code,
+					"log":  data.Log,
 				})
 			}
 		case <-time.After(time.Duration(timeOut) * time.Second):
@@ -257,8 +257,8 @@ func PostTransaction(c *gin.Context) {
 				c.JSON(http.StatusOK, gin.H{
 					"hash": &hash,
 					"data": data,
-					"code": "",
-					"log":  "",
+					"code": data.Code,
+					"log":  data.Log,
 				})
 			}
 		case <-time.After(time.Duration(timeOut) * time.Second):
