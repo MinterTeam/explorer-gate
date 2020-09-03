@@ -67,6 +67,7 @@ func SetupRouter(gateService *core.MinterGate, pubSubServer *pubsub.Server) *gin
 		apiV2.GET(`/nonce/:address`, api_v2.GetNonce)
 		apiV2.GET(`/min_gas_price`, api_v2.GetMinGas)
 		apiV2.GET(`/send_transaction/:tx`, api_v2.PushTransaction)
+		apiV2.POST(`/send_transaction`, api_v2.PostTransaction)
 	}
 	// Default handler 404
 	router.NoRoute(func(c *gin.Context) {
