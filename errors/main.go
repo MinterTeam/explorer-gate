@@ -2,6 +2,8 @@ package errors
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/golang/protobuf/ptypes/struct"
+	"google.golang.org/grpc/status"
 	"math/big"
 	"net/http"
 	"regexp"
@@ -41,27 +43,51 @@ func formatErrorMessage(errorString string) (string, error) {
 }
 
 func SetErrorResponse(err error, c *gin.Context) {
+	grpcErr, ok := status.FromError(err)
+	if !ok {
+		c.JSON(http.StatusBadRequest, GateError{
+			Error:   "",
+			Code:    "1",
+			Message: `want error type: "GRPC Status"`,
+			Details: nil,
+		})
+		return
+	}
 
 	var result GateError
-	splitMsg := strings.Split(err.Error(), "=")
-	msg, e := formatErrorMessage(splitMsg[len(splitMsg)-1])
+	msg, e := formatErrorMessage(grpcErr.Message())
+
+	code := grpcErr.Code().String()
+
+	details := make(map[string]interface{})
+
+	for _, v := range grpcErr.Details() {
+		dd, ok := v.(*structpb.Struct)
+		if ok {
+			for k, v := range dd.AsMap() {
+				details[k] = v
+				if k == "code" {
+					code = v.(string)
+				}
+			}
+		}
+	}
 
 	if e != nil {
 		result = GateError{
 			Error:   "",
-			Code:    1,
+			Code:    "1",
 			Message: e.Error(),
 			Details: nil,
 		}
 	} else {
 		result = GateError{
 			Error:   "",
-			Code:    1,
+			Code:    code,
 			Message: msg,
-			Details: nil,
+			Details: details,
 		}
 	}
-
 	c.JSON(http.StatusBadRequest, result)
 }
 

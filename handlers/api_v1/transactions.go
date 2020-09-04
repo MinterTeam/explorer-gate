@@ -28,7 +28,7 @@ func PushTransaction(c *gin.Context) {
 	if !ok {
 		err := errors.GateError{
 			Error:   "",
-			Code:    1,
+			Code:    "1",
 			Message: "Type cast error",
 		}
 		c.JSON(http.StatusInternalServerError, err)
@@ -54,7 +54,7 @@ func PushTransaction(c *gin.Context) {
 	if !ok {
 		err := errors.GateError{
 			Error:   "",
-			Code:    1,
+			Code:    "1",
 			Message: "Type cast error",
 		}
 		c.JSON(http.StatusInternalServerError, err)
@@ -64,7 +64,7 @@ func PushTransaction(c *gin.Context) {
 	if !ok {
 		err := errors.GateError{
 			Error:   "",
-			Code:    1,
+			Code:    "1",
 			Message: "Type cast error",
 		}
 		c.JSON(http.StatusInternalServerError, err)
@@ -77,7 +77,7 @@ func PushTransaction(c *gin.Context) {
 
 		e := errors.GateError{
 			Error:   "",
-			Code:    1,
+			Code:    "1",
 			Message: err.Error(),
 		}
 		c.JSON(http.StatusBadRequest, e)
@@ -103,7 +103,7 @@ func PushTransaction(c *gin.Context) {
 		if err != nil {
 			err := errors.GateError{
 				Error:   "",
-				Code:    1,
+				Code:    "1",
 				Message: "Subscription error",
 			}
 			c.JSON(http.StatusInternalServerError, err)
@@ -124,7 +124,7 @@ func PushTransaction(c *gin.Context) {
 
 				err := errors.GateError{
 					Error:   "",
-					Code:    1,
+					Code:    "1",
 					Message: tags["error"],
 				}
 				c.JSON(http.StatusBadRequest, err)
@@ -143,12 +143,12 @@ func PushTransaction(c *gin.Context) {
 		case <-time.After(time.Duration(timeOut) * time.Second):
 			gate.Logger.WithFields(logrus.Fields{
 				"transaction": tx,
-				"code":        504,
+				"code":        "504",
 			}).Error(`Time out waiting for transaction to be included in block`)
 
 			err := errors.GateError{
 				Error:   "",
-				Code:    504,
+				Code:    "504",
 				Message: "Time out waiting for transaction to be included in block",
 			}
 			c.JSON(http.StatusRequestTimeout, err)

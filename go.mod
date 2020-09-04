@@ -11,6 +11,7 @@ require (
 	github.com/gin-contrib/cors v1.3.0
 	github.com/gin-gonic/gin v1.5.0
 	github.com/go-resty/resty/v2 v2.0.0
+	github.com/golang/protobuf v1.4.2
 	github.com/jinzhu/gorm v1.9.11
 	github.com/joho/godotenv v1.3.0
 	github.com/prometheus/client_golang v0.9.3 // indirect
@@ -18,4 +19,6 @@ require (
 	github.com/tendermint/tendermint v0.31.0
 	golang.org/x/crypto v0.0.0-20191206172530-e9b2fee46413 // indirect
 	golang.org/x/sys v0.0.0-20200413165638-669c56c373c4 // indirect
+	google.golang.org/grpc v1.31.0
+	google.golang.org/protobuf v1.25.0
 )

@@ -15,7 +15,7 @@ func EstimateTxCommission(c *gin.Context) {
 	if !ok {
 		err := errors.GateError{
 			Error:   "",
-			Code:    1,
+			Code:    "1",
 			Message: "Type cast error",
 		}
 		c.JSON(http.StatusInternalServerError, err)
@@ -42,7 +42,7 @@ func EstimateCoinBuy(c *gin.Context) {
 	if !ok {
 		err := errors.GateError{
 			Error:   "",
-			Code:    1,
+			Code:    "1",
 			Message: "Type cast error",
 		}
 		c.JSON(http.StatusInternalServerError, err)
@@ -72,7 +72,7 @@ func EstimateCoinSell(c *gin.Context) {
 	if !ok {
 		err := errors.GateError{
 			Error:   "",
-			Code:    1,
+			Code:    "1",
 			Message: "Type cast error",
 		}
 		c.JSON(http.StatusInternalServerError, err)
@@ -107,7 +107,7 @@ func EstimateCoinSellAll(c *gin.Context) {
 	if !ok {
 		err := errors.GateError{
 			Error:   "",
-			Code:    1,
+			Code:    "1",
 			Message: "Type cast error",
 		}
 		c.JSON(http.StatusInternalServerError, err)
@@ -141,7 +141,7 @@ func GetNonce(c *gin.Context) {
 	if !ok {
 		err := errors.GateError{
 			Error:   "",
-			Code:    1,
+			Code:    "1",
 			Message: "Type cast error",
 		}
 		c.JSON(http.StatusInternalServerError, err)
@@ -163,7 +163,7 @@ func GetMinGas(c *gin.Context) {
 	if !ok {
 		err := errors.GateError{
 			Error:   "",
-			Code:    1,
+			Code:    "1",
 			Message: "Type cast error",
 		}
 		c.JSON(http.StatusInternalServerError, err)

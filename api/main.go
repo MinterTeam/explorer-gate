@@ -75,7 +75,7 @@ func SetupRouter(gateService *core.MinterGate, pubSubServer *pubsub.Server) *gin
 	router.NoRoute(func(c *gin.Context) {
 		err := errors.GateError{
 			Error:   "",
-			Code:    404,
+			Code:    "404",
 			Message: "Resource not found.",
 		}
 		c.JSON(http.StatusNotFound, err)
@@ -97,7 +97,7 @@ func index(c *gin.Context) {
 	if !ok {
 		err := errors.GateError{
 			Error:   "",
-			Code:    1,
+			Code:    "1",
 			Message: "Type cast error",
 		}
 		c.JSON(http.StatusInternalServerError, err)
