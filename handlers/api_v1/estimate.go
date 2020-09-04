@@ -13,12 +13,7 @@ import (
 func EstimateTxCommission(c *gin.Context) {
 	gate, ok := c.MustGet("gate").(*core.MinterGate)
 	if !ok {
-		err := errors.GateError{
-			Error:   "",
-			Code:    "1",
-			Message: "Type cast error",
-		}
-		c.JSON(http.StatusInternalServerError, err)
+		c.JSON(http.StatusInternalServerError, errors.NewGateError("Type cast error"))
 		return
 	}
 
@@ -42,12 +37,7 @@ func EstimateTxCommission(c *gin.Context) {
 func EstimateCoinBuy(c *gin.Context) {
 	gate, ok := c.MustGet("gate").(*core.MinterGate)
 	if !ok {
-		err := errors.GateError{
-			Error:   "",
-			Code:    "1",
-			Message: "Type cast error",
-		}
-		c.JSON(http.StatusInternalServerError, err)
+		c.JSON(http.StatusInternalServerError, errors.NewGateError("Type cast error"))
 		return
 	}
 	coinToSell := strings.TrimSpace(c.Query(`coinToSell`))
@@ -74,12 +64,7 @@ func EstimateCoinBuy(c *gin.Context) {
 func EstimateCoinSell(c *gin.Context) {
 	gate, ok := c.MustGet("gate").(*core.MinterGate)
 	if !ok {
-		err := errors.GateError{
-			Error:   "",
-			Code:    "1",
-			Message: "Type cast error",
-		}
-		c.JSON(http.StatusInternalServerError, err)
+		c.JSON(http.StatusInternalServerError, errors.NewGateError("Type cast error"))
 		return
 	}
 	coinToSell := strings.TrimSpace(c.Query(`coinToSell`))
@@ -107,12 +92,7 @@ func EstimateCoinSell(c *gin.Context) {
 func GetNonce(c *gin.Context) {
 	gate, ok := c.MustGet("gate").(*core.MinterGate)
 	if !ok {
-		err := errors.GateError{
-			Error:   "",
-			Code:    "1",
-			Message: "Type cast error",
-		}
-		c.JSON(http.StatusInternalServerError, err)
+		c.JSON(http.StatusInternalServerError, errors.NewGateError("Type cast error"))
 		return
 	}
 	address := strings.Title(strings.TrimSpace(c.Param(`address`)))
@@ -131,12 +111,7 @@ func GetNonce(c *gin.Context) {
 func GetMinGas(c *gin.Context) {
 	gate, ok := c.MustGet("gate").(*core.MinterGate)
 	if !ok {
-		err := errors.GateError{
-			Error:   "",
-			Code:    "1",
-			Message: "Type cast error",
-		}
-		c.JSON(http.StatusInternalServerError, err)
+		c.JSON(http.StatusInternalServerError, errors.NewGateError("Type cast error"))
 		return
 	}
 	gas, err := gate.GetMinGas()

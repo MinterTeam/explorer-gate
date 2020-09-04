@@ -11,6 +11,54 @@ import (
 	"strings"
 )
 
+func NewGateError(msg string) GateError {
+	return GateError{
+		ErrorString: "",
+		Code:        "1",
+		Message:     msg,
+		Details:     nil,
+	}
+}
+
+func SetErrorResponse(err error, c *gin.Context) {
+	grpcErr, ok := status.FromError(err)
+	if !ok {
+		c.JSON(http.StatusBadRequest, NewGateError(`want error type: "GRPC Status"`))
+		return
+	}
+
+	var result GateError
+	msg, e := formatErrorMessage(grpcErr.Message())
+
+	code := grpcErr.Code().String()
+
+	details := make(map[string]interface{})
+
+	for _, v := range grpcErr.Details() {
+		dd, ok := v.(*structpb.Struct)
+		if ok {
+			for k, v := range dd.AsMap() {
+				details[k] = v
+				if k == "code" {
+					code = v.(string)
+				}
+			}
+		}
+	}
+
+	if e != nil {
+		result = NewGateError(e.Error())
+	} else {
+		result = GateError{
+			ErrorString: "",
+			Code:        code,
+			Message:     msg,
+			Details:     details,
+		}
+	}
+	c.JSON(http.StatusBadRequest, result)
+}
+
 func formatErrorMessage(errorString string) (string, error) {
 	bip := big.NewFloat(0.000000000000000001)
 	zero := big.NewFloat(0)
@@ -38,116 +86,5 @@ func formatErrorMessage(errorString string) (string, error) {
 			errorString = replacer.Replace(errorString)
 		}
 	}
-
 	return errorString, nil
-}
-
-func SetErrorResponse(err error, c *gin.Context) {
-	grpcErr, ok := status.FromError(err)
-	if !ok {
-		c.JSON(http.StatusBadRequest, GateError{
-			Error:   "",
-			Code:    "1",
-			Message: `want error type: "GRPC Status"`,
-			Details: nil,
-		})
-		return
-	}
-
-	var result GateError
-	msg, e := formatErrorMessage(grpcErr.Message())
-
-	code := grpcErr.Code().String()
-
-	details := make(map[string]interface{})
-
-	for _, v := range grpcErr.Details() {
-		dd, ok := v.(*structpb.Struct)
-		if ok {
-			for k, v := range dd.AsMap() {
-				details[k] = v
-				if k == "code" {
-					code = v.(string)
-				}
-			}
-		}
-	}
-
-	if e != nil {
-		result = GateError{
-			Error:   "",
-			Code:    "1",
-			Message: e.Error(),
-			Details: nil,
-		}
-	} else {
-		result = GateError{
-			Error:   "",
-			Code:    code,
-			Message: msg,
-			Details: details,
-		}
-	}
-	c.JSON(http.StatusBadRequest, result)
-}
-
-func HandleNodeError(err error, c *gin.Context) {
-	switch e := err.(type) {
-	case *NodeError:
-		msg, err := formatErrorMessage(e.GetMessage())
-		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{
-				"error": err,
-			})
-			break
-		}
-
-		log, err := formatErrorMessage(e.GetLog())
-		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{
-				"error": err,
-			})
-			break
-		}
-
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": gin.H{
-				"message": msg,
-				"code":    e.GetCode(),
-				"tx_result": gin.H{
-					"code": e.GetTxCode(),
-					"log":  log,
-				},
-			},
-		})
-	case *NodeTimeOutError:
-		c.JSON(http.StatusRequestTimeout, gin.H{
-			"error": gin.H{
-				"code": e.Code(),
-				"log":  e.Error(),
-			},
-		})
-	case *InsufficientFundsError:
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": gin.H{
-				"code":  e.Code(),
-				"log":   e.Error(),
-				"coin":  e.Coin(),
-				"value": e.Value(),
-			},
-		})
-	case *MaximumValueToSellReachedError:
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": gin.H{
-				"code": e.Code(),
-				"log":  e.Error(),
-				"want": e.Want(),
-				"need": e.Need(),
-			},
-		})
-	default:
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": err,
-		})
-	}
 }

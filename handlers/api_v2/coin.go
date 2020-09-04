@@ -12,12 +12,7 @@ import (
 func CoinInfo(c *gin.Context) {
 	gate, ok := c.MustGet("gate").(*core.MinterGate)
 	if !ok {
-		err := errors.GateError{
-			Error:   "",
-			Code:    "1",
-			Message: "Type cast error",
-		}
-		c.JSON(http.StatusInternalServerError, err)
+		c.JSON(http.StatusInternalServerError, errors.NewGateError("Type cast error"))
 		return
 	}
 	symbol := strings.TrimSpace(c.Param(`symbol`))

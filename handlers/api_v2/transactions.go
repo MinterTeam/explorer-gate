@@ -29,12 +29,7 @@ func PushTransaction(c *gin.Context) {
 func PostTransaction(c *gin.Context) {
 	gate, ok := c.MustGet("gate").(*core.MinterGate)
 	if !ok {
-		err := errors.GateError{
-			Error:   "",
-			Code:    "1",
-			Message: "Type cast error",
-		}
-		c.JSON(http.StatusInternalServerError, err)
+		c.JSON(http.StatusInternalServerError, errors.NewGateError("Type cast error"))
 		return
 	}
 
@@ -42,9 +37,9 @@ func PostTransaction(c *gin.Context) {
 	if err := c.ShouldBindJSON(&tx); err != nil {
 		gate.Logger.Error(err)
 		e := errors.GateError{
-			Error:   "",
-			Code:    "1",
-			Message: err.Error(),
+			ErrorString: "",
+			Code:        "1",
+			Message:     err.Error(),
 		}
 		c.JSON(http.StatusBadRequest, e)
 		return
@@ -57,22 +52,11 @@ func sendTx(tx string, c *gin.Context) {
 	var err error
 	gate, ok := c.MustGet("gate").(*core.MinterGate)
 	if !ok {
-		err := errors.GateError{
-			Error:   "",
-			Code:    "1",
-			Message: "Type cast error",
-		}
-		c.JSON(http.StatusInternalServerError, err)
+		c.JSON(http.StatusInternalServerError, errors.NewGateError("Type cast error"))
 		return
 	}
 	if !gate.IsActive {
-		err := errors.GateError{
-			Error:   "",
-			Code:    "1",
-			Message: "Type cast error",
-		}
-
-		c.JSON(http.StatusBadRequest, err)
+		c.JSON(http.StatusInternalServerError, errors.NewGateError("Explorer is unavailable"))
 		return
 	}
 
@@ -84,22 +68,12 @@ func sendTx(tx string, c *gin.Context) {
 	}
 
 	if !ok {
-		err := errors.GateError{
-			Error:   "",
-			Code:    "1",
-			Message: "Type cast error",
-		}
-		c.JSON(http.StatusInternalServerError, err)
+		c.JSON(http.StatusInternalServerError, errors.NewGateError("Type cast error"))
 		return
 	}
 	pubSubServer, ok := c.MustGet("pubsub").(*pubsub.Server)
 	if !ok {
-		err := errors.GateError{
-			Error:   "",
-			Code:    "1",
-			Message: "Type cast error",
-		}
-		c.JSON(http.StatusInternalServerError, err)
+		c.JSON(http.StatusInternalServerError, errors.NewGateError("Type cast error"))
 		return
 	}
 
@@ -119,9 +93,9 @@ func sendTx(tx string, c *gin.Context) {
 		sub, err := pubSubServer.Subscribe(context.TODO(), txHex, q)
 		if err != nil {
 			err := errors.GateError{
-				Error:   "",
-				Code:    "1",
-				Message: "Subscription error",
+				ErrorString: "",
+				Code:        "1",
+				Message:     "Subscription error",
 			}
 			c.JSON(http.StatusInternalServerError, err)
 			return
@@ -139,12 +113,7 @@ func sendTx(tx string, c *gin.Context) {
 					"code":        1,
 				}).Error(tags["error"])
 
-				err := errors.GateError{
-					Error:   "",
-					Code:    "1",
-					Message: tags["error"],
-				}
-				c.JSON(http.StatusBadRequest, err)
+				c.JSON(http.StatusBadRequest, errors.NewGateError(tags["error"]))
 			} else {
 				tags := msg.Tags()
 				data := new(api.TransactionResult)
@@ -164,9 +133,9 @@ func sendTx(tx string, c *gin.Context) {
 			}).Error(`Time out waiting for transaction to be included in block`)
 
 			err := errors.GateError{
-				Error:   "",
-				Code:    "504",
-				Message: "Time out waiting for transaction to be included in block",
+				ErrorString: "",
+				Code:        "504",
+				Message:     "Time out waiting for transaction to be included in block",
 			}
 			c.JSON(http.StatusRequestTimeout, err)
 		}
