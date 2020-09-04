@@ -1,6 +1,7 @@
 package errors
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/golang/protobuf/ptypes/struct"
 	"google.golang.org/grpc/status"
@@ -30,7 +31,7 @@ func SetErrorResponse(err error, c *gin.Context) {
 	var result GateError
 	msg, e := formatErrorMessage(grpcErr.Message())
 
-	code := grpcErr.Code().String()
+	code := fmt.Sprintf("%d", int(grpcErr.Code()))
 
 	details := make(map[string]interface{})
 
