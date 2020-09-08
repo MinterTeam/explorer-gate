@@ -24,7 +24,9 @@ func NewGateError(msg string) GateError {
 func SetErrorResponse(err error, c *gin.Context) {
 	grpcErr, ok := status.FromError(err)
 	if !ok {
-		c.JSON(http.StatusBadRequest, NewGateError(`want error type: "GRPC Status"`))
+		c.JSON(http.StatusRequestTimeout, gin.H{
+			"error": NewGateError(`want error type: "GRPC Status"`),
+		})
 		return
 	}
 
@@ -57,7 +59,9 @@ func SetErrorResponse(err error, c *gin.Context) {
 			Details:     details,
 		}
 	}
-	c.JSON(http.StatusBadRequest, result)
+	c.JSON(http.StatusRequestTimeout, gin.H{
+		"error": result,
+	})
 }
 
 func formatErrorMessage(errorString string) (string, error) {
