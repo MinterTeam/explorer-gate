@@ -24,12 +24,6 @@ func CoinInfo(c *gin.Context) {
 		}).Warn(err)
 		errors.SetErrorResponse(err, c)
 	} else {
-		c.JSON(http.StatusOK, gin.H{
-			"name":            coinInfo.Name,
-			"symbol":          coinInfo.Symbol,
-			"volume":          coinInfo.Volume,
-			"crr":             coinInfo.Crr,
-			"reserve_balance": coinInfo.ReserveBalance,
-		})
+		c.JSON(http.StatusOK, coinInfo)
 	}
 }
