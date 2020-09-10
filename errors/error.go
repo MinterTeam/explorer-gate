@@ -1,10 +1,9 @@
 package errors
 
 type GateError struct {
-	ErrorString string                 `json:"error"`
-	Code        string                 `json:"code"`
-	Message     string                 `json:"message"`
-	Details     map[string]interface{} `json:"details,omitempty"`
+	Code    string                 `json:"code"`
+	Message string                 `json:"message"`
+	Data    map[string]interface{} `json:"data,omitempty"`
 }
 
 func (ge *GateError) Error() string {

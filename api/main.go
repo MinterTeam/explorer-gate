@@ -74,9 +74,8 @@ func SetupRouter(gateService *core.MinterGate, pubSubServer *pubsub.Server) *gin
 	// Default handler 404
 	router.NoRoute(func(c *gin.Context) {
 		err := errors.GateError{
-			ErrorString: "",
-			Code:        "404",
-			Message:     "Resource not found.",
+			Code:    "404",
+			Message: "Resource not found.",
 		}
 		c.JSON(http.StatusNotFound, err)
 	})

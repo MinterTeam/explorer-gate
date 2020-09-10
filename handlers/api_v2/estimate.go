@@ -43,9 +43,11 @@ func EstimateCoinBuy(c *gin.Context) {
 		return
 	}
 	coinToSell := strings.TrimSpace(c.Query(`coin_to_sell`))
+	coinIdToSell := strings.TrimSpace(c.Query(`coin_id_to_sell`))
 	coinToBuy := strings.TrimSpace(c.Query(`coin_to_buy`))
+	coinIdToBuy := strings.TrimSpace(c.Query(`coin_id_to_buy`))
 	value := strings.TrimSpace(c.Query(`value_to_buy`))
-	estimate, err := gate.EstimateCoinBuy(coinToSell, "", coinToBuy, "", value)
+	estimate, err := gate.EstimateCoinBuy(coinToSell, coinIdToSell, coinToBuy, coinIdToBuy, value)
 	if err != nil {
 		gate.Logger.WithFields(logrus.Fields{
 			"coinToSell": coinToSell,

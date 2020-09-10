@@ -14,10 +14,9 @@ import (
 
 func NewGateError(msg string) GateError {
 	return GateError{
-		ErrorString: "",
-		Code:        "1",
-		Message:     msg,
-		Details:     nil,
+		Code:    "1",
+		Message: msg,
+		Data:    nil,
 	}
 }
 
@@ -53,10 +52,9 @@ func SetErrorResponse(err error, c *gin.Context) {
 		result = NewGateError(e.Error())
 	} else {
 		result = GateError{
-			ErrorString: "",
-			Code:        code,
-			Message:     msg,
-			Details:     details,
+			Code:    code,
+			Message: msg,
+			Data:    details,
 		}
 	}
 	c.JSON(http.StatusRequestTimeout, gin.H{

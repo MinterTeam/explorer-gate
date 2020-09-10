@@ -39,9 +39,8 @@ func PostTransaction(c *gin.Context) {
 	if err := c.ShouldBindJSON(&tx); err != nil {
 		gate.Logger.Error(err)
 		e := errors.GateError{
-			ErrorString: "",
-			Code:        "1",
-			Message:     err.Error(),
+			Code:    "1",
+			Message: err.Error(),
 		}
 		c.JSON(http.StatusBadRequest, e)
 		return
@@ -103,9 +102,8 @@ func sendTx(tx string, c *gin.Context) {
 		sub, err := pubSubServer.Subscribe(context.TODO(), txHex, q)
 		if err != nil {
 			err := errors.GateError{
-				ErrorString: "",
-				Code:        "1",
-				Message:     "Subscription error",
+				Code:    "1",
+				Message: "Subscription error",
 			}
 			c.JSON(http.StatusRequestTimeout, gin.H{
 				"error": err,
@@ -147,9 +145,8 @@ func sendTx(tx string, c *gin.Context) {
 			}).Error(`Time out waiting for transaction to be included in block`)
 
 			err := errors.GateError{
-				ErrorString: "",
-				Code:        "504",
-				Message:     "Time out waiting for transaction to be included in block",
+				Code:    "504",
+				Message: "Time out waiting for transaction to be included in block",
 			}
 
 			c.JSON(http.StatusRequestTimeout, gin.H{

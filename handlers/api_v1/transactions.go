@@ -116,9 +116,8 @@ func PushTransaction(c *gin.Context) {
 			}).Error(`Time out waiting for transaction to be included in block`)
 
 			err := errors.GateError{
-				ErrorString: "",
-				Code:        "504",
-				Message:     "Time out waiting for transaction to be included in block",
+				Code:    "504",
+				Message: "Time out waiting for transaction to be included in block",
 			}
 			c.JSON(http.StatusRequestTimeout, err)
 
