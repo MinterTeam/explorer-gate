@@ -1,11 +1,8 @@
 replicaCount: 1
 
 image:
-  repository: registry.minter.network/minter-gate
+  repository: minterteam/explorer-gate
   pullPolicy: IfNotPresent
-
-imagePullSecrets:
-  - name: registry.minter.network
 
 nameOverride: ""
 fullnameOverride: ""
@@ -21,10 +18,7 @@ service:
   port: 9000
 
 ingress:
-  domain: gate-api.chilinet.minter.network
-  tls:
-    secret: "wildcard"
-  servicename: static
+  domain: { GATE_HOST }
 
 resources: { }
 
@@ -36,8 +30,7 @@ affinity: { }
 
 env:
   debug: { DEBUG }
-  port: { PORT }
-  baseCoin: { BASE_COIN }
+  port: { GATE_PORT }
   nodeApi: { NODE_API }
   nodeApiTimeout: { NODE_API_TIMEOUT }
   explorerApi: { EXPLORER_API }

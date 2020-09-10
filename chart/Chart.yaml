@@ -1,11 +1,11 @@
 version: 1.0.0
 apiVersion: v2
 
-name: ppapi
+name: gate
 icon: https://explorer.minter.network/img/minter-logo-circle.svg
-description: A Helm chart for Minter Pin Pon API
+description: A Helm chart for Minter Gate
 
-appVersion: v2.7.3
+appVersion: latest
 
 home: https://github.com/MinterTeam/explorer-gate
 keywords:
