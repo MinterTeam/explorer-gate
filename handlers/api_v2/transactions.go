@@ -1,4 +1,4 @@
-package handlers
+package api_v2
 
 import (
 	"context"
@@ -19,27 +19,48 @@ import (
 )
 
 type PushTransactionRequest struct {
-	Transaction string `form:"transaction" json:"transaction" binding:"required"`
+	Transaction string `form:"tx" json:"tx" binding:"required"`
 }
 
 func PushTransaction(c *gin.Context) {
+	sendTx(strings.TrimSpace(c.Param("tx")), c)
+}
+
+func PostTransaction(c *gin.Context) {
+	gate, ok := c.MustGet("gate").(*core.MinterGate)
+	if !ok {
+		c.JSON(http.StatusRequestTimeout, gin.H{
+			"error": errors.NewGateError("Type cast error"),
+		})
+		return
+	}
+
+	var tx PushTransactionRequest
+	if err := c.ShouldBindJSON(&tx); err != nil {
+		gate.Logger.Error(err)
+		e := errors.GateError{
+			Code:    "1",
+			Message: err.Error(),
+		}
+		c.JSON(http.StatusBadRequest, e)
+		return
+	}
+
+	sendTx(strings.TrimSpace(tx.Transaction), c)
+}
+
+func sendTx(tx string, c *gin.Context) {
 	var err error
 	gate, ok := c.MustGet("gate").(*core.MinterGate)
 	if !ok {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": gin.H{
-				"code": 1,
-				"log":  "Type cast error",
-			},
+		c.JSON(http.StatusRequestTimeout, gin.H{
+			"error": errors.NewGateError("Type cast error"),
 		})
 		return
 	}
 	if !gate.IsActive {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": gin.H{
-				"code": 1,
-				"log":  "Explorer is down",
-			},
+		c.JSON(http.StatusRequestTimeout, gin.H{
+			"error": errors.NewGateError("Explorer is unavailable"),
 		})
 		return
 	}
@@ -52,53 +73,40 @@ func PushTransaction(c *gin.Context) {
 	}
 
 	if !ok {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": gin.H{
-				"code": 1,
-				"log":  "Type cast error",
-			},
+		c.JSON(http.StatusRequestTimeout, gin.H{
+			"error": errors.NewGateError("Type cast error"),
 		})
 		return
 	}
 	pubSubServer, ok := c.MustGet("pubsub").(*pubsub.Server)
 	if !ok {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": gin.H{
-				"code": 1,
-				"log":  "Type cast error",
-			},
+		c.JSON(http.StatusRequestTimeout, gin.H{
+			"error": errors.NewGateError("Type cast error"),
 		})
 		return
 	}
 
-	var tx PushTransactionRequest
-	if err = c.ShouldBindJSON(&tx); err != nil {
-		gate.Logger.Error(err)
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
+	if tx[:2] != "0x" {
+		tx = `0x` + tx
 	}
 
-	txn := strings.TrimSpace(tx.Transaction)
-	if txn[:2] != "0x" {
-		txn = `0x` + txn
-	}
-
-	hash, err := gate.TxPush(txn)
+	hash, err := gate.TxPush(tx)
 	if err != nil {
 		gate.Logger.WithFields(logrus.Fields{
-			"transaction": tx,
+			"tx": tx,
 		}).Error(err)
 		errors.SetErrorResponse(err, c)
 	} else {
-		txHex := strings.ToUpper(txn[2:])
+		txHex := strings.ToUpper(tx[2:])
 		q, _ := query.New(fmt.Sprintf("tx='%s'", txHex))
 		sub, err := pubSubServer.Subscribe(context.TODO(), txHex, q)
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{
-				"error": gin.H{
-					"code": 1,
-					"log":  "Subscription error",
-				},
+			err := errors.GateError{
+				Code:    "1",
+				Message: "Subscription error",
+			}
+			c.JSON(http.StatusRequestTimeout, gin.H{
+				"error": err,
 			})
 			return
 		}
@@ -116,10 +124,7 @@ func PushTransaction(c *gin.Context) {
 				}).Error(tags["error"])
 
 				c.JSON(http.StatusBadRequest, gin.H{
-					"error": gin.H{
-						"log":  tags["error"],
-						"code": 1,
-					},
+					"error": errors.NewGateError(tags["error"]),
 				})
 			} else {
 				tags := msg.Tags()
@@ -127,22 +132,25 @@ func PushTransaction(c *gin.Context) {
 				err = json.Unmarshal([]byte(tags["txData"]), data)
 				data.Height = tags["height"]
 				c.JSON(http.StatusOK, gin.H{
-					"data": gin.H{
-						"hash":        &hash,
-						"transaction": data,
-					},
+					"hash": &hash,
+					"data": data,
+					"code": data.Code,
+					"log":  data.Log,
 				})
 			}
 		case <-time.After(time.Duration(timeOut) * time.Second):
 			gate.Logger.WithFields(logrus.Fields{
 				"transaction": tx,
-				"code":        504,
+				"code":        "504",
 			}).Error(`Time out waiting for transaction to be included in block`)
+
+			err := errors.GateError{
+				Code:    "504",
+				Message: "Time out waiting for transaction to be included in block",
+			}
+
 			c.JSON(http.StatusRequestTimeout, gin.H{
-				"error": gin.H{
-					"code": 1,
-					"log":  `Time out waiting for transaction to be included in block`,
-				},
+				"error": err,
 			})
 		}
 	}

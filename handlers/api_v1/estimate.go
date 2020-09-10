@@ -1,10 +1,11 @@
-package handlers
+package api_v1
 
 import (
 	"fmt"
 	"github.com/MinterTeam/explorer-gate/v2/core"
 	"github.com/MinterTeam/explorer-gate/v2/errors"
 	"github.com/gin-gonic/gin"
+	"github.com/sirupsen/logrus"
 	"net/http"
 	"strings"
 )
@@ -12,12 +13,7 @@ import (
 func EstimateTxCommission(c *gin.Context) {
 	gate, ok := c.MustGet("gate").(*core.MinterGate)
 	if !ok {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": gin.H{
-				"code": 1,
-				"log":  "Type cast error",
-			},
-		})
+		c.JSON(http.StatusInternalServerError, errors.NewGateError("Type cast error"))
 		return
 	}
 
@@ -41,19 +37,19 @@ func EstimateTxCommission(c *gin.Context) {
 func EstimateCoinBuy(c *gin.Context) {
 	gate, ok := c.MustGet("gate").(*core.MinterGate)
 	if !ok {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": gin.H{
-				"code": 1,
-				"log":  "Type cast error",
-			},
-		})
+		c.JSON(http.StatusInternalServerError, errors.NewGateError("Type cast error"))
 		return
 	}
 	coinToSell := strings.TrimSpace(c.Query(`coinToSell`))
 	coinToBuy := strings.TrimSpace(c.Query(`coinToBuy`))
 	value := strings.TrimSpace(c.Query(`valueToBuy`))
-	estimate, err := gate.EstimateCoinBuy(coinToSell, coinToBuy, value)
+	estimate, err := gate.EstimateCoinBuy(coinToSell, "", coinToBuy, "", value)
 	if err != nil {
+		gate.Logger.WithFields(logrus.Fields{
+			"coinToSell": coinToSell,
+			"coinToBuy":  coinToBuy,
+			"value":      value,
+		}).Warn(err)
 		errors.SetErrorResponse(err, c)
 	} else {
 		c.JSON(http.StatusOK, gin.H{
@@ -68,19 +64,20 @@ func EstimateCoinBuy(c *gin.Context) {
 func EstimateCoinSell(c *gin.Context) {
 	gate, ok := c.MustGet("gate").(*core.MinterGate)
 	if !ok {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": gin.H{
-				"code": 1,
-				"log":  "Type cast error",
-			},
-		})
+		c.JSON(http.StatusInternalServerError, errors.NewGateError("Type cast error"))
 		return
 	}
 	coinToSell := strings.TrimSpace(c.Query(`coinToSell`))
 	coinToBuy := strings.TrimSpace(c.Query(`coinToBuy`))
 	value := strings.TrimSpace(c.Query(`valueToSell`))
-	estimate, err := gate.EstimateCoinSell(coinToSell, coinToBuy, value)
+	estimate, err := gate.EstimateCoinSell(coinToSell, "", coinToBuy, "", value)
 	if err != nil {
+		gate.Logger.WithFields(logrus.Fields{
+			"coinToSell": coinToSell,
+			"coinToBuy":  coinToBuy,
+			"value":      value,
+		}).Warn(err)
+
 		errors.SetErrorResponse(err, c)
 	} else {
 		c.JSON(http.StatusOK, gin.H{
@@ -95,12 +92,7 @@ func EstimateCoinSell(c *gin.Context) {
 func GetNonce(c *gin.Context) {
 	gate, ok := c.MustGet("gate").(*core.MinterGate)
 	if !ok {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": gin.H{
-				"code": 1,
-				"log":  "Type cast error",
-			},
-		})
+		c.JSON(http.StatusInternalServerError, errors.NewGateError("Type cast error"))
 		return
 	}
 	address := strings.Title(strings.TrimSpace(c.Param(`address`)))
@@ -119,12 +111,7 @@ func GetNonce(c *gin.Context) {
 func GetMinGas(c *gin.Context) {
 	gate, ok := c.MustGet("gate").(*core.MinterGate)
 	if !ok {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": gin.H{
-				"code": 1,
-				"log":  "Type cast error",
-			},
-		})
+		c.JSON(http.StatusInternalServerError, errors.NewGateError("Type cast error"))
 		return
 	}
 	gas, err := gate.GetMinGas()
