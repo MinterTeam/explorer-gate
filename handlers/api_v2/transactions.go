@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"github.com/MinterTeam/explorer-gate/v2/core"
 	"github.com/MinterTeam/explorer-gate/v2/errors"
-	"github.com/MinterTeam/minter-go-sdk/api"
+	"github.com/MinterTeam/node-grpc-gateway/api_pb"
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
 	"github.com/tendermint/tendermint/libs/pubsub"
@@ -128,14 +128,30 @@ func sendTx(tx string, c *gin.Context) {
 				})
 			} else {
 				tags := msg.Tags()
-				data := new(api.TransactionResult)
+				data := new(api_pb.TransactionResponse)
 				err = json.Unmarshal([]byte(tags["txData"]), data)
+				if err != nil {
+					c.JSON(http.StatusBadRequest, gin.H{
+						"error": errors.NewGateError(err.Error()),
+					})
+					return
+				}
+
+				ttx, err := gate.NodeClient.Marshal(data)
+				if err != nil {
+					c.JSON(http.StatusBadRequest, gin.H{
+						"error": errors.NewGateError(err.Error()),
+					})
+					return
+				}
+
 				data.Height = tags["height"]
 				c.JSON(http.StatusOK, gin.H{
-					"hash": &hash,
-					"data": data,
-					"code": data.Code,
-					"log":  data.Log,
+					"hash":        &hash,
+					"data":        "",
+					"transaction": ttx,
+					"code":        data.Code,
+					"log":         data.Log,
 				})
 			}
 		case <-time.After(time.Duration(timeOut) * time.Second):

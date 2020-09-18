@@ -14,7 +14,7 @@ import (
 )
 
 type MinterGate struct {
-	nodeClient *grpc_client.Client
+	NodeClient *grpc_client.Client
 	emitter    *pubsub.Server
 	IsActive   bool
 	Logger     *logrus.Entry
@@ -24,7 +24,7 @@ type MinterGate struct {
 func New(nodeApi *grpc_client.Client, e *pubsub.Server, logger *logrus.Entry) *MinterGate {
 	return &MinterGate{
 		emitter:    e,
-		nodeClient: nodeApi,
+		NodeClient: nodeApi,
 		IsActive:   true,
 		Logger:     logger,
 	}
@@ -33,7 +33,7 @@ func New(nodeApi *grpc_client.Client, e *pubsub.Server, logger *logrus.Entry) *M
 //Send transaction to blockchain
 //Return transaction hash
 func (mg *MinterGate) TxPush(tx string) (*string, error) {
-	result, err := mg.nodeClient.SendTransaction(tx)
+	result, err := mg.NodeClient.SendTransaction(tx)
 	if err != nil {
 		mg.Logger.WithFields(logrus.Fields{
 			"transaction": tx,
@@ -46,7 +46,7 @@ func (mg *MinterGate) TxPush(tx string) (*string, error) {
 
 //Return estimate of transaction
 func (mg *MinterGate) EstimateTxCommission(tx string, optionalHeight ...int) (*string, error) {
-	result, err := mg.nodeClient.EstimateTxCommission(tx, optionalHeight...)
+	result, err := mg.NodeClient.EstimateTxCommission(tx, optionalHeight...)
 	if err != nil {
 		mg.Logger.WithFields(logrus.Fields{
 			"transaction": tx,
@@ -85,7 +85,7 @@ func (mg *MinterGate) EstimateCoinBuy(coinToSell, coinIdToSell, coinToBuy, coinI
 		}
 	}
 
-	result, err := mg.nodeClient.EstimateCoinIDBuy(uint32(coinToSellInfoId), uint32(coinToBuyInfoId), value)
+	result, err := mg.NodeClient.EstimateCoinIDBuy(uint32(coinToSellInfoId), uint32(coinToBuyInfoId), value)
 	if err != nil {
 		return nil, err
 	}
@@ -123,7 +123,7 @@ func (mg *MinterGate) EstimateCoinSell(coinToSell, coinIdToSell, coinToBuy, coin
 		}
 	}
 
-	result, err := mg.nodeClient.EstimateCoinIDSell(uint32(coinToBuyInfoId), uint32(coinToSellInfoId), value)
+	result, err := mg.NodeClient.EstimateCoinIDSell(uint32(coinToBuyInfoId), uint32(coinToSellInfoId), value)
 	if err != nil {
 		return nil, err
 	}
@@ -166,7 +166,7 @@ func (mg *MinterGate) EstimateCoinSellAll(coinToSell, coinIdToSell, coinToBuy, c
 		return nil, err
 	}
 
-	result, err := mg.nodeClient.EstimateCoinIDSellAll(uint32(coinToBuyInfoId), uint32(coinToSellInfoId), value, int(gp))
+	result, err := mg.NodeClient.EstimateCoinIDSellAll(uint32(coinToBuyInfoId), uint32(coinToSellInfoId), value, int(gp))
 	if err != nil {
 		return nil, err
 	}
@@ -176,7 +176,7 @@ func (mg *MinterGate) EstimateCoinSellAll(coinToSell, coinIdToSell, coinToBuy, c
 
 //Return nonce for address
 func (mg *MinterGate) GetNonce(address string) (uint64, error) {
-	nonce, err := mg.nodeClient.Nonce(address)
+	nonce, err := mg.NodeClient.Nonce(address)
 	if err != nil {
 		mg.Logger.WithFields(logrus.Fields{
 			"address": address,
@@ -188,7 +188,7 @@ func (mg *MinterGate) GetNonce(address string) (uint64, error) {
 
 //Return nonce for address
 func (mg *MinterGate) GetMinGas() (*string, error) {
-	gasPrice, err := mg.nodeClient.MinGasPrice()
+	gasPrice, err := mg.NodeClient.MinGasPrice()
 	if err != nil {
 		mg.Logger.Error(err)
 		return nil, err
@@ -244,7 +244,7 @@ func (mg *MinterGate) ExplorerStatusChecker() {
 }
 
 func (mg *MinterGate) CoinInfo(symbol string) (*api_pb.CoinInfoResponse, error) {
-	return mg.nodeClient.CoinInfo(symbol)
+	return mg.NodeClient.CoinInfo(symbol)
 }
 
 func (mg *MinterGate) getCoinId(symbol string) (uint64, error) {
@@ -252,7 +252,7 @@ func (mg *MinterGate) getCoinId(symbol string) (uint64, error) {
 		return 0, nil
 	}
 
-	coinInfo, err := mg.nodeClient.CoinInfo(symbol)
+	coinInfo, err := mg.NodeClient.CoinInfo(symbol)
 	if err != nil {
 		return 0, err
 	}
