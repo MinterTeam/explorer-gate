@@ -136,7 +136,7 @@ func sendTx(tx string, c *gin.Context) {
 					})
 					return
 				}
-
+				data.Height = tags["height"]
 				ttx, err := gate.NodeClient.Marshal(data)
 				if err != nil {
 					c.JSON(http.StatusBadRequest, gin.H{
@@ -145,11 +145,10 @@ func sendTx(tx string, c *gin.Context) {
 					return
 				}
 
-				data.Height = tags["height"]
 				c.JSON(http.StatusOK, gin.H{
 					"hash":        &hash,
 					"data":        "",
-					"transaction": ttx,
+					"transaction": json.RawMessage(ttx),
 					"code":        data.Code,
 					"log":         data.Log,
 				})
