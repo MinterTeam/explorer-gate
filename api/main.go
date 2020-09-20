@@ -43,9 +43,12 @@ func SetupRouter(gateService *core.MinterGate, pubSubServer *pubsub.Server) *gin
 		router.Use(gin.Recovery()) // returns 500 on any code panics
 	}
 	router.Use(p.Instrument())
-	router.Use(cors.Default())                           // CORS
 	router.Use(gin.ErrorLogger())                        // print all errors
 	router.Use(apiMiddleware(gateService, pubSubServer)) // init global context
+
+	if os.Getenv("ENABLE_CORS") == "true" || os.Getenv("ENABLE_CORS") == "1" {
+		router.Use(cors.Default()) // CORS
+	}
 
 	router.GET(`/`, index)
 
