@@ -3,7 +3,7 @@ kind: Ingress
 metadata:
   name: {{ include "chart.fullname" . }}
   annotations:
-    nginx.ingress.kubernetes.io/cors-allow-methods: POST, OPTIONS, PUT, GET
+    nginx.ingress.kubernetes.io/cors-allow-methods: "POST, OPTIONS, PUT, GET, HEAD"
     nginx.ingress.kubernetes.io/enable-cors: "true"
     nginx.ingress.kubernetes.io/cors-allow-origin: "*"
     nginx.ingress.kubernetes.io/cors-allow-headers: "DNT,TE,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Authorization"
