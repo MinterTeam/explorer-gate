@@ -40,7 +40,7 @@ func (mg *MinterGate) TxPush(tx string) (*string, error) {
 		}).Warn(err)
 		return nil, err
 	}
-	hash := `Mt` + strings.ToLower(result.Hash)
+	hash := strings.ToTitle(result.Hash)
 	return &hash, nil
 }
 
