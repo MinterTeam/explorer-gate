@@ -13,7 +13,6 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/tendermint/tendermint/libs/pubsub"
 	"os"
-	"strconv"
 	"time"
 )
 
@@ -77,25 +76,21 @@ func main() {
 		panic(err)
 	}
 
-	latestBlock, err := strconv.Atoi(status.LatestBlockHeight)
-	if err != nil {
-		panic(err)
-	}
-
-	logger.Info("Starting with block " + strconv.Itoa(latestBlock))
+	latestBlock := status.LatestBlockHeight
+	logger.Info(fmt.Sprintf("Starting with block %d", status.LatestBlockHeight))
 
 	gateService := core.New(nodeApi, pubsubServer, contextLogger)
 
 	go func() {
 		for {
-			block, err := nodeApi.Block(latestBlock)
+			block, err := nodeApi.Block(status.LatestBlockHeight)
 			if err != nil {
 				time.Sleep(time.Second)
 				continue
 			}
 
 			for _, tx := range block.Transactions {
-				if tx.Code != "0" {
+				if tx.Code != 0 {
 					err := pubsubServer.PublishWithTags(context.TODO(), "FailTx", map[string]string{
 						"error": fmt.Sprintf("%X", tx.Log),
 					})
@@ -116,7 +111,7 @@ func main() {
 				err = pubsubServer.PublishWithTags(context.TODO(), "NewTx", map[string]string{
 					"tx":     fmt.Sprintf("%X", b),
 					"txData": string(txJson),
-					"height": block.Height,
+					"height": fmt.Sprintf("%d", block.Height),
 				})
 				if err != nil {
 					logger.Error(err)

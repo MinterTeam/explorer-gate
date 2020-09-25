@@ -136,7 +136,16 @@ func sendTx(tx string, c *gin.Context) {
 					})
 					return
 				}
-				data.Height = tags["height"]
+
+				h, err := strconv.ParseUint(tags["height"], 10, 64)
+				if err != nil {
+					c.JSON(http.StatusBadRequest, gin.H{
+						"error": errors.NewGateError(err.Error()),
+					})
+					return
+				}
+
+				data.Height = h
 				ttx, err := gate.NodeClient.Marshal(data)
 				if err != nil {
 					c.JSON(http.StatusBadRequest, gin.H{

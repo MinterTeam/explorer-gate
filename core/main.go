@@ -1,6 +1,7 @@
 package core
 
 import (
+	"fmt"
 	"github.com/MinterTeam/explorer-gate/v2/domain"
 	"github.com/MinterTeam/minter-go-sdk/v2/api/grpc_client"
 	"github.com/MinterTeam/node-grpc-gateway/api_pb"
@@ -45,7 +46,7 @@ func (mg *MinterGate) TxPush(tx string) (*string, error) {
 }
 
 //Return estimate of transaction
-func (mg *MinterGate) EstimateTxCommission(tx string, optionalHeight ...int) (*string, error) {
+func (mg *MinterGate) EstimateTxCommission(tx string, optionalHeight ...uint64) (*string, error) {
 	result, err := mg.NodeClient.EstimateTxCommission(tx, optionalHeight...)
 	if err != nil {
 		mg.Logger.WithFields(logrus.Fields{
@@ -85,7 +86,7 @@ func (mg *MinterGate) EstimateCoinBuy(coinToSell, coinIdToSell, coinToBuy, coinI
 		}
 	}
 
-	result, err := mg.NodeClient.EstimateCoinIDBuy(uint32(coinToSellInfoId), uint32(coinToBuyInfoId), value)
+	result, err := mg.NodeClient.EstimateCoinIDBuy(coinToSellInfoId, coinToBuyInfoId, value)
 	if err != nil {
 		return nil, err
 	}
@@ -123,7 +124,7 @@ func (mg *MinterGate) EstimateCoinSell(coinToSell, coinIdToSell, coinToBuy, coin
 		}
 	}
 
-	result, err := mg.NodeClient.EstimateCoinIDSell(uint32(coinToBuyInfoId), uint32(coinToSellInfoId), value)
+	result, err := mg.NodeClient.EstimateCoinIDSell(coinToBuyInfoId, coinToSellInfoId, value)
 	if err != nil {
 		return nil, err
 	}
@@ -166,7 +167,7 @@ func (mg *MinterGate) EstimateCoinSellAll(coinToSell, coinIdToSell, coinToBuy, c
 		return nil, err
 	}
 
-	result, err := mg.NodeClient.EstimateCoinIDSellAll(uint32(coinToBuyInfoId), uint32(coinToSellInfoId), value, int(gp))
+	result, err := mg.NodeClient.EstimateCoinIDSellAll(coinToBuyInfoId, coinToSellInfoId, value, int(gp))
 	if err != nil {
 		return nil, err
 	}
@@ -187,13 +188,13 @@ func (mg *MinterGate) GetNonce(address string) (uint64, error) {
 }
 
 //Return nonce for address
-func (mg *MinterGate) GetMinGas() (*string, error) {
+func (mg *MinterGate) GetMinGas() (string, error) {
 	gasPrice, err := mg.NodeClient.MinGasPrice()
 	if err != nil {
 		mg.Logger.Error(err)
-		return nil, err
+		return "", err
 	}
-	return &gasPrice.MinGasPrice, nil
+	return fmt.Sprintf("%d", gasPrice.MinGasPrice), nil
 }
 
 func (mg *MinterGate) ExplorerStatusChecker() {
@@ -257,5 +258,5 @@ func (mg *MinterGate) getCoinId(symbol string) (uint64, error) {
 		return 0, err
 	}
 
-	return strconv.ParseUint(coinInfo.Id, 10, 64)
+	return coinInfo.Id, nil
 }
