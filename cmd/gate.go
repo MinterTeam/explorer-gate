@@ -83,7 +83,7 @@ func main() {
 
 	go func() {
 		for {
-			block, err := nodeApi.Block(status.LatestBlockHeight)
+			block, err := nodeApi.Block(latestBlock)
 			if err != nil {
 				time.Sleep(time.Second)
 				continue
