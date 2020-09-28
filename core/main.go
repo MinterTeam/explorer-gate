@@ -248,6 +248,10 @@ func (mg *MinterGate) CoinInfo(symbol string) (*api_pb.CoinInfoResponse, error) 
 	return mg.NodeClient.CoinInfo(symbol)
 }
 
+func (mg *MinterGate) CoinInfoById(id uint64) (*api_pb.CoinInfoResponse, error) {
+	return mg.NodeClient.CoinInfoByID(id)
+}
+
 func (mg *MinterGate) getCoinId(symbol string) (uint64, error) {
 	if symbol == os.Getenv("BASE_COIN") {
 		return 0, nil
