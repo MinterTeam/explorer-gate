@@ -158,7 +158,7 @@ func GetMinGas(c *gin.Context) {
 		errors.SetErrorResponse(err, c)
 	} else {
 		c.JSON(http.StatusOK, gin.H{
-			"result": gas,
+			"min_gas_price": gas,
 		})
 	}
 }

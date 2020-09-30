@@ -35,7 +35,7 @@ func CoinInfo(c *gin.Context) {
 		}).Warn(err)
 		errors.SetErrorResponse(err, c)
 	} else {
-		c.JSON(http.StatusOK, gin.H{"result": json.RawMessage(resp)})
+		c.JSON(http.StatusOK, json.RawMessage(resp))
 	}
 }
 
@@ -68,6 +68,6 @@ func CoinInfoById(c *gin.Context) {
 		}).Warn(err)
 		errors.SetErrorResponse(err, c)
 	} else {
-		c.JSON(http.StatusOK, gin.H{"result": json.RawMessage(resp)})
+		c.JSON(http.StatusOK, json.RawMessage(resp))
 	}
 }
