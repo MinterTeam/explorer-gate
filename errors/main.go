@@ -57,7 +57,7 @@ func SetErrorResponse(err error, c *gin.Context) {
 			Data:    details,
 		}
 	}
-	c.JSON(http.StatusRequestTimeout, gin.H{
+	c.JSON(http.StatusBadRequest, gin.H{
 		"error": result,
 	})
 }
