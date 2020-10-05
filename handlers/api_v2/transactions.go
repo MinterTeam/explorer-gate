@@ -90,7 +90,7 @@ func sendTx(tx string, c *gin.Context) {
 		tx = `0x` + tx
 	}
 
-	hash, err := gate.TxPush(tx)
+	_, err = gate.TxPush(tx)
 	if err != nil {
 		gate.Logger.WithFields(logrus.Fields{
 			"tx": tx,
@@ -155,7 +155,7 @@ func sendTx(tx string, c *gin.Context) {
 				}
 
 				c.JSON(http.StatusOK, gin.H{
-					"hash":        &hash,
+					"hash":        data.Hash,
 					"data":        "",
 					"transaction": json.RawMessage(ttx),
 					"code":        data.Code,
