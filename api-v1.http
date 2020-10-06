@@ -1,0 +1,38 @@
+### Estimate transaction commision
+GET {{host}}/api/v1/estimate/tx-commission?transaction={{tx}}
+Accept: */*
+Cache-Control: no-cache
+Content-Type: application/json
+
+### Estimate buy coin
+GET {{host}}/api/v1/estimate/coin-buy?coinToSell={{coin_to_sell_symbol}}&valueToSell={{value}}&coinToBuy={{coin_to_buy_symbol}}
+Accept: */*
+Cache-Control: no-cache
+Content-Type: application/json
+
+### Estimate sell coin
+GET {{host}}/api/v1/estimate/coin-sell?coinToSell={{coin_to_sell_symbol}}&valueToSell={{value}}&coinToBuy={{coin_to_buy_symbol}}
+Accept: */*
+Cache-Control: no-cache
+Content-Type: application/json
+
+### Nonce
+GET {{host}}/api/v1/nonce/{{address}}
+Accept: */*
+Cache-Control: no-cache
+Content-Type: application/json
+
+### Min gas price
+GET {{host}}/api/v1/min-gas
+Accept: */*
+Cache-Control: no-cache
+Content-Type: application/json
+
+### Send transaction
+POST {{host}}/api/v1/transaction/push
+Accept: */*
+Cache-Control: no-cache
+Content-Type: application/json
+
+{"transaction" : "{{tx}}"}
+

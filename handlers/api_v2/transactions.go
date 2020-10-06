@@ -155,7 +155,7 @@ func sendTx(tx string, c *gin.Context) {
 				}
 
 				c.JSON(http.StatusOK, gin.H{
-					"hash":        fmt.Sprintf("%s", data.Hash),
+					"hash":        data.Hash,
 					"data":        "",
 					"transaction": json.RawMessage(ttx),
 					"code":        data.Code,

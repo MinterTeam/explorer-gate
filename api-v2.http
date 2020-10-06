@@ -1,0 +1,61 @@
+### Estimate transaction
+GET {{host}}/api/v2/estimate_tx_commission/{{tx}}
+Accept: */*
+Cache-Control: no-cache
+Content-Type: application/json
+
+### Estimate buy coin
+GET {{host}}/api/v2/estimate_coin_buy?
+Accept: */*
+Cache-Control: no-cache
+Content-Type: application/json
+
+### Estimate sell coin
+GET {{host}}/api/v2/estimate_coin_sell?
+Accept: */*
+Cache-Control: no-cache
+Content-Type: application/json
+
+### Estimate sell all coin
+GET {{host}}/api/v2/estimate_coin_sell_all?
+Accept: */*
+Cache-Control: no-cache
+Content-Type: application/json
+
+### Nonce
+GET {{host}}/api/v2/nonce/{{address}}
+Accept: */*
+Cache-Control: no-cache
+Content-Type: application/json
+
+### Min gas price
+GET {{host}}/api/v2/min_gas_price
+Accept: */*
+Cache-Control: no-cache
+Content-Type: application/json
+
+### Coin info
+GET {{host}}api/v2/coin_info/{{symbol}}
+Accept: */*
+Cache-Control: no-cache
+Content-Type: application/json
+
+### Coin info by id
+GET {{host}}/api/v2/coin_info_by_id/{{id}}
+Accept: */*
+Cache-Control: no-cache
+Content-Type: application/json
+
+### Send transaction
+GET {{host}}/api/v2/send_transaction/{{tx}}
+Accept: */*
+Cache-Control: no-cache
+Content-Type: application/json
+
+### Send transaction
+POST   {{host}}/api/v2/send_transaction
+Accept: */*
+Cache-Control: no-cache
+Content-Type: application/json
+
+{"transaction" : "{{tx}}"}

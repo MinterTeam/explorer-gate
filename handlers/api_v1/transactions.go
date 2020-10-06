@@ -69,7 +69,7 @@ func PushTransaction(c *gin.Context) {
 		txn = `0x` + txn
 	}
 
-	hash, err := gate.TxPush(txn)
+	_, err = gate.TxPush(txn)
 	if err != nil {
 		gate.Logger.WithFields(logrus.Fields{
 			"transaction": tx,
@@ -104,7 +104,7 @@ func PushTransaction(c *gin.Context) {
 				data.Height = tags["height"]
 				c.JSON(http.StatusOK, gin.H{
 					"data": gin.H{
-						"hash":        &hash,
+						"hash":        data.Hash,
 						"transaction": data,
 					},
 				})
