@@ -1,8 +1,8 @@
 name: CI
 
-on: 
+on:
    push:
-     branches: [ chilinet ]
+     branches: [ dev ]
 
 jobs:
   docker:
