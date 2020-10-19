@@ -1,0 +1,39 @@
+replicaCount: 1
+
+image:
+  repository: minterteam/explorer-gate
+  pullPolicy: IfNotPresent
+
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  create: true
+
+podSecurityContext: { }
+
+securityContext: { }
+
+service:
+  port: 9000
+
+ingress:
+  domain: { GATE_HOST }
+
+resources: { }
+
+nodeSelector: { }
+
+tolerations: [ ]
+
+affinity: { }
+
+env:
+  debug: { DEBUG }
+  port: { GATE_PORT }
+  nodeApi: { NODE_API }
+  nodeApiTimeout: { NODE_API_TIMEOUT }
+  explorerApi: { EXPLORER_API }
+  explorerCheck: { EXPLORER_CHECK }
+  explorerCheckTimeout: { EXPLORER_CHECK_TIMEOUT }
+  lastBlockDifTime: { LAST_BLOCK_DIF_TIME }

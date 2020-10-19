@@ -25,3 +25,7 @@ config.json
 
 .idea/
 __debug_bin
+
+*.tmp.yaml
+*.tmp.http
+http-client.private.env.json

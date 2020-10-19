@@ -6,15 +6,13 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
-	"github.com/MinterTeam/explorer-gate/v2/src/api"
-	"github.com/MinterTeam/explorer-gate/v2/src/core"
-	sdk "github.com/MinterTeam/minter-go-sdk/api"
-	_ "github.com/jinzhu/gorm/dialects/postgres"
+	"github.com/MinterTeam/explorer-gate/v2/api"
+	"github.com/MinterTeam/explorer-gate/v2/core"
+	"github.com/MinterTeam/minter-go-sdk/v2/api/grpc_client"
 	"github.com/joho/godotenv"
 	"github.com/sirupsen/logrus"
 	"github.com/tendermint/tendermint/libs/pubsub"
 	"os"
-	"strconv"
 	"time"
 )
 
@@ -68,22 +66,20 @@ func main() {
 		contextLogger.Error(err)
 	}
 
-	gateService := core.New(pubsubServer, contextLogger)
-
-	link := os.Getenv("NODE_API")
-	nodeApi := sdk.NewApi(link)
+	nodeApi, err := grpc_client.New(os.Getenv("NODE_API"))
+	if err != nil {
+		logrus.Fatal(err)
+	}
 
 	status, err := nodeApi.Status()
 	if err != nil {
 		panic(err)
 	}
 
-	latestBlock, err := strconv.Atoi(status.LatestBlockHeight)
-	if err != nil {
-		panic(err)
-	}
+	latestBlock := status.LatestBlockHeight
+	logger.Info(fmt.Sprintf("Starting with block %d", status.LatestBlockHeight))
 
-	logger.Info("Starting with block " + strconv.Itoa(latestBlock))
+	gateService := core.New(nodeApi, pubsubServer, contextLogger)
 
 	go func() {
 		for {
@@ -115,7 +111,7 @@ func main() {
 				err = pubsubServer.PublishWithTags(context.TODO(), "NewTx", map[string]string{
 					"tx":     fmt.Sprintf("%X", b),
 					"txData": string(txJson),
-					"height": block.Height,
+					"height": fmt.Sprintf("%d", block.Height),
 				})
 				if err != nil {
 					logger.Error(err)

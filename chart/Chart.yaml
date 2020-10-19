@@ -1,0 +1,16 @@
+version: 1.0.0
+apiVersion: v2
+
+name: gate
+icon: https://explorer.minter.network/img/minter-logo-circle.svg
+description: A Helm chart for Minter Gate
+
+appVersion: latest
+
+home: https://github.com/MinterTeam/explorer-gate
+keywords:
+  - minter-gate
+maintainers:
+  - name: daniildulin
+    email: daniildulin@gmail.com
+

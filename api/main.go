@@ -2,8 +2,10 @@ package api
 
 import (
 	"github.com/Depado/ginprom"
-	"github.com/MinterTeam/explorer-gate/v2/src/core"
-	"github.com/MinterTeam/explorer-gate/v2/src/handlers"
+	"github.com/MinterTeam/explorer-gate/v2/core"
+	"github.com/MinterTeam/explorer-gate/v2/errors"
+	"github.com/MinterTeam/explorer-gate/v2/handlers/api_v1"
+	"github.com/MinterTeam/explorer-gate/v2/handlers/api_v2"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/tendermint/tendermint/libs/pubsub"
@@ -41,24 +43,45 @@ func SetupRouter(gateService *core.MinterGate, pubSubServer *pubsub.Server) *gin
 		router.Use(gin.Recovery()) // returns 500 on any code panics
 	}
 	router.Use(p.Instrument())
-	router.Use(cors.Default())                           // CORS
 	router.Use(gin.ErrorLogger())                        // print all errors
 	router.Use(apiMiddleware(gateService, pubSubServer)) // init global context
 
+	if os.Getenv("ENABLE_CORS") == "true" || os.Getenv("ENABLE_CORS") == "1" {
+		router.Use(cors.Default()) // CORS
+	}
+
 	router.GET(`/`, index)
 
-	v1 := router.Group("/api/v1")
+	apiV1 := router.Group("/api/v1")
 	{
-		v1.GET(`/estimate/tx-commission`, handlers.EstimateTxCommission)
-		v1.GET(`/estimate/coin-buy`, handlers.EstimateCoinBuy)
-		v1.GET(`/estimate/coin-sell`, handlers.EstimateCoinSell)
-		v1.GET(`/nonce/:address`, handlers.GetNonce)
-		v1.GET(`/min-gas`, handlers.GetMinGas)
-		v1.POST(`/transaction/push`, handlers.PushTransaction)
+		apiV1.GET(`/estimate/tx-commission`, api_v1.EstimateTxCommission)
+		apiV1.GET(`/estimate/coin-buy`, api_v1.EstimateCoinBuy)
+		apiV1.GET(`/estimate/coin-sell`, api_v1.EstimateCoinSell)
+		apiV1.GET(`/nonce/:address`, api_v1.GetNonce)
+		apiV1.GET(`/min-gas`, api_v1.GetMinGas)
+		apiV1.POST(`/transaction/push`, api_v1.PushTransaction)
+	}
+
+	apiV2 := router.Group("/api/v2")
+	{
+		apiV2.GET(`/estimate_tx_commission/:tx`, api_v2.EstimateTxCommission)
+		apiV2.GET(`/estimate_coin_buy`, api_v2.EstimateCoinBuy)
+		apiV2.GET(`/estimate_coin_sell`, api_v2.EstimateCoinSell)
+		apiV2.GET(`/estimate_coin_sell_all`, api_v2.EstimateCoinSellAll)
+		apiV2.GET(`/nonce/:address`, api_v2.GetNonce)
+		apiV2.GET(`/min_gas_price`, api_v2.GetMinGas)
+		apiV2.GET(`/coin_info/:symbol`, api_v2.CoinInfo)
+		apiV2.GET(`/coin_info_by_id/:id`, api_v2.CoinInfoById)
+		apiV2.GET(`/send_transaction/:tx`, api_v2.PushTransaction)
+		apiV2.POST(`/send_transaction`, api_v2.PostTransaction)
 	}
 	// Default handler 404
 	router.NoRoute(func(c *gin.Context) {
-		c.JSON(http.StatusNotFound, gin.H{"error": gin.H{"code": 404, "log": "Resource not found."}})
+		err := errors.GateError{
+			Code:    "404",
+			Message: "Resource not found.",
+		}
+		c.JSON(http.StatusNotFound, err)
 	})
 	return router
 }
@@ -75,12 +98,7 @@ func apiMiddleware(gate *core.MinterGate, pubSubServer *pubsub.Server) gin.Handl
 func index(c *gin.Context) {
 	gate, ok := c.MustGet("gate").(*core.MinterGate)
 	if !ok {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": gin.H{
-				"code": 1,
-				"log":  "Type cast error",
-			},
-		})
+		c.JSON(http.StatusInternalServerError, errors.NewGateError("Type cast error"))
 		return
 	}
 	c.JSON(200, gin.H{
