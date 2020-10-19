@@ -31,6 +31,7 @@ _NOTE: This project in active development stage so feel free to send us question
 ## API Docs
 
 Don't forget to read the [documentation](https://minterteam.github.io/minter-gate-docs/)
+([docs repo](https://github.com/MinterTeam/minter-gate-docs))
 
 ## BUILD
 
