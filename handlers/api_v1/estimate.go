@@ -24,7 +24,7 @@ func EstimateTxCommission(c *gin.Context) {
 
 	commission, err := gate.EstimateTxCommission(tx)
 	if err != nil {
-		errors.SetErrorResponse(err, c)
+		errors.SetErrorResponseV1(err, c)
 	} else {
 		c.JSON(http.StatusOK, gin.H{
 			"data": gin.H{
@@ -50,7 +50,7 @@ func EstimateCoinBuy(c *gin.Context) {
 			"coinToBuy":  coinToBuy,
 			"value":      value,
 		}).Warn(err)
-		errors.SetErrorResponse(err, c)
+		errors.SetErrorResponseV1(err, c)
 	} else {
 		c.JSON(http.StatusOK, gin.H{
 			"data": gin.H{
@@ -78,7 +78,7 @@ func EstimateCoinSell(c *gin.Context) {
 			"value":      value,
 		}).Warn(err)
 
-		errors.SetErrorResponse(err, c)
+		errors.SetErrorResponseV1(err, c)
 	} else {
 		c.JSON(http.StatusOK, gin.H{
 			"data": gin.H{
@@ -98,7 +98,7 @@ func GetNonce(c *gin.Context) {
 	address := strings.Title(strings.TrimSpace(c.Param(`address`)))
 	nonce, err := gate.GetNonce(address)
 	if err != nil {
-		errors.SetErrorResponse(err, c)
+		errors.SetErrorResponseV1(err, c)
 	} else {
 		c.JSON(http.StatusOK, gin.H{
 			"data": gin.H{
@@ -116,7 +116,7 @@ func GetMinGas(c *gin.Context) {
 	}
 	gas, err := gate.GetMinGas()
 	if err != nil {
-		errors.SetErrorResponse(err, c)
+		errors.SetErrorResponseV1(err, c)
 	} else {
 		c.JSON(http.StatusOK, gin.H{
 			"data": gin.H{
