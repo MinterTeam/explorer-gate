@@ -20,6 +20,56 @@ func NewGateError(msg string) GateError {
 	}
 }
 
+func NewGateV1Error(msg string) GateErrorV1 {
+	return GateErrorV1{
+		Code: "1",
+		Log:  msg,
+		Data: nil,
+	}
+}
+
+func SetErrorResponseV1(err error, c *gin.Context) {
+	grpcErr, ok := status.FromError(err)
+	if !ok {
+		c.JSON(http.StatusRequestTimeout, gin.H{
+			"error": NewGateError(`want error type: "GRPC Status"`),
+		})
+		return
+	}
+
+	var result GateErrorV1
+	msg, e := formatErrorMessage(grpcErr.Message())
+
+	code := fmt.Sprintf("%d", int(grpcErr.Code()))
+
+	details := make(map[string]interface{})
+
+	for _, v := range grpcErr.Details() {
+		dd, ok := v.(*structpb.Struct)
+		if ok {
+			for k, v := range dd.AsMap() {
+				details[k] = v
+				if k == "code" {
+					code = v.(string)
+				}
+			}
+		}
+	}
+
+	if e != nil {
+		result = NewGateV1Error(e.Error())
+	} else {
+		result = GateErrorV1{
+			Code: code,
+			Log:  msg,
+			Data: details,
+		}
+	}
+	c.JSON(http.StatusBadRequest, gin.H{
+		"error": result,
+	})
+}
+
 func SetErrorResponse(err error, c *gin.Context) {
 	grpcErr, ok := status.FromError(err)
 	if !ok {
