@@ -27,7 +27,7 @@ jobs:
           PASSWORD: ${{ secrets.MINTER_REGISTRY_PASSWORD }}
           IMAGE_NAME: "explorer-gate"
           REGISTRY: "registry.minter.network"
-          DOCKERFILE: ".docker/Dockerfile"
+          DOCKERFILE: ".docker/gate/Dockerfile"
           LATEST: "true"
           VERSION: "${{ steps.version.outputs.text }}"
           TAG_NAME: ${{ github.sha }}
