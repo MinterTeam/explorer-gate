@@ -167,7 +167,7 @@ func (mg *MinterGate) EstimateCoinSellAll(coinToSell, coinIdToSell, coinToBuy, c
 		return nil, err
 	}
 
-	result, err := mg.NodeClient.EstimateCoinIDSellAll(coinToBuyInfoId, coinToSellInfoId, value, int(gp))
+	result, err := mg.NodeClient.EstimateCoinIDSellAll(coinToBuyInfoId, coinToSellInfoId, uint64(gp), value)
 	if err != nil {
 		return nil, err
 	}
