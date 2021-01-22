@@ -42,12 +42,18 @@ func EstimateCoinBuy(c *gin.Context) {
 		})
 		return
 	}
+
+	swapFrom := strings.TrimSpace(c.Query(`swap_from`))
+	if swapFrom == "" {
+		swapFrom = "optimal"
+	}
+
 	coinToSell := strings.TrimSpace(c.Query(`coin_to_sell`))
 	coinIdToSell := strings.TrimSpace(c.Query(`coin_id_to_sell`))
 	coinToBuy := strings.TrimSpace(c.Query(`coin_to_buy`))
 	coinIdToBuy := strings.TrimSpace(c.Query(`coin_id_to_buy`))
 	value := strings.TrimSpace(c.Query(`value_to_buy`))
-	estimate, err := gate.EstimateCoinBuy(coinToSell, coinIdToSell, coinToBuy, coinIdToBuy, value)
+	estimate, err := gate.EstimateCoinBuy(coinToSell, coinIdToSell, coinToBuy, coinIdToBuy, value, swapFrom)
 	if err != nil {
 		gate.Logger.WithFields(logrus.Fields{
 			"coinToSell": coinToSell,
@@ -71,6 +77,12 @@ func EstimateCoinSell(c *gin.Context) {
 		})
 		return
 	}
+
+	swapFrom := strings.TrimSpace(c.Query(`swap_from`))
+	if swapFrom == "" {
+		swapFrom = "optimal"
+	}
+
 	coinToSell := strings.TrimSpace(c.Query(`coin_to_sell`))
 	coinToBuy := strings.TrimSpace(c.Query(`coin_to_buy`))
 
@@ -78,7 +90,7 @@ func EstimateCoinSell(c *gin.Context) {
 	coinIdToBuy := strings.TrimSpace(c.Query(`coin_id_to_buy`))
 
 	value := strings.TrimSpace(c.Query(`value_to_sell`))
-	estimate, err := gate.EstimateCoinSell(coinToSell, coinIdToSell, coinToBuy, coinIdToBuy, value)
+	estimate, err := gate.EstimateCoinSell(coinToSell, coinIdToSell, coinToBuy, coinIdToBuy, value, swapFrom)
 	if err != nil {
 		gate.Logger.WithFields(logrus.Fields{
 			"coinToSell": coinToSell,
@@ -110,7 +122,12 @@ func EstimateCoinSellAll(c *gin.Context) {
 	gasPrice := strings.TrimSpace(c.Query(`gas_price`))
 	value := strings.TrimSpace(c.Query(`value_to_sell`))
 
-	estimate, err := gate.EstimateCoinSellAll(coinToSell, coinIdToSell, coinToBuy, coinIdToBuy, value, gasPrice)
+	swapFrom := strings.TrimSpace(c.Query(`swap_from`))
+	if swapFrom == "" {
+		swapFrom = "optimal"
+	}
+
+	estimate, err := gate.EstimateCoinSellAll(coinToSell, coinIdToSell, coinToBuy, coinIdToBuy, value, gasPrice, swapFrom)
 	if err != nil {
 		gate.Logger.WithFields(logrus.Fields{
 			"coinToSell": coinToSell,

@@ -58,7 +58,7 @@ func (mg *MinterGate) EstimateTxCommission(tx string, optionalHeight ...uint64) 
 }
 
 //Return estimate of buy coin
-func (mg *MinterGate) EstimateCoinBuy(coinToSell, coinIdToSell, coinToBuy, coinIdToBuy, value string) (*domain.CoinEstimate, error) {
+func (mg *MinterGate) EstimateCoinBuy(coinToSell, coinIdToSell, coinToBuy, coinIdToBuy, value, swapFrom string) (*domain.CoinEstimate, error) {
 	var coinToSellInfoId, coinToBuyInfoId uint64
 	var err error
 
@@ -86,7 +86,7 @@ func (mg *MinterGate) EstimateCoinBuy(coinToSell, coinIdToSell, coinToBuy, coinI
 		}
 	}
 
-	result, err := mg.NodeClient.EstimateCoinIDBuy(coinToSellInfoId, coinToBuyInfoId, value)
+	result, err := mg.NodeClient.EstimateCoinIDBuyFrom(coinToSellInfoId, coinToBuyInfoId, value, swapFrom)
 	if err != nil {
 		return nil, err
 	}
@@ -95,7 +95,7 @@ func (mg *MinterGate) EstimateCoinBuy(coinToSell, coinIdToSell, coinToBuy, coinI
 }
 
 //Return estimate of sell coin
-func (mg *MinterGate) EstimateCoinSell(coinToSell, coinIdToSell, coinToBuy, coinIdToBuy, value string) (*domain.CoinEstimate, error) {
+func (mg *MinterGate) EstimateCoinSell(coinToSell, coinIdToSell, coinToBuy, coinIdToBuy, value, swapFrom string) (*domain.CoinEstimate, error) {
 
 	var coinToSellInfoId, coinToBuyInfoId uint64
 	var err error
@@ -124,7 +124,7 @@ func (mg *MinterGate) EstimateCoinSell(coinToSell, coinIdToSell, coinToBuy, coin
 		}
 	}
 
-	result, err := mg.NodeClient.EstimateCoinIDSell(coinToBuyInfoId, coinToSellInfoId, value)
+	result, err := mg.NodeClient.EstimateCoinIDSellFrom(coinToBuyInfoId, coinToSellInfoId, value, swapFrom)
 	if err != nil {
 		return nil, err
 	}
@@ -133,7 +133,7 @@ func (mg *MinterGate) EstimateCoinSell(coinToSell, coinIdToSell, coinToBuy, coin
 }
 
 //Return estimate of sell coin
-func (mg *MinterGate) EstimateCoinSellAll(coinToSell, coinIdToSell, coinToBuy, coinIdToBuy, value, gasPrice string) (*domain.CoinEstimate, error) {
+func (mg *MinterGate) EstimateCoinSellAll(coinToSell, coinIdToSell, coinToBuy, coinIdToBuy, value, gasPrice, swapFrom string) (*domain.CoinEstimate, error) {
 
 	var coinToSellInfoId, coinToBuyInfoId uint64
 	var err error
@@ -167,7 +167,7 @@ func (mg *MinterGate) EstimateCoinSellAll(coinToSell, coinIdToSell, coinToBuy, c
 		return nil, err
 	}
 
-	result, err := mg.NodeClient.EstimateCoinIDSellAll(coinToBuyInfoId, coinToSellInfoId, uint64(gp), value)
+	result, err := mg.NodeClient.EstimateCoinIDSellAllFrom(coinToBuyInfoId, coinToSellInfoId, uint64(gp), value, swapFrom)
 	if err != nil {
 		return nil, err
 	}

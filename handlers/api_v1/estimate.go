@@ -43,7 +43,13 @@ func EstimateCoinBuy(c *gin.Context) {
 	coinToSell := strings.TrimSpace(c.Query(`coinToSell`))
 	coinToBuy := strings.TrimSpace(c.Query(`coinToBuy`))
 	value := strings.TrimSpace(c.Query(`valueToBuy`))
-	estimate, err := gate.EstimateCoinBuy(coinToSell, "", coinToBuy, "", value)
+
+	swapFrom := strings.TrimSpace(c.Query(`swap_from`))
+	if swapFrom == "" {
+		swapFrom = "optimal"
+	}
+
+	estimate, err := gate.EstimateCoinBuy(coinToSell, "", coinToBuy, "", value, swapFrom)
 	if err != nil {
 		gate.Logger.WithFields(logrus.Fields{
 			"coinToSell": coinToSell,
@@ -70,7 +76,13 @@ func EstimateCoinSell(c *gin.Context) {
 	coinToSell := strings.TrimSpace(c.Query(`coinToSell`))
 	coinToBuy := strings.TrimSpace(c.Query(`coinToBuy`))
 	value := strings.TrimSpace(c.Query(`valueToSell`))
-	estimate, err := gate.EstimateCoinSell(coinToSell, "", coinToBuy, "", value)
+
+	swapFrom := strings.TrimSpace(c.Query(`swap_from`))
+	if swapFrom == "" {
+		swapFrom = "optimal"
+	}
+
+	estimate, err := gate.EstimateCoinSell(coinToSell, "", coinToBuy, "", value, swapFrom)
 	if err != nil {
 		gate.Logger.WithFields(logrus.Fields{
 			"coinToSell": coinToSell,
