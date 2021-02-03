@@ -83,7 +83,7 @@ func main() {
 
 	go func() {
 		for {
-			block, err := nodeApi.Block(latestBlock)
+			block, err := nodeApi.BlockExtended(latestBlock, true)
 			if err != nil {
 				time.Sleep(time.Second)
 				continue
@@ -100,7 +100,11 @@ func main() {
 					continue
 				}
 
-				b, _ := hex.DecodeString(tx.RawTx)
+				b, err := hex.DecodeString(tx.RawTx)
+				if err != nil {
+					logger.Error(err)
+					continue
+				}
 
 				txJson, err := json.Marshal(tx)
 				if err != nil {
