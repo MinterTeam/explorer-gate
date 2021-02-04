@@ -9,6 +9,11 @@ import (
 
 func (mg *MinterGate) PriceCommissionsHandler(c *gin.Context) {
 	data, err := mg.NodeClient.PriceCommission()
+	if err != nil {
+		mg.Logger.Warn(err)
+		errors.SetErrorResponse(err, c)
+	}
+
 	resp, err := mg.NodeClient.Marshal(data)
 	if err != nil {
 		mg.Logger.Warn(err)
