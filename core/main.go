@@ -92,7 +92,7 @@ func (mg *MinterGate) EstimateCoinBuy(coinToSell, coinIdToSell, coinToBuy, coinI
 		return nil, err
 	}
 
-	return &domain.CoinEstimate{Value: result.WillPay, Commission: result.Commission}, nil
+	return &domain.CoinEstimate{Value: result.WillPay, Commission: result.Commission, SwapFrom: result.SwapFrom.String()}, nil
 }
 
 //Return estimate of sell coin
@@ -131,7 +131,7 @@ func (mg *MinterGate) EstimateCoinSell(coinToSell, coinIdToSell, coinToBuy, coin
 		return nil, err
 	}
 
-	return &domain.CoinEstimate{Value: result.WillGet, Commission: result.Commission}, nil
+	return &domain.CoinEstimate{Value: result.WillGet, Commission: result.Commission, SwapFrom: result.SwapFrom.String()}, nil
 }
 
 //Return estimate of sell coin
@@ -175,7 +175,7 @@ func (mg *MinterGate) EstimateCoinSellAll(coinToSell, coinIdToSell, coinToBuy, c
 		return nil, err
 	}
 
-	return &domain.CoinEstimate{Value: result.WillGet}, nil
+	return &domain.CoinEstimate{Value: result.WillGet, SwapFrom: result.SwapFrom.String()}, nil
 }
 
 //Return nonce for address
