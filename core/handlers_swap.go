@@ -37,7 +37,7 @@ func (mg *MinterGate) SwapPoolHandler(c *gin.Context) {
 			c.JSON(http.StatusOK, json.RawMessage(resp))
 		}
 	} else {
-		data, err := mg.NodeClient.PairSwapPool(coin0, coin1)
+		data, err := mg.NodeClient.SwapPool(coin0, coin1)
 		resp, err := mg.NodeClient.Marshal(data)
 		if err != nil {
 			mg.Logger.Warn(err)
