@@ -1,6 +1,7 @@
 package api_v1
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/MinterTeam/explorer-gate/v2/core"
 	"github.com/MinterTeam/explorer-gate/v2/errors"
@@ -49,7 +50,22 @@ func EstimateCoinBuy(c *gin.Context) {
 		swapFrom = "optimal"
 	}
 
-	estimate, err := gate.EstimateCoinBuy(coinToSell, "", coinToBuy, "", value, swapFrom)
+	var route []uint64
+	if strings.TrimSpace(c.Query(`route`)) != "" {
+		err := json.Unmarshal([]byte(strings.TrimSpace(c.Query(`route`))), &route)
+		if err != nil {
+			gate.Logger.WithFields(logrus.Fields{
+				"coinToSell": coinToSell,
+				"coinToBuy":  coinToBuy,
+				"value":      value,
+			}).Warn(err)
+
+			errors.SetErrorResponse(err, c)
+			return
+		}
+	}
+
+	estimate, err := gate.EstimateCoinBuy(coinToSell, "", coinToBuy, "", value, swapFrom, route)
 	if err != nil {
 		gate.Logger.WithFields(logrus.Fields{
 			"coinToSell": coinToSell,
@@ -82,7 +98,22 @@ func EstimateCoinSell(c *gin.Context) {
 		swapFrom = "optimal"
 	}
 
-	estimate, err := gate.EstimateCoinSell(coinToSell, "", coinToBuy, "", value, swapFrom)
+	var route []uint64
+	if strings.TrimSpace(c.Query(`route`)) != "" {
+		err := json.Unmarshal([]byte(strings.TrimSpace(c.Query(`route`))), &route)
+		if err != nil {
+			gate.Logger.WithFields(logrus.Fields{
+				"coinToSell": coinToSell,
+				"coinToBuy":  coinToBuy,
+				"value":      value,
+			}).Warn(err)
+
+			errors.SetErrorResponse(err, c)
+			return
+		}
+	}
+
+	estimate, err := gate.EstimateCoinSell(coinToSell, "", coinToBuy, "", value, swapFrom, route)
 	if err != nil {
 		gate.Logger.WithFields(logrus.Fields{
 			"coinToSell": coinToSell,
