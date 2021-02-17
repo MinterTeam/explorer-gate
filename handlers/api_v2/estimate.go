@@ -77,7 +77,11 @@ func EstimateCoinBuy(c *gin.Context) {
 		}).Warn(err)
 		errors.SetErrorResponse(err, c)
 	} else {
-		c.JSON(http.StatusOK, estimate)
+		c.JSON(http.StatusOK, gin.H{
+			"commission": estimate.Commission,
+			"will_pay":   estimate.Value,
+			"swap_from":  estimate.SwapFrom,
+		})
 	}
 }
 
@@ -128,7 +132,11 @@ func EstimateCoinSell(c *gin.Context) {
 
 		errors.SetErrorResponse(err, c)
 	} else {
-		c.JSON(http.StatusOK, estimate)
+		c.JSON(http.StatusOK, gin.H{
+			"commission": estimate.Commission,
+			"will_get":   estimate.Value,
+			"swap_from":  estimate.SwapFrom,
+		})
 	}
 }
 
@@ -177,7 +185,10 @@ func EstimateCoinSellAll(c *gin.Context) {
 
 		errors.SetErrorResponse(err, c)
 	} else {
-		c.JSON(http.StatusOK, estimate)
+		c.JSON(http.StatusOK, gin.H{
+			"will_get":  estimate.Value,
+			"swap_from": estimate.SwapFrom,
+		})
 	}
 }
 
