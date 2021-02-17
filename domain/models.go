@@ -1,7 +1,7 @@
 package domain
 
 type CoinEstimate struct {
-	Value      string
-	Commission string
-	SwapFrom   string
+	Value      string `json:"value"`
+	Commission string `json:"commission"`
+	SwapFrom   string `json:"swap_from"`
 }
