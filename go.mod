@@ -1,6 +1,6 @@
 module github.com/MinterTeam/explorer-gate/v2
 
-go 1.15
+go 1.16
 
 require (
 	github.com/Depado/ginprom v1.2.0

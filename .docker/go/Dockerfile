@@ -1,4 +1,4 @@
-FROM golang:1.15.6-alpine
+FROM golang:1.16.0-alpine
 
 RUN apk add --no-cache make gcc musl-dev linux-headers
 RUN go get -u github.com/go-delve/delve/cmd/dlv

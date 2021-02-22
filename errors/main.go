@@ -116,7 +116,7 @@ func formatErrorMessage(errorString string) (string, error) {
 	bip := big.NewFloat(0.000000000000000001)
 	zero := big.NewFloat(0)
 
-	re := regexp.MustCompile(`(?mi)(Has:|required|Wanted|Expected|maximum|spend|minimum|get|buy|only) -*(\d+)`)
+	re := regexp.MustCompile(`(?mi)(Has:|required|Wanted|Expected|maximum|spend|minimum|get|buy|only|add) -*(\d+)`)
 	matches := re.FindAllStringSubmatch(errorString, -1)
 
 	if matches != nil {
