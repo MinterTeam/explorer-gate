@@ -1,6 +1,7 @@
 package api_v1
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/MinterTeam/explorer-gate/v2/core"
 	"github.com/MinterTeam/explorer-gate/v2/errors"
@@ -43,7 +44,28 @@ func EstimateCoinBuy(c *gin.Context) {
 	coinToSell := strings.TrimSpace(c.Query(`coinToSell`))
 	coinToBuy := strings.TrimSpace(c.Query(`coinToBuy`))
 	value := strings.TrimSpace(c.Query(`valueToBuy`))
-	estimate, err := gate.EstimateCoinBuy(coinToSell, "", coinToBuy, "", value)
+
+	swapFrom := strings.TrimSpace(c.Query(`swap_from`))
+	if swapFrom == "" {
+		swapFrom = "optimal"
+	}
+
+	var route []uint64
+	if strings.TrimSpace(c.Query(`route`)) != "" {
+		err := json.Unmarshal([]byte(strings.TrimSpace(c.Query(`route`))), &route)
+		if err != nil {
+			gate.Logger.WithFields(logrus.Fields{
+				"coinToSell": coinToSell,
+				"coinToBuy":  coinToBuy,
+				"value":      value,
+			}).Warn(err)
+
+			errors.SetErrorResponse(err, c)
+			return
+		}
+	}
+
+	estimate, err := gate.EstimateCoinBuy(coinToSell, "", coinToBuy, "", value, swapFrom, route)
 	if err != nil {
 		gate.Logger.WithFields(logrus.Fields{
 			"coinToSell": coinToSell,
@@ -70,7 +92,28 @@ func EstimateCoinSell(c *gin.Context) {
 	coinToSell := strings.TrimSpace(c.Query(`coinToSell`))
 	coinToBuy := strings.TrimSpace(c.Query(`coinToBuy`))
 	value := strings.TrimSpace(c.Query(`valueToSell`))
-	estimate, err := gate.EstimateCoinSell(coinToSell, "", coinToBuy, "", value)
+
+	swapFrom := strings.TrimSpace(c.Query(`swap_from`))
+	if swapFrom == "" {
+		swapFrom = "optimal"
+	}
+
+	var route []uint64
+	if strings.TrimSpace(c.Query(`route`)) != "" {
+		err := json.Unmarshal([]byte(strings.TrimSpace(c.Query(`route`))), &route)
+		if err != nil {
+			gate.Logger.WithFields(logrus.Fields{
+				"coinToSell": coinToSell,
+				"coinToBuy":  coinToBuy,
+				"value":      value,
+			}).Warn(err)
+
+			errors.SetErrorResponse(err, c)
+			return
+		}
+	}
+
+	estimate, err := gate.EstimateCoinSell(coinToSell, "", coinToBuy, "", value, swapFrom, route)
 	if err != nil {
 		gate.Logger.WithFields(logrus.Fields{
 			"coinToSell": coinToSell,

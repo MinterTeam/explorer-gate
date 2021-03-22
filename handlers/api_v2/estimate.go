@@ -1,6 +1,7 @@
 package api_v2
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/MinterTeam/explorer-gate/v2/core"
 	"github.com/MinterTeam/explorer-gate/v2/errors"
@@ -42,12 +43,32 @@ func EstimateCoinBuy(c *gin.Context) {
 		})
 		return
 	}
+
+	swapFrom := strings.TrimSpace(c.Query(`swap_from`))
+	if swapFrom == "" {
+		swapFrom = "optimal"
+	}
+
 	coinToSell := strings.TrimSpace(c.Query(`coin_to_sell`))
 	coinIdToSell := strings.TrimSpace(c.Query(`coin_id_to_sell`))
 	coinToBuy := strings.TrimSpace(c.Query(`coin_to_buy`))
 	coinIdToBuy := strings.TrimSpace(c.Query(`coin_id_to_buy`))
 	value := strings.TrimSpace(c.Query(`value_to_buy`))
-	estimate, err := gate.EstimateCoinBuy(coinToSell, coinIdToSell, coinToBuy, coinIdToBuy, value)
+	var route []uint64
+	if strings.TrimSpace(c.Query(`route`)) != "" {
+		err := json.Unmarshal([]byte(strings.TrimSpace(c.Query(`route`))), &route)
+		if err != nil {
+			gate.Logger.WithFields(logrus.Fields{
+				"coinToSell": coinToSell,
+				"coinToBuy":  coinToBuy,
+				"value":      value,
+			}).Warn(err)
+
+			errors.SetErrorResponse(err, c)
+			return
+		}
+	}
+	estimate, err := gate.EstimateCoinBuy(coinToSell, coinIdToSell, coinToBuy, coinIdToBuy, value, swapFrom, route)
 	if err != nil {
 		gate.Logger.WithFields(logrus.Fields{
 			"coinToSell": coinToSell,
@@ -59,6 +80,7 @@ func EstimateCoinBuy(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
 			"commission": estimate.Commission,
 			"will_pay":   estimate.Value,
+			"swap_from":  estimate.SwapFrom,
 		})
 	}
 }
@@ -71,6 +93,12 @@ func EstimateCoinSell(c *gin.Context) {
 		})
 		return
 	}
+
+	swapFrom := strings.TrimSpace(c.Query(`swap_from`))
+	if swapFrom == "" {
+		swapFrom = "optimal"
+	}
+
 	coinToSell := strings.TrimSpace(c.Query(`coin_to_sell`))
 	coinToBuy := strings.TrimSpace(c.Query(`coin_to_buy`))
 
@@ -78,7 +106,23 @@ func EstimateCoinSell(c *gin.Context) {
 	coinIdToBuy := strings.TrimSpace(c.Query(`coin_id_to_buy`))
 
 	value := strings.TrimSpace(c.Query(`value_to_sell`))
-	estimate, err := gate.EstimateCoinSell(coinToSell, coinIdToSell, coinToBuy, coinIdToBuy, value)
+
+	var route []uint64
+	if strings.TrimSpace(c.Query(`route`)) != "" {
+		err := json.Unmarshal([]byte(strings.TrimSpace(c.Query(`route`))), &route)
+		if err != nil {
+			gate.Logger.WithFields(logrus.Fields{
+				"coinToSell": coinToSell,
+				"coinToBuy":  coinToBuy,
+				"value":      value,
+			}).Warn(err)
+
+			errors.SetErrorResponse(err, c)
+			return
+		}
+	}
+
+	estimate, err := gate.EstimateCoinSell(coinToSell, coinIdToSell, coinToBuy, coinIdToBuy, value, swapFrom, route)
 	if err != nil {
 		gate.Logger.WithFields(logrus.Fields{
 			"coinToSell": coinToSell,
@@ -91,6 +135,7 @@ func EstimateCoinSell(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
 			"commission": estimate.Commission,
 			"will_get":   estimate.Value,
+			"swap_from":  estimate.SwapFrom,
 		})
 	}
 }
@@ -110,7 +155,27 @@ func EstimateCoinSellAll(c *gin.Context) {
 	gasPrice := strings.TrimSpace(c.Query(`gas_price`))
 	value := strings.TrimSpace(c.Query(`value_to_sell`))
 
-	estimate, err := gate.EstimateCoinSellAll(coinToSell, coinIdToSell, coinToBuy, coinIdToBuy, value, gasPrice)
+	swapFrom := strings.TrimSpace(c.Query(`swap_from`))
+	if swapFrom == "" {
+		swapFrom = "optimal"
+	}
+
+	var route []uint64
+	if strings.TrimSpace(c.Query(`route`)) != "" {
+		err := json.Unmarshal([]byte(strings.TrimSpace(c.Query(`route`))), &route)
+		if err != nil {
+			gate.Logger.WithFields(logrus.Fields{
+				"coinToSell": coinToSell,
+				"coinToBuy":  coinToBuy,
+				"value":      value,
+			}).Warn(err)
+
+			errors.SetErrorResponse(err, c)
+			return
+		}
+	}
+
+	estimate, err := gate.EstimateCoinSellAll(coinToSell, coinIdToSell, coinToBuy, coinIdToBuy, value, gasPrice, swapFrom, route)
 	if err != nil {
 		gate.Logger.WithFields(logrus.Fields{
 			"coinToSell": coinToSell,
@@ -121,7 +186,8 @@ func EstimateCoinSellAll(c *gin.Context) {
 		errors.SetErrorResponse(err, c)
 	} else {
 		c.JSON(http.StatusOK, gin.H{
-			"will_get": estimate.Value,
+			"will_get":  estimate.Value,
+			"swap_from": estimate.SwapFrom,
 		})
 	}
 }
