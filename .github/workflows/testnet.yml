@@ -31,13 +31,19 @@ jobs:
           TAG_NAME: ${{ github.sha }}
           DOCKER_BUILD_ARGS: --build-arg VERSION=${{ steps.version.outputs.text }}
 
-      - name: Deploy
-        uses: wahyd4/kubectl-helm-action@master
-        env:
-          KUBE_CONFIG_DATA: ${{ secrets.KUBE_CONFIG_DATA }}
-          TAG_NAME: ${{ github.sha }}
+      - name: DigitalOcean Kubernetes
+        uses: matootie/dokube@master
         with:
-          args: helm upgrade gate-chilinet chart/ --reuse-values --atomic --timeout 100s --set image.tag=$TAG_NAME
+          personalAccessToken: ${{ secrets.DIGITALOCEAN_TOKEN }}
+          clusterName: k8s-prod-do
+
+      - name: Install helm
+        run: wget https://get.helm.sh/helm-v3.3.4-linux-amd64.tar.gz &> /dev/null && tar xvzf helm-v3.3.4-linux-amd64.tar.gz && chmod 777 linux-amd64/helm && ./linux-amd64/helm ls -n testnet-reserved
+
+      - name: Deploy to DO
+        env:
+          TAG_NAME: ${{ github.sha }}
+        run: ./linux-amd64/helm upgrade -n testnet-reserved -i gate chart/ --atomic --timeout 100s --set image.tag=$TAG_NAME --reuse-values
 
       - name: notification
         if: cancelled() == false
