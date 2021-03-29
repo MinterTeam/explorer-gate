@@ -5,8 +5,8 @@ go 1.16
 require (
 	github.com/Depado/ginprom v1.2.0
 	github.com/MinterTeam/minter-go-sdk v1.0.8
-	github.com/MinterTeam/minter-go-sdk/v2 v2.2.0-alpha1.0.20210303135204-27811167e36c
-	github.com/MinterTeam/node-grpc-gateway v1.2.2-0.20210303134153-03f03059d078
+	github.com/MinterTeam/minter-go-sdk/v2 v2.2.0-alpha1.0.20210327021641-068a106a883b
+	github.com/MinterTeam/node-grpc-gateway v1.2.2-0.20210327013510-012fe2754dfc
 	github.com/fortytw2/leaktest v1.3.0 // indirect
 	github.com/gin-contrib/cors v1.3.0
 	github.com/gin-gonic/gin v1.5.0
