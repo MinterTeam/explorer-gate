@@ -29,3 +29,5 @@ __debug_bin
 *.tmp.yaml
 *.tmp.http
 http-client.private.env.json
+values.*.yaml
+go.sum
