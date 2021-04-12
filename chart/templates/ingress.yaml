@@ -19,7 +19,15 @@ spec:
               serviceName: "{{ include "chart.fullname" . }}"
               servicePort: {{ .Values.service.port }}
             path: /
+    - host: "{{ .Values.ingress.domain2 }}"
+      http:
+        paths:
+          - backend:
+              serviceName: "{{ include "chart.fullname" . }}"
+              servicePort: {{ .Values.service.port }}
+            path: /
   tls:
     - hosts:
         - "{{ .Values.ingress.domain }}"
+        - "{{ .Values.ingress.domain2 }}"
       secretName: {{ include "chart.fullname" . }}
