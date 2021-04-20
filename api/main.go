@@ -74,6 +74,10 @@ func SetupRouter(gateService *core.MinterGate, pubSubServer *pubsub.Server) *gin
 		apiV2.GET(`/coin_info_by_id/:id`, api_v2.CoinInfoById)
 		apiV2.GET(`/send_transaction/:tx`, api_v2.PushTransaction)
 		apiV2.POST(`/send_transaction`, api_v2.PostTransaction)
+
+		apiV2.GET(`/swap_pool/:coin0/:coin1`, gateService.SwapPoolHandler)
+		apiV2.GET(`/swap_pool/:coin0/:coin1/*provider`, gateService.SwapPoolHandler)
+		apiV2.GET(`/price_commissions`, gateService.PriceCommissionsHandler)
 	}
 	// Default handler 404
 	router.NoRoute(func(c *gin.Context) {

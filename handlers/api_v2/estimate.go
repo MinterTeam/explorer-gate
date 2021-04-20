@@ -7,6 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
 	"net/http"
+	"strconv"
 	"strings"
 )
 
@@ -35,6 +36,7 @@ func EstimateTxCommission(c *gin.Context) {
 }
 
 func EstimateCoinBuy(c *gin.Context) {
+	var err error
 	gate, ok := c.MustGet("gate").(*core.MinterGate)
 	if !ok {
 		c.JSON(http.StatusRequestTimeout, gin.H{
@@ -42,12 +44,65 @@ func EstimateCoinBuy(c *gin.Context) {
 		})
 		return
 	}
+
+	swapFrom := strings.TrimSpace(c.Query(`swap_from`))
+	if swapFrom == "" {
+		swapFrom = "optimal"
+	}
+
 	coinToSell := strings.TrimSpace(c.Query(`coin_to_sell`))
 	coinIdToSell := strings.TrimSpace(c.Query(`coin_id_to_sell`))
 	coinToBuy := strings.TrimSpace(c.Query(`coin_to_buy`))
 	coinIdToBuy := strings.TrimSpace(c.Query(`coin_id_to_buy`))
 	value := strings.TrimSpace(c.Query(`value_to_buy`))
-	estimate, err := gate.EstimateCoinBuy(coinToSell, coinIdToSell, coinToBuy, coinIdToBuy, value)
+
+	var route []uint64
+	routes := c.QueryArray(`route`)
+	if len(routes) == 0 {
+		routes = c.QueryArray(`route[]`)
+	}
+	for _, r := range routes {
+		cId, err := strconv.ParseUint(r, 10, 64)
+		if err != nil {
+			gate.Logger.WithFields(logrus.Fields{
+				"coinToSell": coinToSell,
+				"coinToBuy":  coinToBuy,
+				"value":      value,
+			}).Warn(err)
+			errors.SetErrorResponse(err, c)
+			return
+		}
+		route = append(route, cId)
+	}
+
+	commissionIdCoin := uint64(0)
+	commissionCoin := strings.TrimSpace(c.Query(`coin_commission`))
+	if strings.TrimSpace(c.Query(`coin_id_commission`)) != "" {
+		commissionIdCoin, err = strconv.ParseUint(c.Query(`coin_id_commission`), 10, 64)
+		if err != nil {
+			gate.Logger.WithFields(logrus.Fields{
+				"coinToSell": coinToSell,
+				"coinToBuy":  coinToBuy,
+				"value":      value,
+			}).Warn(err)
+			errors.SetErrorResponse(err, c)
+			return
+		}
+	} else if commissionCoin != "" {
+		coinInfo, err := gate.CoinInfo(commissionCoin)
+		if err != nil {
+			gate.Logger.WithFields(logrus.Fields{
+				"coinToSell": coinToSell,
+				"coinToBuy":  coinToBuy,
+				"value":      value,
+			}).Warn(err)
+			errors.SetErrorResponse(err, c)
+			return
+		}
+		commissionIdCoin = coinInfo.Id
+	}
+
+	estimate, err := gate.EstimateCoinBuy(coinToSell, coinIdToSell, coinToBuy, coinIdToBuy, value, swapFrom, commissionIdCoin, route)
 	if err != nil {
 		gate.Logger.WithFields(logrus.Fields{
 			"coinToSell": coinToSell,
@@ -59,11 +114,13 @@ func EstimateCoinBuy(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
 			"commission": estimate.Commission,
 			"will_pay":   estimate.Value,
+			"swap_from":  estimate.SwapFrom,
 		})
 	}
 }
 
 func EstimateCoinSell(c *gin.Context) {
+	var err error
 	gate, ok := c.MustGet("gate").(*core.MinterGate)
 	if !ok {
 		c.JSON(http.StatusRequestTimeout, gin.H{
@@ -71,6 +128,12 @@ func EstimateCoinSell(c *gin.Context) {
 		})
 		return
 	}
+
+	swapFrom := strings.TrimSpace(c.Query(`swap_from`))
+	if swapFrom == "" {
+		swapFrom = "optimal"
+	}
+
 	coinToSell := strings.TrimSpace(c.Query(`coin_to_sell`))
 	coinToBuy := strings.TrimSpace(c.Query(`coin_to_buy`))
 
@@ -78,7 +141,54 @@ func EstimateCoinSell(c *gin.Context) {
 	coinIdToBuy := strings.TrimSpace(c.Query(`coin_id_to_buy`))
 
 	value := strings.TrimSpace(c.Query(`value_to_sell`))
-	estimate, err := gate.EstimateCoinSell(coinToSell, coinIdToSell, coinToBuy, coinIdToBuy, value)
+
+	var route []uint64
+	routes := c.QueryArray(`route`)
+	if len(routes) == 0 {
+		routes = c.QueryArray(`route[]`)
+	}
+	for _, r := range routes {
+		cId, err := strconv.ParseUint(r, 10, 64)
+		if err != nil {
+			gate.Logger.WithFields(logrus.Fields{
+				"coinToSell": coinToSell,
+				"coinToBuy":  coinToBuy,
+				"value":      value,
+			}).Warn(err)
+			errors.SetErrorResponse(err, c)
+			return
+		}
+		route = append(route, cId)
+	}
+
+	commissionIdCoin := uint64(0)
+	commissionCoin := strings.TrimSpace(c.Query(`coin_commission`))
+	if strings.TrimSpace(c.Query(`coin_id_commission`)) != "" {
+		commissionIdCoin, err = strconv.ParseUint(c.Query(`coin_id_commission`), 10, 64)
+		if err != nil {
+			gate.Logger.WithFields(logrus.Fields{
+				"coinToSell": coinToSell,
+				"coinToBuy":  coinToBuy,
+				"value":      value,
+			}).Warn(err)
+			errors.SetErrorResponse(err, c)
+			return
+		}
+	} else if commissionCoin != "" {
+		coinInfo, err := gate.CoinInfo(commissionCoin)
+		if err != nil {
+			gate.Logger.WithFields(logrus.Fields{
+				"coinToSell": coinToSell,
+				"coinToBuy":  coinToBuy,
+				"value":      value,
+			}).Warn(err)
+			errors.SetErrorResponse(err, c)
+			return
+		}
+		commissionIdCoin = coinInfo.Id
+	}
+
+	estimate, err := gate.EstimateCoinSell(coinToSell, coinIdToSell, coinToBuy, coinIdToBuy, value, swapFrom, commissionIdCoin, route)
 	if err != nil {
 		gate.Logger.WithFields(logrus.Fields{
 			"coinToSell": coinToSell,
@@ -91,6 +201,7 @@ func EstimateCoinSell(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
 			"commission": estimate.Commission,
 			"will_get":   estimate.Value,
+			"swap_from":  estimate.SwapFrom,
 		})
 	}
 }
@@ -110,7 +221,31 @@ func EstimateCoinSellAll(c *gin.Context) {
 	gasPrice := strings.TrimSpace(c.Query(`gas_price`))
 	value := strings.TrimSpace(c.Query(`value_to_sell`))
 
-	estimate, err := gate.EstimateCoinSellAll(coinToSell, coinIdToSell, coinToBuy, coinIdToBuy, value, gasPrice)
+	swapFrom := strings.TrimSpace(c.Query(`swap_from`))
+	if swapFrom == "" {
+		swapFrom = "optimal"
+	}
+
+	var route []uint64
+	routes := c.QueryArray(`route`)
+	if len(routes) == 0 {
+		routes = c.QueryArray(`route[]`)
+	}
+	for _, r := range routes {
+		cId, err := strconv.ParseUint(r, 10, 64)
+		if err != nil {
+			gate.Logger.WithFields(logrus.Fields{
+				"coinToSell": coinToSell,
+				"coinToBuy":  coinToBuy,
+				"value":      value,
+			}).Warn(err)
+			errors.SetErrorResponse(err, c)
+			return
+		}
+		route = append(route, cId)
+	}
+
+	estimate, err := gate.EstimateCoinSellAll(coinToSell, coinIdToSell, coinToBuy, coinIdToBuy, value, gasPrice, swapFrom, route)
 	if err != nil {
 		gate.Logger.WithFields(logrus.Fields{
 			"coinToSell": coinToSell,
@@ -121,7 +256,8 @@ func EstimateCoinSellAll(c *gin.Context) {
 		errors.SetErrorResponse(err, c)
 	} else {
 		c.JSON(http.StatusOK, gin.H{
-			"will_get": estimate.Value,
+			"will_get":  estimate.Value,
+			"swap_from": estimate.SwapFrom,
 		})
 	}
 }
