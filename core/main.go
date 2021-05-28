@@ -190,7 +190,6 @@ func (mg *MinterGate) GetNonce(address string) (uint64, error) {
 	return nonce - 1, nil
 }
 
-//Return nonce for address
 func (mg *MinterGate) GetMinGas() (string, error) {
 	gasPrice, err := mg.NodeClient.MinGasPrice()
 	if err != nil {

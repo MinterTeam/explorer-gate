@@ -80,7 +80,8 @@ func SetErrorResponse(err error, c *gin.Context) {
 	}
 
 	var result GateError
-	msg, e := formatErrorMessage(grpcErr.Message())
+	var msg string
+	var e error
 
 	code := fmt.Sprintf("%d", int(grpcErr.Code()))
 
@@ -96,6 +97,12 @@ func SetErrorResponse(err error, c *gin.Context) {
 				}
 			}
 		}
+	}
+
+	if isExceptFormatting(code) {
+		msg = grpcErr.Message()
+	} else {
+		msg, e = formatErrorMessage(grpcErr.Message())
 	}
 
 	if e != nil {
@@ -140,4 +147,17 @@ func formatErrorMessage(errorString string) (string, error) {
 		}
 	}
 	return errorString, nil
+}
+
+func isExceptFormatting(c string) bool {
+	code := make(map[string]string)
+	code["101"] = "unexpected nonce"
+	code["114"] = "gas price of tx is too low to be included in mempool"
+
+	for k := range code {
+		if k == c {
+			return true
+		}
+	}
+	return false
 }

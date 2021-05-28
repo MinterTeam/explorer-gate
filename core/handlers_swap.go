@@ -29,6 +29,11 @@ func (mg *MinterGate) SwapPoolHandler(c *gin.Context) {
 
 	if provider != "" {
 		data, err := mg.NodeClient.SwapPoolProvider(coin0, coin1, provider)
+		if err != nil {
+			mg.Logger.Error(err)
+			errors.SetErrorResponse(err, c)
+			return
+		}
 		resp, err := mg.NodeClient.Marshal(data)
 		if err != nil {
 			mg.Logger.Error(err)
