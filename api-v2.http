@@ -23,7 +23,7 @@ Cache-Control: no-cache
 Content-Type: application/json
 
 ### Estimate sell all coin
-GET {{host}}/api/v2/estimate_coin_sell_all?
+GET {{host}}/api/v2/estimate_coin_sell_all?coin_id_to_buy=0&coin_id_to_sell=1902&value_to_sell=1000000000000000000
 Accept: */*
 Cache-Control: no-cache
 Content-Type: application/json
