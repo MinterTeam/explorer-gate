@@ -31,7 +31,7 @@ func New(nodeApi *grpc_client.Client, e *pubsub.Server, logger *logrus.Entry) *M
 	}
 }
 
-//Send transaction to blockchain
+// TxPush Send transaction to blockchain
 //Return transaction hash
 func (mg *MinterGate) TxPush(tx string) (*string, error) {
 	result, err := mg.NodeClient.SendTransaction(tx)

@@ -11,7 +11,7 @@ Cache-Control: no-cache
 Content-Type: application/json
 
 ### Estimate buy coin
-GET {{host}}/api/v2/estimate_coin_buy?
+GET {{host}}/api/v2/estimate_coin_buy?coin_to_buy=MNT&value_to_buy=10000000000000000000&coin_to_sell=MUSDC&swap_from=pool
 Accept: */*
 Cache-Control: no-cache
 Content-Type: application/json
@@ -23,7 +23,7 @@ Cache-Control: no-cache
 Content-Type: application/json
 
 ### Estimate sell all coin
-GET {{host}}/api/v2/estimate_coin_sell_all?
+GET {{host}}/api/v2/estimate_coin_sell_all?coin_id_to_buy=0&coin_id_to_sell=1902&value_to_sell=1000000000000000000
 Accept: */*
 Cache-Control: no-cache
 Content-Type: application/json
@@ -41,7 +41,7 @@ Cache-Control: no-cache
 Content-Type: application/json
 
 ### Coin info
-GET {{host}}api/v2/coin_info/{{symbol}}
+GET {{host}}/api/v2/coin_info/{{symbol}}
 Accept: */*
 Cache-Control: no-cache
 Content-Type: application/json

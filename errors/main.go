@@ -114,7 +114,8 @@ func SetErrorResponse(err error, c *gin.Context) {
 			Data:    details,
 		}
 	}
-	c.JSON(http.StatusBadRequest, gin.H{
+
+	c.JSON(gerResponseCode(code), gin.H{
 		"error": result,
 	})
 }
@@ -160,4 +161,16 @@ func isExceptFormatting(c string) bool {
 		}
 	}
 	return false
+}
+
+func gerResponseCode(c string) int {
+	code := make(map[string]int)
+	code["102"] = http.StatusNotFound
+
+	for k, v := range code {
+		if k == c {
+			return v
+		}
+	}
+	return http.StatusBadRequest
 }
