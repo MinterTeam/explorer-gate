@@ -5,8 +5,8 @@ go 1.17
 require (
 	github.com/Depado/ginprom v1.2.0
 	github.com/MinterTeam/minter-go-sdk v1.0.8
-	github.com/MinterTeam/minter-go-sdk/v2 v2.4.1-0.20220222111347-67fbebbdf760
-	github.com/MinterTeam/node-grpc-gateway v1.5.2-0.20220222111111-70a755dd46ee
+	github.com/MinterTeam/minter-go-sdk/v2 v2.5.2
+	github.com/MinterTeam/node-grpc-gateway v1.6.1-0.20220405114733-63e3aa339814
 	github.com/gin-contrib/cors v1.3.0
 	github.com/gin-gonic/gin v1.7.7
 	github.com/go-resty/resty/v2 v2.7.0
@@ -14,7 +14,7 @@ require (
 	github.com/joho/godotenv v1.3.0
 	github.com/sirupsen/logrus v1.4.2
 	github.com/tendermint/tendermint v0.31.0
-	google.golang.org/grpc v1.42.0
+	google.golang.org/grpc v1.45.0
 )
 
 require (
@@ -32,7 +32,7 @@ require (
 	github.com/go-playground/validator/v10 v10.9.0 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/grpc-ecosystem/go-grpc-middleware v1.3.0 // indirect
-	github.com/grpc-ecosystem/grpc-gateway/v2 v2.7.1 // indirect
+	github.com/grpc-ecosystem/grpc-gateway/v2 v2.10.0 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/konsorten/go-windows-terminal-sequences v1.0.2 // indirect
 	github.com/kr/logfmt v0.0.0-20140226030751-b84e30acd515 // indirect
@@ -50,10 +50,10 @@ require (
 	github.com/tyler-smith/go-bip39 v1.1.0 // indirect
 	github.com/ugorji/go/codec v1.2.6 // indirect
 	golang.org/x/crypto v0.0.0-20211215153901-e495a2d5b3d3 // indirect
-	golang.org/x/net v0.0.0-20211216030914-fe4d6282115f // indirect
+	golang.org/x/net v0.0.0-20220127200216-cd36cc0744dd // indirect
 	golang.org/x/sys v0.0.0-20211216021012-1d35b9e2eb4e // indirect
 	golang.org/x/text v0.3.7 // indirect
-	google.golang.org/genproto v0.0.0-20211207154714-918901c715cf // indirect
+	google.golang.org/genproto v0.0.0-20220317150908-0efb43f6373e // indirect
 	google.golang.org/protobuf v1.27.1 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 )
