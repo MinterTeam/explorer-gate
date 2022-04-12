@@ -21,7 +21,23 @@ spec:
               serviceName: "{{ include "chart.fullname" . }}"
               servicePort: {{ .Values.service.port }}
             path: /
+    - host: "{{ .Values.ingress.domain2 }}"
+      http:
+        paths:
+          - backend:
+              serviceName: "{{ include "chart.fullname" . }}"
+              servicePort: {{ .Values.service.port }}
+            path: /
+    - host: "{{ .Values.ingress.domain3 }}"
+      http:
+        paths:
+          - backend:
+              serviceName: "{{ include "chart.fullname" . }}"
+              servicePort: {{ .Values.service.port }}
+            path: /
   tls:
     - hosts:
         - "{{ .Values.ingress.domain }}"
+        - "{{ .Values.ingress.domain2 }}"
+        - "{{ .Values.ingress.domain3 }}"
       secretName: {{ include "chart.fullname" . }}
