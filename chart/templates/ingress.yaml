@@ -11,7 +11,8 @@ metadata:
     cert-manager.io/cluster-issuer: letsencrypt-prod
     certmanager.k8s.io/cluster-issuer: letsencrypt-prod
     kubernetes.io/tls-acme: "true"
-
+    nginx.ingress.kubernetes.io/server-snippet: |
+      large_client_header_buffers 4 64k;
 spec:
   rules:
     - host: "{{ .Values.ingress.domain }}"
